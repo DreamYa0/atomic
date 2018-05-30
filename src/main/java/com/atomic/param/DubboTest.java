@@ -1,7 +1,8 @@
 package com.atomic.param;
 
 import com.alibaba.fastjson.JSON;
-import com.atomic.IDubboTest;
+import com.atomic.BaseUnitTest;
+import com.atomic.ITestBase;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.ExceptionUtils;
 import com.atomic.param.entity.MethodMeta;
@@ -29,7 +30,7 @@ import static com.atomic.param.StringUtils.transferMap2Bean;
  * @author dreamyao
  * @version 1.0 Created by dreamyao on 2017/5/29.
  */
-public abstract class DubboTest<T> extends BaseUnitTest implements IDubboTest {
+public abstract class DubboTest<T> extends BaseUnitTest implements ITestBase {
 
     @Override
     public void run(IHookCallBack callBack, ITestResult testResult) {

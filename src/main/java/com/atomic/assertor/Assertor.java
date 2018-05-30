@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * @author dreamyao
- * @title
+ * @title 通用断言接口
  * @Data 2018/5/19 下午8:47
  * @since 1.0.0
  */

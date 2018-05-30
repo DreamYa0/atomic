@@ -48,7 +48,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.atomic.AutoTest.generateAutoTestCases;
+import static com.atomic.param.AutoTest.generateAutoTestCases;
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
@@ -83,7 +83,7 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 @SqlConfig
 @Listeners({SaveResultListener.class, ReportListener.class, IntegrationTestRollBackListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
-public abstract class CommonTest<T> extends BaseUnitTest implements IDubboTest {
+public abstract class CommonTest<T> extends BaseUnitTest implements ITestBase {
 
     @BeforeClass(alwaysRun = true)
     protected void beforeClass() throws Exception {

@@ -1,6 +1,9 @@
-package com.atomic.param;
+package com.atomic;
 
 import com.atomic.listener.SoaMockListener;
+import com.atomic.param.Constants;
+import com.atomic.param.ParamUtils;
+import com.atomic.param.TestNGUtils;
 import com.atomic.util.CsvUtils;
 import com.atomic.util.ExcelUtils;
 import com.google.common.collect.Sets;

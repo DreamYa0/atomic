@@ -1,12 +1,10 @@
-package com.atomic;
+package com.atomic.param;
 
 
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.enums.AutoTestEnum;
 import com.atomic.enums.AutoTestMode;
 import com.atomic.exception.AutoTestException;
-import com.atomic.param.ParamUtils;
-import com.atomic.param.StringUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.values.AutoTestBigDecimalValues;
 import com.atomic.param.values.AutoTestBooleanValues;
