@@ -8,7 +8,7 @@ import java.util.Map;
  * @Data 2018/5/19 下午9:16
  * @since 1.0.0
  */
-public class DubboAssertor implements Assertor{
+public class UnitTestAssertor implements Assertor{
 
     @Override
     public void assertResult(Object result, Map<String, Object> context) {
