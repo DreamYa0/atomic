@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Zeratul-Suite" parallel="false" verbose="1">
+    <test name="Zeratul-Test">
+        <method-selectors>
+            <method-selector>
+                <selector-class name="com.atomic.listener.RunTestSelector" priority="-1"/>
+            </method-selector>
+        </method-selectors>
+        <packages>
+            <package name="com.atomic.autotest.*"/>
+        </packages>
+    </test>
+</suite>
