@@ -1,11 +1,8 @@
 package com.atomic.tools.sql;
 
-import com.alibaba.fastjson.JSON;
 import com.atomic.config.CenterConfig;
 import com.atomic.config.GlobalConfig;
-import com.atomic.enums.TestMode;
 import com.atomic.param.Constants;
-import com.google.common.collect.Lists;
 import org.assertj.db.type.Request;
 import org.assertj.db.type.Source;
 
@@ -39,17 +36,6 @@ public class SqlTools {
         GlobalConfig.load();//加载环境配置文件
         profile = GlobalConfig.getProfile();
         crateSqlTools();
-    }
-
-    public static void main(String[] args) throws Exception {
-        List<Map<String, Object>> list = Lists.newArrayList();
-        SqlTools sql = new SqlTools(TestMode.TEST_ONE.getName());
-        sql.connect("exchange_liantiao_test");
-        // String tableName = "mk_dealreq";
-        ResultSet rs = sql.getResult("select * from order_info  order by utc_create desc limit 1");
-        // list =  SqlTools.getListFromResultSet(rs);
-        System.out.println(JSON.toJSON(list));
-        System.out.println(JSON.toJSON(list));
     }
 
     private void crateSqlTools() {

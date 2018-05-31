@@ -117,21 +117,6 @@ public final class Constants {
     /** 预期值sql语句 */
     public static final String ASSERT_SQL = "assertSql";
 
-    /** Jira名称 */
-    public static final String JIRA_NAME = "jiraName";
-
-    /** Jira标签 */
-    public static final String LABELS = "labels";
-
-    /** Jira bug受理人 */
-    public static final String ASSIGNEE = "assignee";
-
-    /** Issue 类型 */
-    public static final String ISSUE_TYPE = "issueType";
-
-    /** Jira bug等级 */
-    public static final String PRIORITY = "priority";
-
     /** 运行指定测试包 */
     public static final String RUN_TEST_PACKAGES = "run.test.packages";
 
@@ -186,5 +171,6 @@ public final class Constants {
     /** 预防布环境 */
     public static final String PROFILE_TESTING = "testing";
 
+    /** 日期时间格式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 }

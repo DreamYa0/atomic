@@ -3,12 +3,11 @@ package com.atomic.listener;
 import com.atomic.exception.TestTimeException;
 import org.testng.ITestResult;
 import org.testng.collections.Lists;
-import org.testng.collections.Maps;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.util.stream.Collectors.toList;
 
@@ -20,8 +19,8 @@ import static java.util.stream.Collectors.toList;
  */
 public final class SaveRunTime {
 
-    private static List<Long> output = new Vector<>();
-    private static Map<Integer, List<Integer>> methodOutputMap = Maps.newHashMap();
+    private static List<Long> output = new CopyOnWriteArrayList<>();
+    private static ConcurrentMap<Integer, List<Integer>> methodOutputMap = new ConcurrentHashMap<>(32);
     private static ThreadLocal<List<Long>> orphanedOutput = new InheritableThreadLocal<>();
 
     private SaveRunTime() {

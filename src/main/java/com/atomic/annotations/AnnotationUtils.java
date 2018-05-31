@@ -4,11 +4,9 @@ import com.atomic.enums.AutoTestMode;
 import com.atomic.enums.CheckMessage;
 import com.atomic.enums.CheckMode;
 import com.atomic.exception.AnnotationException;
-import com.atomic.exception.ParameterException;
 import com.atomic.param.Constants;
 import com.atomic.param.MethodMetaUtils;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Component;
@@ -24,9 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-
-import static com.atomic.param.MethodMetaUtils.getTestMethod;
 
 /**
  * 通用注解工具类
@@ -380,36 +375,5 @@ public abstract class AnnotationUtils {
     public static Boolean isParallel(Method method) {
         Parallel parallel = method.getAnnotation(Parallel.class);
         return parallel != null;
-    }
-
-    /**
-     * 判断测试方法是否有@Jira注解
-     * @param testResult 测试上下文
-     * @return true or false
-     */
-    public static Boolean isJira(ITestResult testResult) {
-        Method method = getTestMethod(testResult);
-        Jira jira = method.getAnnotation(Jira.class);
-        return jira != null && jira.enabled();
-    }
-
-    /**
-     * 获取@Jira注解中的信息
-     * @param testResult 测试上下文
-     * @return @Jira注解中的信息
-     */
-    public static Map<String, String> getJiraInfo(ITestResult testResult) {
-        Method method = getTestMethod(testResult);
-        Map<String, String> jiraInfo = Maps.newHashMap();
-        Jira jira = method.getAnnotation(Jira.class);
-        if ("".equals(jira.jiraName()) || "".equals(jira.assignee())) {
-            throw new ParameterException("Jira名称或bug受理人不能为空！");
-        }
-        jiraInfo.put(Constants.JIRA_NAME, jira.jiraName());
-        jiraInfo.put(Constants.LABELS, jira.labels());
-        jiraInfo.put(Constants.ASSIGNEE, jira.assignee());
-        jiraInfo.put(Constants.ISSUE_TYPE, jira.issueType());
-        jiraInfo.put(Constants.PRIORITY, jira.priority());
-        return jiraInfo;
     }
 }

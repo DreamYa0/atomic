@@ -135,6 +135,18 @@ public final class ParamUtils {
     }
 
     /**
+     * 判断 excel 中是否有预期断言值
+     * @param param excel 入参
+     * @return 是否存在
+     */
+    public static boolean isExpectedResultNoNull(Map<String, Object> param) {
+        if (param.get(Constants.EXPECTED_RESULT) == null || "".equals(param.get(Constants.EXPECTED_RESULT))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * excel入参中是否包含sid参数
      * @param param 入参 map 集合
      * @return 是否有

@@ -7,15 +7,10 @@ import com.atomic.config.CenterConfig;
 import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.ParameterException;
-import com.atomic.listener.ReportListener;
-import com.atomic.listener.RollBackListener;
-import com.atomic.listener.SaveResultListener;
-import com.atomic.listener.ScenarioRollBackListener;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
-import com.atomic.tools.sql.SqlTools;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
@@ -25,10 +20,10 @@ import org.testng.IHookable;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.Listeners;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
@@ -71,10 +66,9 @@ import static java.nio.charset.Charset.defaultCharset;
  * @title REST风格接口测试基类
  * @Data 2018/05/30 10:48
  */
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
+// @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
 public abstract class BaseRestful extends BaseInterfaceTest implements IHookable, ITestBase {
 
-    protected final SqlTools sqlTools = new SqlTools();
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
 
     /**
@@ -100,7 +94,6 @@ public abstract class BaseRestful extends BaseInterfaceTest implements IHookable
 
     @AfterClass(alwaysRun = true)
     public void closeSqlTools() {
-        sqlTools.disconnect();
         newSqlTools.disconnect();
     }
 
@@ -203,7 +196,7 @@ public abstract class BaseRestful extends BaseInterfaceTest implements IHookable
      * @return boolean
      */
     private boolean isJsonContext(Map<String, Object> param) {
-        if ("application/json".equalsIgnoreCase(param.get("httpContentType").toString())) {
+        if (Objects.nonNull(param.get("httpContentType")) && "application/json".equalsIgnoreCase(param.get("httpContentType").toString())) {
             return true;
         }
         return false;
