@@ -9,12 +9,12 @@ package com.atomic.enums;
 public class Data {
 
     /**
-     * dubbo接口串行执行数据源名称
+     * 接口串行执行数据源名称
      */
     public static final String SINGLE = "excel";
 
     /**
-     * dubbo接口并行执行数据源名称
+     * 接口并行执行数据源名称
      */
     public static final String PARALLEL = "parallelExcel";
 }

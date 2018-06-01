@@ -1,6 +1,8 @@
 package com.atomic.param;
 
+import com.atomic.annotations.AnnotationUtils;
 import com.atomic.util.ReflectionUtils;
+import com.atomic.util.SaveResultUtils;
 import org.testng.ITestResult;
 
 import java.lang.reflect.Method;
@@ -81,5 +83,37 @@ public final class TestNGUtils {
      */
     public static String getHttpMethod(ITestResult testResult) {
         return testResult.getTestClass().getRealClass().getSimpleName();
+    }
+
+    /**
+     * 获取入参
+     * @param testResult 测试结果视图
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> getParamContext(ITestResult testResult) {
+        return (Map<String, Object>) testResult.getParameters()[0];
+    }
+
+    /**
+     * 注入场景测试所需要的依赖方法的返回结果
+     * @param iTestResult 测试结果上下问
+     */
+    public static void injectScenarioReturnResult(ITestResult iTestResult, Map<String, Object> context) {
+        //获取接口所依赖的返回值并注入到context中
+        String[] dependsOnMethodNames = AnnotationUtils.getDependsOnMethods(iTestResult);
+        if (dependsOnMethodNames != null && dependsOnMethodNames.length > 0) {
+            for (String dependsOnMethodName : dependsOnMethodNames) {
+                Object dependMethodReturn;
+                if (ParamUtils.isDependencyIndexNoNull(context)) {
+                    dependMethodReturn = SaveResultUtils.getTestResultInCache(dependsOnMethodName, context.get(Constants.DEPENDENCY_INDEX));
+                } else {
+                    dependMethodReturn = SaveResultUtils.getTestResultInCache(dependsOnMethodName, context.get(Constants.CASE_INDEX));
+                }
+                if (dependMethodReturn != null) {
+                    context.put(dependsOnMethodName, dependMethodReturn);
+                }
+            }
+        }
     }
 }

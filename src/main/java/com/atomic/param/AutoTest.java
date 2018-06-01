@@ -42,7 +42,6 @@ import static com.atomic.exception.ThrowException.throwNewException;
 import static com.atomic.param.Constants.DATE_FORMAT;
 import static com.atomic.param.MethodMetaUtils.getMethodMeta;
 import static com.atomic.param.MethodMetaUtils.getTestMethod;
-import static com.atomic.param.ParamUtils.getParamContext;
 import static com.atomic.param.ParamUtils.getParamContextWithoutExtraInfo;
 import static com.atomic.param.ParamUtils.getParamName;
 import static com.atomic.param.ParamUtils.isParamTypeExtendsBaseRequest;
@@ -123,7 +122,7 @@ public class AutoTest {
      * @return
      */
     public static List<Map<String, Object>> generateAutoTestCases(ITestResult testResult, Object testInstance) throws Exception {
-        Map<String, Object> param = getParamContext(testResult);
+        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         MethodMeta methodMeta = getMethodMeta(param, testResult, testInstance);
         Type[] parameterTypes = methodMeta.getParamTypes();
         List<AutoTest.AutoTestItem> autoTestItemList = Lists.newArrayList();
@@ -144,7 +143,7 @@ public class AutoTest {
      * @return
      */
     public static List<Map<String, Object>> generateAutoTestCases(ITestResult testResult, Class interfaceType, String testMethodName, CompletableFuture<Object> future) throws Exception {
-        Map<String, Object> param = getParamContext(testResult);
+        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         MethodMeta methodMeta = getMethodMeta(testResult, interfaceType, testMethodName, param, future);
         Type[] parameterTypes = methodMeta.getParamTypes();
         List<AutoTestItem> autoTestItemList = Lists.newArrayList();

@@ -2,18 +2,15 @@ package com.atomic.param;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.ParameterException;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.util.ReflectionUtils;
-import com.atomic.util.SaveResultUtils;
 import com.coinsuper.common.model.BaseRequest;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.http.util.Args;
-import org.testng.ITestResult;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
@@ -186,16 +183,6 @@ public final class ParamUtils {
     }
 
     /**
-     * 获取入参
-     * @param testResult 测试结果视图
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> getParamContext(ITestResult testResult) {
-        return (Map<String, Object>) testResult.getParameters()[0];
-    }
-
-    /**
      * 获取第一个入参
      * @param param 入参
      * @param <T>
@@ -280,7 +267,7 @@ public final class ParamUtils {
         if (type instanceof Class) {
             return generateParametersNew(param, (Class) type, paramName);
         } else {
-            // 泛型
+            // 泛型，取出泛型对象中的参数
             Type parameterizedType = ((ParameterizedType) type).getActualTypeArguments()[0];
             return generateParametersNew(type, parameterizedType, param, paramName);
         }
@@ -423,33 +410,11 @@ public final class ParamUtils {
     }
 
     /**
-     * 注入场景测试所需要的依赖方法的返回结果
-     * @param iTestResult 测试结果上下问
-     */
-    public static void injectScenarioReturnResult(ITestResult iTestResult, Map<String, Object> context) {
-        //获取接口所依赖的返回值并注入到context中
-        String[] dependsOnMethodNames = AnnotationUtils.getDependsOnMethods(iTestResult);
-        if (dependsOnMethodNames != null && dependsOnMethodNames.length > 0) {
-            for (String dependsOnMethodName : dependsOnMethodNames) {
-                Object dependMethodReturn;
-                if (isDependencyIndexNoNull(context)) {
-                    dependMethodReturn = SaveResultUtils.getTestResultInCache(dependsOnMethodName, context.get(Constants.DEPENDENCY_INDEX));
-                } else {
-                    dependMethodReturn = SaveResultUtils.getTestResultInCache(dependsOnMethodName, context.get(Constants.CASE_INDEX));
-                }
-                if (dependMethodReturn != null) {
-                    context.put(dependsOnMethodName, dependMethodReturn);
-                }
-            }
-        }
-    }
-
-    /**
      * 判断excel测试用例中是否存在dependencyIndex字段
      * @param param 入参
      * @return
      */
-    private static boolean isDependencyIndexNoNull(Map<String, Object> param) {
+    public static boolean isDependencyIndexNoNull(Map<String, Object> param) {
         if (param.get(Constants.DEPENDENCY_INDEX) == null || "".equals(param.get(Constants.DEPENDENCY_INDEX))) {
             return false;
         }

@@ -34,11 +34,11 @@ public class DubboServiceStream {
         profile = GlobalConfig.getProfile();
         CenterConfig.newInstance().readPropertyConfig(profile);
         application = new ApplicationConfig();
-        application.setName("Zeratul_Config");
+        application.setName("atomic_Config");
         // 连接注册中心配置
         registry = new RegistryConfig();
         registry.setAddress(dubboRegistry[0]);
-        registry.setUsername("Zeratul");
+        registry.setUsername("atomic");
     }
 
     public static DubboServiceStream dubboServiceFactory() {

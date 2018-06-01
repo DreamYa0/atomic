@@ -1,28 +1,37 @@
-package com.atomic.tools.mock.dubbo;
+package com.atomic.tools.mock.spring;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.*;
+import com.alibaba.dubbo.rpc.Filter;
+import com.alibaba.dubbo.rpc.Invocation;
+import com.alibaba.dubbo.rpc.Invoker;
+import com.alibaba.dubbo.rpc.Result;
+import com.alibaba.dubbo.rpc.RpcException;
 import com.atomic.config.TestMethodMode;
 import com.atomic.tools.mock.data.DubboMockData2FileServiceImpl;
 import com.atomic.tools.mock.data.MockContext;
 import com.atomic.tools.mock.data.MockDataService;
 import com.atomic.tools.mock.dto.MockData4Rpc;
 import com.atomic.tools.mock.util.JacksonUtils;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 import org.testng.Reporter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @Activate(group = Constants.CONSUMER)
-public class UnitTestFilter4Dubbo implements Filter {
+public class UnitTestFilter4Spring implements Filter,HandlerInterceptor {
 
     private MockDataService mockDataService;
 
-    public UnitTestFilter4Dubbo() {
+    public UnitTestFilter4Spring() {
         mockDataService = DubboMockData2FileServiceImpl.getInstance();
     }
 
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
 
-        if ("com.alibaba.META_INF.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
+        if ("com.alibaba.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
             return invoker.invoke(invocation);
         }
 
@@ -60,4 +69,18 @@ public class UnitTestFilter4Dubbo implements Filter {
         return invoker.invoke(invocation);
     }
 
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        return false;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+
+    }
 }

@@ -5,7 +5,7 @@ import com.atomic.config.GlobalConfig;
 import com.atomic.exception.ListenerException;
 import com.atomic.param.Constants;
 import com.atomic.param.HandleMethodName;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.TestNGUtils;
 import com.atomic.param.entity.QaProject;
 import com.atomic.param.entity.QaResult;
 import com.atomic.util.CIDbUtils;
@@ -99,7 +99,7 @@ public class SaveResultListener extends TestListenerAdapter {
             int testStatus = result.getStatus();
             methodName = HandleMethodName.getTestMethodName(result);
             className = HandleMethodName.getTestClassName(result);
-            Map<String, Object> context = ParamUtils.getParamContext(result);
+            Map<String, Object> context = TestNGUtils.getParamContext(result);
             Object methodsReturn = context.get(Constants.RESULT_NAME);
             String caseName;
             if (context.get(Constants.CASE_NAME) == null) {

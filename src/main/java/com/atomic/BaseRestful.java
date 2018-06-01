@@ -40,8 +40,6 @@ import static com.atomic.param.Constants.LOGIN_URL;
 import static com.atomic.param.HandleMethodName.getTestMethodName;
 import static com.atomic.param.MethodMetaUtils.getTestMethod;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.getParamContext;
-import static com.atomic.param.ParamUtils.injectScenarioReturnResult;
 import static com.atomic.param.ParamUtils.isHttpContentTypeNoNull;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
@@ -67,7 +65,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @Data 2018/05/30 10:48
  */
 // @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
-public abstract class BaseRestful extends BaseInterfaceTest implements IHookable, ITestBase {
+public abstract class BaseRestful extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
 
@@ -112,9 +110,9 @@ public abstract class BaseRestful extends BaseInterfaceTest implements IHookable
     }
 
     private void startTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
-        Map<String, Object> context = getParamContext(testResult);
+        Map<String, Object> context = TestNGUtils.getParamContext(testResult);
         //注入场景测试所需要的依赖方法的返回结果
-        injectScenarioReturnResult(testResult, context);
+        TestNGUtils.injectScenarioReturnResult(testResult, context);
         // 先执行beforeTestMethod
         beforeTest(context);
         // 检查Http接口测试入参必填字段
@@ -196,10 +194,7 @@ public abstract class BaseRestful extends BaseInterfaceTest implements IHookable
      * @return boolean
      */
     private boolean isJsonContext(Map<String, Object> param) {
-        if (Objects.nonNull(param.get("httpContentType")) && "application/json".equalsIgnoreCase(param.get("httpContentType").toString())) {
-            return true;
-        }
-        return false;
+        return Objects.nonNull(param.get("httpContentType")) && "application/json".equalsIgnoreCase(param.get("httpContentType").toString());
     }
 
     private void execMethod(Response response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {

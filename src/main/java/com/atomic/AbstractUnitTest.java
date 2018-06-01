@@ -26,7 +26,7 @@ import java.util.Set;
 
 @ContextConfiguration(locations = {"/test-service.xml"})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, SoaMockListener.class})
-public abstract class BaseUnitTest extends AbstractTestNGSpringContextTests {
+public abstract class AbstractUnitTest extends AbstractTestNGSpringContextTests {
 
     @DataProvider(name = "excel")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {
@@ -82,7 +82,7 @@ public abstract class BaseUnitTest extends AbstractTestNGSpringContextTests {
             Iterator<Object[]> iterator = set.iterator();
             return iterator;
         } catch (Exception e) {
-            Reporter.log("[BaseUnitTest#dataProviderFromCsv()]:{dataProvider处理失败！}");
+            Reporter.log("[AbstractUnitTest#dataProviderFromCsv()]:{dataProvider处理失败！}");
             System.out.println("--------------dataProvider处理失败！----------------");
             e.printStackTrace();
             return set.iterator();

@@ -83,7 +83,7 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 @SqlConfig
 @Listeners({SaveResultListener.class, ReportListener.class, IntegrationTestRollBackListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
-public abstract class CommonTest<T> extends BaseUnitTest implements ITestBase {
+public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBase {
 
     @BeforeClass(alwaysRun = true)
     protected void beforeClass() throws Exception {
@@ -109,9 +109,9 @@ public abstract class CommonTest<T> extends BaseUnitTest implements ITestBase {
             throw new ParameterException("获取测试入参异常！");
         }
         // 获取param
-        Map<String, Object> param = getParamContext(testResult);
+        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         // 注入场景测试所需要的依赖方法的返回结果
-        injectScenarioReturnResult(testResult, param);
+        TestNGUtils.injectScenarioReturnResult(testResult, param);
         // 为mock注入caseIndex
         getContext().setCaseIndex((Integer) param.get(Constants.CASE_INDEX));
         if (getContext().getMode() == TestMethodMode.REC) {
@@ -161,7 +161,7 @@ public abstract class CommonTest<T> extends BaseUnitTest implements ITestBase {
         Map<String, List<Map<String, Object>>> exceptionMsgs = Maps.newHashMap();
         allTestCases.forEach(newParam -> {
             try {
-                MapUtils.mergeMap(getParamContext(testResult), newParam);// 合并参数
+                MapUtils.mergeMap(TestNGUtils.getParamContext(testResult), newParam);// 合并参数
                 startRunTest(newParam, callBack, testResult);
             } catch (Exception e) {
                 if (exception[0] == null) {
@@ -252,7 +252,7 @@ public abstract class CommonTest<T> extends BaseUnitTest implements ITestBase {
     }
 
     private void commonTest(final ITestResult testResult, final ITestResultCallback callback) throws Exception {
-        final Map<String, Object> param = getParamContext(testResult);
+        final Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         final MethodMeta methodMeta = getMethodMeta(param, testResult, this);
         // 先判断是不是foreach循环，不是就只执行一次
         Object value = param.get(methodMeta.getMultiTimeField());
@@ -292,9 +292,11 @@ public abstract class CommonTest<T> extends BaseUnitTest implements ITestBase {
     private void execMethod(ITestResult testResult, MethodMeta methodMeta, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
         Method method = methodMeta.getInterfaceMethod();
         Object interfaceObj = methodMeta.getInterfaceObj();
-        startTestTime(testResult);//记录方法调用开始时间
+        // 记录方法调用开始时间
+        startTestTime(testResult);
         Object result = method.invoke(interfaceObj, parameters);
-        endTestTime(testResult);//记录方法调用结束时间
+        // 记录方法调用结束时间
+        endTestTime(testResult);
         if (!isAutoTest(param) && !AnnotationUtils.isAutoTest(getTestMethod(testResult))) {
             // 实现测试方法名、入参、返回结果、入参、CASE_INDEX数据入库
             // saveScenarioTestData(parameters, result, null, param, getTestCaseClassName(testResult));

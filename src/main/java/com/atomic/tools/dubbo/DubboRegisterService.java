@@ -55,7 +55,7 @@ public class DubboRegisterService {
         String strs[] = url.split("\\?");
         //解析头部
         String prefixUrl = strs[0];
-        String prefix = "META_INF.dubbo://";
+        String prefix = "dubbo://";
         if (prefixUrl.startsWith(prefix)) {
             prefixUrl = prefixUrl.substring(prefix.length());
         }

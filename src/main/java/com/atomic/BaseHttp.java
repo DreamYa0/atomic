@@ -46,9 +46,7 @@ import static com.atomic.param.Constants.HTTP_PROXY;
 import static com.atomic.param.HandleMethodName.getTestMethodName;
 import static com.atomic.param.MethodMetaUtils.getTestMethod;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.getParamContext;
 import static com.atomic.param.ParamUtils.getParameters;
-import static com.atomic.param.ParamUtils.injectScenarioReturnResult;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
@@ -67,7 +65,7 @@ import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
  * @Data 2018/05/30 10:48
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
-public abstract class BaseHttp extends BaseInterfaceTest implements IHookable, ITestBase {
+public abstract class BaseHttp extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
 
@@ -106,9 +104,9 @@ public abstract class BaseHttp extends BaseInterfaceTest implements IHookable, I
     }
 
     private void prepareTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
-        Map<String, Object> context = getParamContext(testResult);
+        Map<String, Object> context = TestNGUtils.getParamContext(testResult);
         //注入场景测试所需要的依赖方法的返回结果
-        injectScenarioReturnResult(testResult, context);
+        TestNGUtils.injectScenarioReturnResult(testResult, context);
         // 先执行beforeTestMethod
         beforeTest(context);
         // 检查Http接口测试入参必填字段

@@ -7,6 +7,7 @@ import com.atomic.param.Constants;
 import com.atomic.param.HandleMethodName;
 import com.atomic.param.MethodMetaUtils;
 import com.atomic.param.ParamUtils;
+import com.atomic.param.TestNGUtils;
 import com.atomic.param.assertcheck.AssertCheck;
 import com.atomic.param.entity.QaResult;
 import com.atomic.util.CIDbUtils;
@@ -207,14 +208,14 @@ public class ReportListener implements IReporter {
                 if (map != null) {
                     test.info("入参：" + map.get("param"));
                     test.info("出参：" + map.get("returnValue"));
-                    if ((AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(ParamUtils.getParamContext(result)) &&
+                    if ((AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
                             AnnotationUtils.getCheckMode(MethodMetaUtils.getTestMethod(result)) == CheckMode.NORMAL) || (!AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result))
-                            || !ParamUtils.isAutoAssert(ParamUtils.getParamContext(result)))) {
+                            || !ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)))) {
                         if (map.get("expected_return") != null) {
                             test.info("预期返回值：" + map.get("expected_return"));
                         }
                     }
-                    if (AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(ParamUtils.getParamContext(result)) &&
+                    if (AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
                             AnnotationUtils.getCheckMode(MethodMetaUtils.getTestMethod(result)) == CheckMode.REPLAY) {
                         String expectedReturn = AssertCheck.getExpectedReturn(HandleMethodName.getTestMethodName(result), map.get("param"));
                         if (expectedReturn != null) {
@@ -255,7 +256,7 @@ public class ReportListener implements IReporter {
      * @return 集合
      */
     private Map<String, String> getParamAndReturn(ITestResult testResult) {
-        Map<String, Object> param = ParamUtils.getParamContext(testResult);
+        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         String className = HandleMethodName.getTestClassName(testResult);
         String methodName = HandleMethodName.getTestMethodName(testResult);
         String caseName;
@@ -297,7 +298,7 @@ public class ReportListener implements IReporter {
         sb.append("CaseName：");
         Map<String, Object> param = null;
         try {
-            param = ParamUtils.getParamContext(result);
+            param = TestNGUtils.getParamContext(result);
         } catch (Exception e) {
             System.out.println("---------------------" + className + "#" + methodName + "--------------------");
             e.printStackTrace();

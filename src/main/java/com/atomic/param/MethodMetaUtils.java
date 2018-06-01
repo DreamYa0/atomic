@@ -46,8 +46,8 @@ public final class MethodMetaUtils {
         if (superType instanceof ParameterizedType) {
             return (Class<? extends T>) ((ParameterizedType) superType).getActualTypeArguments()[0];
         }
-        Reporter.log(testInstance.getClass().getName() + "继承BaseNgTest<T>缺少类定义T");
-        throw new RuntimeException(testInstance.getClass().getName() + "继承BaseNgTest<T>缺少类定义T");
+        Reporter.log(testInstance.getClass().getName() + "继承的 XXX<T>缺少类定义T");
+        throw new RuntimeException(testInstance.getClass().getName() + "继承 XXX<T>缺少类定义T");
     }
 
     /**
@@ -176,7 +176,7 @@ public final class MethodMetaUtils {
 
     private static MethodMeta generateMethodMeta(ITestResult testResult, Object testInstance) throws Exception {
         // 截取param
-        Map<String, Object> param = ParamUtils.getParamContext(testResult);
+        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         IClass testClass = testResult.getTestClass();
         return generateMethodMeta(param, testResult.getInstance(), testClass.getRealClass(), testInstance);
     }
