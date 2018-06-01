@@ -6,11 +6,13 @@ import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.CenterConfig;
 import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
-import com.atomic.exception.ParameterException;
+import com.atomic.listener.SaveRunTime;
+import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
+import com.atomic.util.SaveResultUtils;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
@@ -29,8 +31,6 @@ import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ThrowException.throwNewException;
-import static com.atomic.listener.SaveRunTime.endTestTime;
-import static com.atomic.listener.SaveRunTime.startTestTime;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.HTTP_HEADER;
 import static com.atomic.param.Constants.HTTP_HOST;
@@ -38,9 +38,8 @@ import static com.atomic.param.Constants.HTTP_METHOD;
 import static com.atomic.param.Constants.HTTP_MODE;
 import static com.atomic.param.Constants.LOGIN_URL;
 import static com.atomic.param.HandleMethodName.getTestMethodName;
-import static com.atomic.param.MethodMetaUtils.getTestMethod;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.isHttpContentTypeNoNull;
+import static com.atomic.param.ParamUtils.isContentTypeNoNull;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
@@ -50,7 +49,6 @@ import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.param.assertcheck.AssertCheck.recMode;
 import static com.atomic.param.assertcheck.AssertCheck.replayMode;
 import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
-import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
 import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
@@ -69,22 +67,6 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
 
-    /**
-     * Http接口入参字段检查
-     * @param context excel入参
-     * @return
-     */
-    private static void checkHttpKeyWord(Map<String, Object> context) {
-        if (!ParamUtils.isHttpModeNoNull(context)) {
-            Reporter.log("Http Mode not be empty");
-            throw new ParameterException("Http Mode not be empty.");
-        }
-        if (!ParamUtils.isHttpMethodNoNull(context)) {
-            Reporter.log("Http Method not be null");
-            throw new ParameterException("Http Method not be null.");
-        }
-    }
-
     @Override
     public void initDb() {
 
@@ -98,7 +80,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
     @Override
     public void run(IHookCallBack callBack, ITestResult testResult) {
         // 有Ignore注解，就直接转测试代码
-        if (isIgnoreMethod(getTestMethod(testResult))) {
+        if (isIgnoreMethod(TestNGUtils.getTestMethod(testResult))) {
             callBack.runTestMethod(testResult);
             return;
         }
@@ -116,13 +98,13 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         // 先执行beforeTestMethod
         beforeTest(context);
         // 检查Http接口测试入参必填字段
-        checkHttpKeyWord(context);
+        ParamUtils.checkKeyWord(context);
         //记录方法调用开始时间
-        startTestTime(testResult);
+        SaveRunTime.startTestTime(testResult);
         Response response = startRequest(testResult, context);
         //记录方法调用结束时间
-        endTestTime(testResult);
-        saveTestResultInCache(response, testResult, context);
+        SaveRunTime.endTestTime(testResult);
+        SaveResultUtils.saveTestResultInCache(response, testResult, context);
         execMethod(response, testResult, callBack, context);
     }
 
@@ -136,11 +118,14 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
             httpHost = context.get(HTTP_HOST).toString();
         }
         RequestSpecification specification = given().baseUri(httpHost)
+                // 编码设置
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset(defaultCharset())))
+                //  SSL 设置
                 .config(config().sslConfig(sslConfig().allowAllHostnames()));
 
         //设置ContentType
         setContentType(specification, context);
+
         if (isLoginUrlNoNull(context)) {
             headers = given().get(context.get(LOGIN_URL).toString()).getHeaders();
             specification = specification.headers(headers);
@@ -158,22 +143,23 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         String uri = context.get(HTTP_METHOD).toString();
         // Http接口入参
         Map<String, Object> parameters = ParamUtils.getParameters(context);
-        if (isScenario(getTestMethod(testResult))) {
+
+        if (isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
             saveTestRequestInCache(parameters, testResult, context);
         }
-        if ("get".equalsIgnoreCase(httpMode)) {
+        if (Constants.HTTP_GET.equalsIgnoreCase(httpMode)) {
             if (parameters != null && parameters.size() > 0) {
                 response = specification.params(parameters).when().get(uri);
             } else {
                 response = specification.when().get(uri);
             }
-        } else if ("post".equalsIgnoreCase(httpMode) && isJsonContext(context)) {
+        } else if (Constants.HTTP_HOST.equalsIgnoreCase(httpMode) && isJsonContext(context)) {
             // POST Json请求
             if (parameters == null || parameters.size() == 0) {
                 response = specification.when().post(uri);
-            } else if (parameters.keySet().contains("data")) {
-                response = specification.body(parameters.get("data").toString()).when().post(uri);
+            } else if (parameters.keySet().contains(Constants.DEFAULT_SINGLE_PARAM_NAME)) {
+                response = specification.body(parameters.get(Constants.DEFAULT_SINGLE_PARAM_NAME).toString()).when().post(uri);
             } else {
                 response = specification.body(parameters).when().post(uri);
             }
@@ -194,7 +180,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
      * @return boolean
      */
     private boolean isJsonContext(Map<String, Object> param) {
-        return Objects.nonNull(param.get("httpContentType")) && "application/json".equalsIgnoreCase(param.get("httpContentType").toString());
+        return Objects.nonNull(param.get(Constants.CONTENT_TYPE)) && Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(param.get(Constants.CONTENT_TYPE).toString());
     }
 
     private void execMethod(Response response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {
@@ -205,12 +191,12 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
         //返回result为String，则检测是否需要录制回放和自动断言
-        if (AnnotationUtils.isAutoAssert(getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
-            if (getCheckMode(getTestMethod(testResult)) == CheckMode.REC) {
+        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+            if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
                 recMode(parameters, result, TestNGUtils.getHttpMethod(testResult));
                 System.out.println("-----------------------执行智能化断言录制模式成功！-------------------------");
                 resultCallBack(response, context, callback, parameters);
-            } else if (getCheckMode(getTestMethod(testResult)) == CheckMode.REPLAY) {
+            } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
                 replayMode(parameters, result, TestNGUtils.getHttpMethod(testResult), context, callback);
                 System.out.println("-----------------------执行智能化断言回放模式成功！-------------------------");
                 resultCallBack(response, context, callback, parameters);
@@ -245,8 +231,8 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
     }
 
     private void setContentType(RequestSpecification specification, Map<String, Object> context) {
-        if (isHttpContentTypeNoNull(context)) {
-            specification.contentType(context.get("httpContentType").toString());
+        if (isContentTypeNoNull(context)) {
+            specification.contentType(context.get(Constants.CONTENT_TYPE).toString());
         }
     }
 }

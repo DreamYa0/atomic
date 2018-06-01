@@ -24,7 +24,7 @@ public final class TestNGUtils {
      * @throws Exception
      */
     public static void injectResultAndParameters(Map<String, Object> param, ITestResult testResult, Object testInstance) throws Exception {
-        Method testMethod = MethodMetaUtils.getTestMethod(testResult);
+        Method testMethod = TestNGUtils.getTestMethod(testResult);
         int parameters = testMethod.getGenericParameterTypes().length;
         if (parameters > 1) {
             // 获取测试函数的入参名称列表
@@ -115,5 +115,14 @@ public final class TestNGUtils {
                 }
             }
         }
+    }
+
+    /**
+     * 获取测试方法
+     * @param testResult 测试结果上下文对象
+     * @return 方法
+     */
+    public static Method getTestMethod(ITestResult testResult) {
+        return testResult.getMethod().getConstructorOrMethod().getMethod();
     }
 }

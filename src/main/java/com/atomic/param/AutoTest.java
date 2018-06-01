@@ -41,7 +41,6 @@ import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.exception.ThrowException.throwNewException;
 import static com.atomic.param.Constants.DATE_FORMAT;
 import static com.atomic.param.MethodMetaUtils.getMethodMeta;
-import static com.atomic.param.MethodMetaUtils.getTestMethod;
 import static com.atomic.param.ParamUtils.getParamContextWithoutExtraInfo;
 import static com.atomic.param.ParamUtils.getParamName;
 import static com.atomic.param.ParamUtils.isParamTypeExtendsBaseRequest;
@@ -130,8 +129,8 @@ public class AutoTest {
         // 去重
         autoTestItemList = ListUtils.distinct(autoTestItemList, comparing(AutoTestItem::getParamName));
         // 多属性模式，属性之间用组合模式；单属性模式，每次一个属性变化，其他属性使用正常值
-        if (getAutoTestMode(getTestMethod(testResult)) == AutoTestMode.MULTIPLE) {
-            return generateAutoTestCasesByMultiple(param, autoTestItemList, getTestMethod(testResult));
+        if (getAutoTestMode(TestNGUtils.getTestMethod(testResult)) == AutoTestMode.MULTIPLE) {
+            return generateAutoTestCasesByMultiple(param, autoTestItemList, TestNGUtils.getTestMethod(testResult));
         } else {
             return generateAutoTestCasesBySingle(param, autoTestItemList);
         }
@@ -151,8 +150,8 @@ public class AutoTest {
         // 去重
         autoTestItemList = ListUtils.distinct(autoTestItemList, comparing(AutoTestItem::getParamName));
         // 多属性模式，属性之间用组合模式；单属性模式，每次一个属性变化，其他属性使用正常值
-        if (getAutoTestMode(getTestMethod(testResult)) == AutoTestMode.MULTIPLE) {
-            return generateAutoTestCasesByMultiple(param, autoTestItemList, getTestMethod(testResult));
+        if (getAutoTestMode(TestNGUtils.getTestMethod(testResult)) == AutoTestMode.MULTIPLE) {
+            return generateAutoTestCasesByMultiple(param, autoTestItemList, TestNGUtils.getTestMethod(testResult));
         } else {
             return generateAutoTestCasesBySingle(param, autoTestItemList);
         }

@@ -4,7 +4,7 @@ import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.GlobalConfig;
 import com.atomic.exception.AnnotationException;
 import com.atomic.exception.RollBackException;
-import com.atomic.param.MethodMetaUtils;
+import com.atomic.param.TestNGUtils;
 import com.atomic.tools.db.Changes;
 import com.atomic.tools.sql.SqlTools;
 import com.google.common.collect.Lists;
@@ -47,9 +47,9 @@ public class RollBackListener extends TestListenerAdapter {
     @Override
     public void onTestStart(ITestResult testResult) {
         //实现单库多表数据回滚
-        if (AnnotationUtils.isRollBackMethod(MethodMetaUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(MethodMetaUtils.getTestMethod(testResult))) {
+        if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
             startRollBack(testResult);//开启监听，当为@RollBack注解时执行单库,多表数据回滚
-        } else if (AnnotationUtils.isRollBackAllMethod(MethodMetaUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(MethodMetaUtils.getTestMethod(testResult))) {
+        } else if (AnnotationUtils.isRollBackAllMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
             //实现多库多表数据回滚
             try {
                 startRollBackAll(testResult);//当为@RollBackAll注解时执行多库,多表数据回滚
@@ -80,8 +80,8 @@ public class RollBackListener extends TestListenerAdapter {
      * @param testResult
      */
     private void startRollBack(ITestResult testResult) {
-        String dbName = AnnotationUtils.getDbName(MethodMetaUtils.getTestMethod(testResult));
-        String[] tableNames = AnnotationUtils.getTableName(MethodMetaUtils.getTestMethod(testResult));
+        String dbName = AnnotationUtils.getDbName(TestNGUtils.getTestMethod(testResult));
+        String[] tableNames = AnnotationUtils.getTableName(TestNGUtils.getTestMethod(testResult));
         //开启监听
         dbNameAndChanges.putIfAbsent(dbName, new Changes());
         Set<Map.Entry<String, Changes>> entries = dbNameAndChanges.entrySet();
@@ -98,7 +98,7 @@ public class RollBackListener extends TestListenerAdapter {
     private void startRollBackAll(ITestResult testResult) throws RollBackException {
         //实现多数据库数据回滚
         try {
-            Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(MethodMetaUtils.getTestMethod(testResult));
+            Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(TestNGUtils.getTestMethod(testResult));
             Set<String> set = multimap.keySet();
             List<String> stringList = Lists.newArrayList();
             stringList.addAll(set);

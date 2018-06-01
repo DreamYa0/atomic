@@ -7,19 +7,19 @@ package com.atomic.param;
 public final class Constants {
 
     /** 期望结果，为 Y 时才执行断言 */
-    public static final String ASSERTRESULT_NAME = "assertResult";
+    public static final String ASSERT_RESULT = "assertResult";
 
     /** 测试用例标题 */
     public static final String CASE_NAME = "caseName";
 
     /** 为 Y 时启动自动化测试 */
-    public static final String AUTOTEST_NAME = "autotest";
+    public static final String AUTO_TEST = "autotest";
 
     /** 当期望结果为 N 时才执行assertCode断言 */
-    public static final String ASSERTRESULT_CODE = "assertCode";
+    public static final String ASSERT_CODE = "assertCode";
 
     /** 当期望结果为 N 时才执行assertDescription断言 */
-    public static final String ASSERTRESULT_MSG = "assertMsg";
+    public static final String ASSERT_MSG = "assertMsg";
 
     /** 预期结果字段，当预期结果内容不为空是进行自动断言 */
     public static final String EXPECTED_RESULT = "expectedResult";
@@ -36,8 +36,10 @@ public final class Constants {
     /** 请求URI路径 */
     public static final String HTTP_METHOD = "httpMethod";
 
+    public static final String HTTP_ENTITY = "httpEntity";
+
     /** ContentType */
-    public static final String HTTP_CONTENT_TYPE = "httpContentType";
+    public static final String CONTENT_TYPE = "contentType";
 
     /** POST JSON提交 */
     public static final String CONTENT_TYPE_JSON = "application/json";

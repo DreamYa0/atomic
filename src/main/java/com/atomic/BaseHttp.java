@@ -44,7 +44,6 @@ import static com.atomic.param.Constants.HTTP_HEADER;
 import static com.atomic.param.Constants.HTTP_HOST;
 import static com.atomic.param.Constants.HTTP_PROXY;
 import static com.atomic.param.HandleMethodName.getTestMethodName;
-import static com.atomic.param.MethodMetaUtils.getTestMethod;
 import static com.atomic.param.ParamPrint.resultPrint;
 import static com.atomic.param.ParamUtils.getParameters;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
@@ -75,11 +74,11 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
      */
     private static void checkHttpKeyWord(Map<String, Object> context) {
         if (!ParamUtils.isHttpModeNoNull(context)) {
-            Reporter.log("[BaseHttp#checkHttpKeyWord()]:{} ---> Http Mode not be empty");
+            Reporter.log("[BaseHttp#checkKeyWord()]:{} ---> Http Mode not be empty");
             throw new ParameterException("Http Mode not be empty.");
         }
         if (!ParamUtils.isHttpMethodNoNull(context)) {
-            Reporter.log("[BaseHttp#checkHttpKeyWord()]:{} ---> Http Method not be null");
+            Reporter.log("[BaseHttp#checkKeyWord()]:{} ---> Http Method not be null");
             throw new ParameterException("Http Method not be null.");
         }
     }
@@ -92,7 +91,7 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
     @Override
     public void run(IHookCallBack callBack, ITestResult testResult) {
         // 有Ignore注解，就直接转测试代码
-        if (isIgnoreMethod(getTestMethod(testResult))) {
+        if (isIgnoreMethod(TestNGUtils.getTestMethod(testResult))) {
             callBack.runTestMethod(testResult);
             return;
         }
@@ -169,12 +168,12 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
         //返回result为String，则检测是否需要录制回放和自动断言
-        if (AnnotationUtils.isAutoAssert(getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
-            if (getCheckMode(getTestMethod(testResult)) == CheckMode.REC) {
+        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+            if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
                 recMode(parameters, result, TestNGUtils.getHttpMethod(testResult));
                 System.out.println("-----------------------执行智能化断言录制模式成功！-------------------------");
                 resultCallBack(response, context, callback, parameters);
-            } else if (getCheckMode(getTestMethod(testResult)) == CheckMode.REPLAY) {
+            } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
                 replayMode(parameters, result, TestNGUtils.getHttpMethod(testResult), context, callback);
                 System.out.println("-----------------------执行智能化断言回放模式成功！-------------------------");
                 resultCallBack(response, context, callback, parameters);

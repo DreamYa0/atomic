@@ -5,7 +5,7 @@ import com.atomic.enums.CheckMessage;
 import com.atomic.enums.CheckMode;
 import com.atomic.exception.AnnotationException;
 import com.atomic.param.Constants;
-import com.atomic.param.MethodMetaUtils;
+import com.atomic.param.TestNGUtils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
@@ -353,7 +353,7 @@ public abstract class AnnotationUtils {
      * @return
      */
     public static String[] getDependsOnMethods(ITestResult testResult) {
-        Method method = MethodMetaUtils.getTestMethod(testResult);
+        Method method = TestNGUtils.getTestMethod(testResult);
         Test test = method.getAnnotation(Test.class);
         String[] testNames = test.dependsOnMethods();
         if (testNames.length > 0) {

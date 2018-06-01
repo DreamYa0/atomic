@@ -78,13 +78,13 @@ public final class ResultAssert {
         // 把入参和执行结果写入param中
         callback.afterTestMethod(param, result, parameters);
         // 如果是Result型，检测执行结果，assertResult不填的就不管，比如自动化测试
-        if (param.get(Constants.ASSERTRESULT_NAME) != null && result instanceof PagedResult) {
+        if (param.get(Constants.ASSERT_RESULT) != null && result instanceof PagedResult) {
             PagedResult pagedResult = (PagedResult) result;
             assertCheck(pagedResult, param);
-        } else if (param.get(Constants.ASSERTRESULT_NAME) != null && result instanceof Result) {
+        } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof Result) {
             Result resultNew = (Result) result;
             assertCheck(resultNew, param, returnType);
-        } else if (param.get(Constants.ASSERTRESULT_NAME) != null && result instanceof BaseResult) {
+        } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof BaseResult) {
             BaseResult baseResult = (BaseResult) result;
             assertCheck(baseResult, param);
         } else {
@@ -127,7 +127,7 @@ public final class ResultAssert {
      * @return
      */
     public static boolean isExpectFalse(Map<String, Object> param) {
-        return Constants.EXCEL_NO.equals(param.get(Constants.ASSERTRESULT_NAME));
+        return Constants.EXCEL_NO.equals(param.get(Constants.ASSERT_RESULT));
     }
 
     /**
@@ -157,10 +157,10 @@ public final class ResultAssert {
         Assert.assertFalse(result.isSuccess());
         //增加期望为 N 时对Code和Description的断言
         if (isCodeNoNull(param)) {
-            Assert.assertEquals(result.getCode(), param.get(Constants.ASSERTRESULT_CODE));
+            Assert.assertEquals(result.getCode(), param.get(Constants.ASSERT_CODE));
         }
         if (isDescriptionNoNull(param)) {
-            Assert.assertEquals(result.getMsg(), param.get(Constants.ASSERTRESULT_MSG));
+            Assert.assertEquals(result.getMsg(), param.get(Constants.ASSERT_MSG));
         }
     }
 
@@ -170,7 +170,7 @@ public final class ResultAssert {
      * @return
      */
     private static boolean isDescriptionNoNull(Map<String, Object> param) {
-        if (param.get(Constants.ASSERTRESULT_MSG) == null || "".equals(param.get(Constants.ASSERTRESULT_MSG))) {
+        if (param.get(Constants.ASSERT_MSG) == null || "".equals(param.get(Constants.ASSERT_MSG))) {
             return false;
         }
         return true;
@@ -182,7 +182,7 @@ public final class ResultAssert {
      * @return
      */
     private static boolean isCodeNoNull(Map<String, Object> param) {
-        if (param.get(Constants.ASSERTRESULT_CODE) == null || "".equals(param.get(Constants.ASSERTRESULT_CODE))) {
+        if (param.get(Constants.ASSERT_CODE) == null || "".equals(param.get(Constants.ASSERT_CODE))) {
             return false;
         }
         return true;

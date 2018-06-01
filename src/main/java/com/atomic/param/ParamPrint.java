@@ -34,13 +34,13 @@ public final class ParamPrint {
                 if ((ParamUtils.isAutoTest(map))) {
                     System.out.println("------------------" + method + " 自动化测试 (" + map.get(Constants.EXCEL_DESC) + ")------------------------");
                 } else {
-                    System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERTRESULT_NAME) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
+                    System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
                 }
             } else {
                 if ((ParamUtils.isAutoTest(map))) {
                     System.out.println("------------------" + method + " 自动化测试 (" + map.get(Constants.CASE_NAME) + ")------------------------");
                 } else {
-                    System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERTRESULT_NAME) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
+                    System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
                 }
             }
             System.out.println("出参：" + ParamUtils.getJSONStringWithDateFormat(result, true, Constants.DATE_FORMAT));
@@ -65,9 +65,9 @@ public final class ParamPrint {
             System.out.println("------------------" + method + " request------------------------");
             System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
             if (map.get(Constants.CASE_NAME) == null) {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERTRESULT_NAME) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
+                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
             } else {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERTRESULT_NAME) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
+                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
             }
             System.out.println("出参：");
             response.body().prettyPrint();
@@ -92,9 +92,9 @@ public final class ParamPrint {
             System.out.println("------------------" + method + " request------------------------");
             System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
             if (map.get(Constants.CASE_NAME) == null) {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERTRESULT_NAME) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
+                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
             } else {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERTRESULT_NAME) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
+                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
             }
             System.out.println("出参：" + formatJson(result));
             System.out.println("------------------------------------------------");

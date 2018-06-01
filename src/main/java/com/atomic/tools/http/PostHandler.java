@@ -24,13 +24,13 @@ public class PostHandler implements IHandler {
             boolean isPost = Constants.HTTP_POST.equalsIgnoreCase(param.get(Constants.HTTP_MODE).toString());
             if (isPost) {
                 request.method(Method.POST);
-                if (param.get(Constants.HTTP_CONTENT_TYPE) == null ||
-                        Constants.CONTENT_TYPE_FROM.equalsIgnoreCase(param.get(Constants.HTTP_CONTENT_TYPE).toString())) {
+                if (param.get(Constants.CONTENT_TYPE) == null ||
+                        Constants.CONTENT_TYPE_FROM.equalsIgnoreCase(param.get(Constants.CONTENT_TYPE).toString())) {
                     request.contentType(Constants.CONTENT_TYPE_FROM);
                     Map<String, Object> newParam = ParamUtils.getParameters(param);
                     request.form(newParam);
                     return request.execute();
-                } else if (Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(param.get(Constants.HTTP_CONTENT_TYPE).toString())) {
+                } else if (Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(param.get(Constants.CONTENT_TYPE).toString())) {
                     Map<String, Object> newParam = ParamUtils.getParameters(param);
                     request.contentType(Constants.CONTENT_TYPE_JSON).body(JSON.toJSONString(newParam));
                     return request.execute();

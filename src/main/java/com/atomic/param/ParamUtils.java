@@ -53,7 +53,7 @@ public final class ParamUtils {
      * @return
      */
     public static boolean isExpectSuccess(Map<String, Object> param) {
-        return isValueTrue(param.get(Constants.ASSERTRESULT_NAME));
+        return isValueTrue(param.get(Constants.ASSERT_RESULT));
     }
 
     /**
@@ -62,7 +62,7 @@ public final class ParamUtils {
      * @return
      */
     public static boolean isAutoTest(Map<String, Object> param) {
-        return isValueTrue(param.get(Constants.AUTOTEST_NAME));
+        return isValueTrue(param.get(Constants.AUTO_TEST));
     }
 
     /**
@@ -110,8 +110,8 @@ public final class ParamUtils {
         return true;
     }
 
-    public static boolean isHttpContentTypeNoNull(Map<String, Object> param) {
-        if (param.get(Constants.HTTP_CONTENT_TYPE) == null || "".equals(param.get(Constants.HTTP_CONTENT_TYPE))) {
+    public static boolean isContentTypeNoNull(Map<String, Object> param) {
+        if (param.get(Constants.CONTENT_TYPE) == null || "".equals(param.get(Constants.CONTENT_TYPE))) {
             return false;
         }
         return true;
@@ -236,12 +236,12 @@ public final class ParamUtils {
         newParam.remove(Constants.TESTMETHODMETA);
         // newParam.remove(PARAMETER_NAME_);
         // newParam.remove(RESULT_NAME);
-        newParam.remove(Constants.ASSERTRESULT_CODE);
-        newParam.remove(Constants.ASSERTRESULT_MSG);
+        newParam.remove(Constants.ASSERT_CODE);
+        newParam.remove(Constants.ASSERT_MSG);
         newParam.remove(Constants.EXPECTED_RESULT);
         newParam.remove(Constants.TEST_ONLY);
-        // newParam.remove(ASSERTRESULT_NAME);
-        newParam.remove(Constants.AUTOTEST_NAME);
+        // newParam.remove(ASSERT_RESULT);
+        newParam.remove(Constants.AUTO_TEST);
         List<String> keys = Lists.newArrayList(param.keySet());
         keys.stream().filter(key -> key.startsWith(Constants.ASSERT_ITEM_)).forEach(param::remove);
         return newParam;
@@ -462,7 +462,7 @@ public final class ParamUtils {
      * @return
      */
     public static Map<String, Object> getParameters(Map<String, Object> context) {
-        Args.notNull(context, "入参对象");
+        Args.notNull(context, "入参字段不能为空！");
         if (!context.isEmpty()) {
             List<String> removeKey = getRemoveKey();
             Map<String, Object> inParam = new HashMap<>();
@@ -480,36 +480,48 @@ public final class ParamUtils {
             }
             return inParam;
         } else {
-            Reporter.log(" 入参对象不能为空！");
-            throw new ParameterException("入参对象不能为空！");
+            Reporter.log(" 入参字段不能为空！");
+            throw new ParameterException("入参字段不能为空！");
         }
     }
 
     /**
-     * 非Http请求入参字段清单
+     * 非Http请求入参字段清单,移除框架关键字
      */
     private static List<String> getRemoveKey() {
         List<String> removeKey = new ArrayList<>();
-        removeKey.add("caseName");
-        removeKey.add("caseDescription");
-        removeKey.add("caseRun");
-        removeKey.add("caseType");
-        removeKey.add("casePriority");
-        removeKey.add("CASE_INDEX");
-        removeKey.add("assertResult");
-        removeKey.add("testOnly");
-        removeKey.add("assertCode");
-        removeKey.add("assertDescription");
-        removeKey.add("expectedResult");
-        removeKey.add("loginUrl");
-        removeKey.add("httpMode");
-        removeKey.add("httpHost");
-        removeKey.add("httpMethod");
-        removeKey.add("httpContentType");
-        removeKey.add("httpHeader");
-        removeKey.add("httpEntity");
-        removeKey.add("autoAssert");
-        removeKey.add("messageType");
+        removeKey.add(Constants.CASE_NAME);
+        removeKey.add(Constants.CASE_INDEX);
+        removeKey.add(Constants.ASSERT_RESULT);
+        removeKey.add(Constants.TEST_ONLY);
+        removeKey.add(Constants.ASSERT_CODE);
+        removeKey.add(Constants.ASSERT_MSG);
+        removeKey.add(Constants.EXPECTED_RESULT);
+        removeKey.add(Constants.LOGIN_URL);
+        removeKey.add(Constants.HTTP_MODE);
+        removeKey.add(Constants.HTTP_HOST);
+        removeKey.add(Constants.HTTP_METHOD);
+        removeKey.add(Constants.CONTENT_TYPE);
+        removeKey.add(Constants.HTTP_HEADER);
+        removeKey.add(Constants.HTTP_ENTITY);
+        removeKey.add(Constants.AUTO_ASSERT);
+        removeKey.add(Constants.MESSAGE_TYPE);
         return removeKey;
+    }
+
+    /**
+     * Http接口入参字段检查
+     * @param context excel入参
+     * @return
+     */
+    public static void checkKeyWord(Map<String, Object> context) {
+        if (!ParamUtils.isHttpModeNoNull(context)) {
+            Reporter.log("接口请求类型不能为空！例如：POST、GET！");
+            throw new ParameterException("接口请求类型不能为空！例如：POST、GET！");
+        }
+        if (!ParamUtils.isHttpMethodNoNull(context)) {
+            Reporter.log("接口请求 URI 路径不能为空！");
+            throw new ParameterException("接口请求 URI 路径不能为空！");
+        }
     }
 }

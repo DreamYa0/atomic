@@ -11,7 +11,13 @@ import com.atomic.exception.ThrowException;
 import com.atomic.listener.IntegrationTestRollBackListener;
 import com.atomic.listener.ReportListener;
 import com.atomic.listener.SaveResultListener;
-import com.atomic.param.*;
+import com.atomic.param.AutoTest;
+import com.atomic.param.Constants;
+import com.atomic.param.ITestMethodMultiTimes;
+import com.atomic.param.ITestResultCallback;
+import com.atomic.param.ParamUtils;
+import com.atomic.param.StringUtils;
+import com.atomic.param.TestNGUtils;
 import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.tools.mock.dto.MockData;
@@ -48,18 +54,22 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.atomic.param.AutoTest.generateAutoTestCases;
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ExceptionUtils.isExceptionThrowsBySpecialMethod;
 import static com.atomic.listener.SaveRunTime.endTestTime;
 import static com.atomic.listener.SaveRunTime.startTestTime;
-import static com.atomic.param.Constants.*;
+import static com.atomic.param.AutoTest.generateAutoTestCases;
+import static com.atomic.param.Constants.EXCEL_DESC;
+import static com.atomic.param.Constants.PARAMETER_NAME_;
+import static com.atomic.param.Constants.RESULT_NAME;
+import static com.atomic.param.Constants.THREAD_COUNT;
 import static com.atomic.param.MethodMetaUtils.getMethodMeta;
-import static com.atomic.param.MethodMetaUtils.getTestMethod;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.*;
+import static com.atomic.param.ParamUtils.generateParametersNew;
+import static com.atomic.param.ParamUtils.isAutoTest;
+import static com.atomic.param.ParamUtils.isExpectSuccess;
 import static com.atomic.param.ResultAssert.assertResult;
 import static com.atomic.param.ResultAssert.exceptionDeal;
 import static com.atomic.param.ResultAssert.resultCallBack;
@@ -100,7 +110,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
     @Override
     public void run(IHookCallBack callBack, ITestResult testResult) {
         // 有Ignore注解，就直接转测试代码
-        if (AnnotationUtils.isIgnoreMethod(getTestMethod(testResult))) {
+        if (AnnotationUtils.isIgnoreMethod(TestNGUtils.getTestMethod(testResult))) {
             super.run(callBack, testResult);
             return;
         }
@@ -150,7 +160,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
 
     private void autoTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
         // 跳过自动化测试用例
-        if (getAutoTestMode(getTestMethod(testResult)) == AutoTestMode.NONE) {
+        if (getAutoTestMode(TestNGUtils.getTestMethod(testResult)) == AutoTestMode.NONE) {
             System.out.println("-----------------------------自动化测试用例已跳过!-----------------------------");
             return;
         }
@@ -279,7 +289,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
         // 构造入参
         final Object[] parameters = generateParametersNew(methodMeta, newParam);
-        if ((!isAutoTest(param) && !AnnotationUtils.isAutoTest(getTestMethod(testResult))) && isScenario(getTestMethod(testResult))) {
+        if ((!isAutoTest(param) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) && isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
             saveTestRequestInCache(parameters[0], testResult, param);
         }
@@ -297,7 +307,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         Object result = method.invoke(interfaceObj, parameters);
         // 记录方法调用结束时间
         endTestTime(testResult);
-        if (!isAutoTest(param) && !AnnotationUtils.isAutoTest(getTestMethod(testResult))) {
+        if (!isAutoTest(param) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) {
             // 实现测试方法名、入参、返回结果、入参、CASE_INDEX数据入库
             // saveScenarioTestData(parameters, result, null, param, getTestCaseClassName(testResult));
             saveTestResultInCache(result, testResult, param);
@@ -308,12 +318,12 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             // parameters 可能被接口改变，打印出来看起来就像有问题
             resultPrint(method.getName(), result, param, parameters);
         }
-        if (AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(param)) {
-            if (getCheckMode(MethodMetaUtils.getTestMethod(testResult)) == CheckMode.REC) {
+        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(param)) {
+            if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
                 recMode(parameters[0], result, methodMeta);
                 System.out.println("-----------------------------执行智能化断言录制模式成功！-----------------------------");
                 resultCallBack(result, param, callback, parameters);
-            } else if (getCheckMode(MethodMetaUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
+            } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
                 replayMode(parameters[0], result, methodMeta);
                 System.out.println("-----------------------------执行智能化断言回放模式成功！-----------------------------");
                 resultCallBack(result, param, callback, parameters);

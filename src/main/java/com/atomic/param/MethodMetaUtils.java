@@ -51,15 +51,6 @@ public final class MethodMetaUtils {
     }
 
     /**
-     * 获取测试方法
-     * @param testResult 测试结果上下文对象
-     * @return 方法
-     */
-    public static Method getTestMethod(ITestResult testResult) {
-        return testResult.getMethod().getConstructorOrMethod().getMethod();
-    }
-
-    /**
      * 获取测试所需的属性
      * @param interfaceType  接口的定义
      * @param testMethodName 接口中的方法名
@@ -233,7 +224,7 @@ public final class MethodMetaUtils {
         if (param.containsKey(Constants.DEFAULT_SINGLE_PARAM_NAME)) {
             return Constants.DEFAULT_SINGLE_PARAM_NAME;
         }
-        ImmutableList<String> expectList = ImmutableList.of(Constants.ASSERTRESULT_NAME, Constants.EXCEL_DESC, Constants.AUTOTEST_NAME, Constants.CASE_NAME, Constants.ASSERTRESULT_CODE, Constants.ASSERTRESULT_MSG, Constants.EXPECTED_RESULT, Constants.AUTO_ASSERT, "");
+        ImmutableList<String> expectList = ImmutableList.of(Constants.ASSERT_RESULT, Constants.EXCEL_DESC, Constants.AUTO_TEST, Constants.CASE_NAME, Constants.ASSERT_CODE, Constants.ASSERT_MSG, Constants.EXPECTED_RESULT, Constants.AUTO_ASSERT, "");
         List<String> allParamList = new ArrayList<>(param.keySet());
         allParamList.removeAll(expectList);
         if (allParamList.size() == 0) {

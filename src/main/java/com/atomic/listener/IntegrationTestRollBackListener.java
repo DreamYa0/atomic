@@ -3,7 +3,7 @@ package com.atomic.listener;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.AnnotationException;
 import com.atomic.exception.RollBackException;
-import com.atomic.param.MethodMetaUtils;
+import com.atomic.param.TestNGUtils;
 import com.atomic.tools.db.Changes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -62,16 +62,16 @@ public class IntegrationTestRollBackListener extends TestListenerAdapter {
 
     @Override
     public void onTestStart(ITestResult testResult) {
-        if (AnnotationUtils.isRollBackMethod(MethodMetaUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(MethodMetaUtils.getTestMethod(testResult))) {
-            String dbName = AnnotationUtils.getDbName(MethodMetaUtils.getTestMethod(testResult));
-            String[] tableNames = AnnotationUtils.getTableName(MethodMetaUtils.getTestMethod(testResult));
+        if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
+            String dbName = AnnotationUtils.getDbName(TestNGUtils.getTestMethod(testResult));
+            String[] tableNames = AnnotationUtils.getTableName(TestNGUtils.getTestMethod(testResult));
             // 开启监听，当为@RollBack注解时执行单库,多表数据回滚
             RollBack.newInstance().setStartPoint(new Changes(), dbName, tableNames);
-        } else if (AnnotationUtils.isRollBackAllMethod(MethodMetaUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(MethodMetaUtils.getTestMethod(testResult))) {
+        } else if (AnnotationUtils.isRollBackAllMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 当为@RollBackAll注解时执行多库,多表数据回滚
             try {
                 try {
-                    Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(MethodMetaUtils.getTestMethod(testResult));
+                    Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(TestNGUtils.getTestMethod(testResult));
                     Set<String> set = multimap.keySet();
                     List<String> stringList = Lists.newArrayList(set);
                     for (String dbName : stringList) {

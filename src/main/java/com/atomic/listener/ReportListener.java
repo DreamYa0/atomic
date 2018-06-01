@@ -5,7 +5,6 @@ import com.atomic.config.GlobalConfig;
 import com.atomic.enums.CheckMode;
 import com.atomic.param.Constants;
 import com.atomic.param.HandleMethodName;
-import com.atomic.param.MethodMetaUtils;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.assertcheck.AssertCheck;
@@ -208,15 +207,15 @@ public class ReportListener implements IReporter {
                 if (map != null) {
                     test.info("入参：" + map.get("param"));
                     test.info("出参：" + map.get("returnValue"));
-                    if ((AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
-                            AnnotationUtils.getCheckMode(MethodMetaUtils.getTestMethod(result)) == CheckMode.NORMAL) || (!AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result))
+                    if ((AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
+                            AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(result)) == CheckMode.NORMAL) || (!AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result))
                             || !ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)))) {
                         if (map.get("expected_return") != null) {
                             test.info("预期返回值：" + map.get("expected_return"));
                         }
                     }
-                    if (AnnotationUtils.isAutoAssert(MethodMetaUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
-                            AnnotationUtils.getCheckMode(MethodMetaUtils.getTestMethod(result)) == CheckMode.REPLAY) {
+                    if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
+                            AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(result)) == CheckMode.REPLAY) {
                         String expectedReturn = AssertCheck.getExpectedReturn(HandleMethodName.getTestMethodName(result), map.get("param"));
                         if (expectedReturn != null) {
                             test.info("预期返回值：" + expectedReturn);
