@@ -356,10 +356,12 @@ public final class ParamUtils {
                     return request;
                 } else {
                     data = ReflectionUtils.initFromClass(paramClass);
-                    StringUtils.transferMap2Bean(data, param);// 设置属性值
+                    // 设置属性值
+                    StringUtils.transferMap2Bean(data, param);
                 }
             }
-            StringUtils.transferMap2Bean(request, param);// 设置属性值
+            // 设置属性值
+            StringUtils.transferMap2Bean(request, param);
             setRequestData(request, data);
         }
         return request;
