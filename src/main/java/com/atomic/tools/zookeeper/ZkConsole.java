@@ -15,7 +15,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Created by luoqinqin on 16/5/14.
+ * @author dreamyao
+ * @title
+ * @Date 16/5/14 上午11:43
+ * @since 1.0.0
  */
 @ThreadSafe
 public class ZkConsole implements Watcher {
@@ -51,10 +54,12 @@ public class ZkConsole implements Watcher {
      * @throws Exception
      */
     public synchronized void update() throws Exception {
-        List<String> strs = zookeeper.getChildren("/META_INF/dubbo", false); //获取所有dubbo服务
+        //获取/dubbo节点下的所有服务
+        List<String> strs = zookeeper.getChildren("/dubbo", false);
         serviceMap.clear();
         strs.forEach(serviceName -> {
-            String nodeString = "/META_INF/dubbo/" + serviceName + "/providers";
+            // /dubbo 节点下服务提供者节点名称
+            String nodeString = "/dubbo/" + serviceName + "/providers";
             try {
                 List<String> providers = zookeeper.getChildren(nodeString, false);
                 if (providers.size() > 0) {
