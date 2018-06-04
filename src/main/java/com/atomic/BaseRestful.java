@@ -120,7 +120,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         RequestSpecification specification = given().baseUri(httpHost)
                 // 编码设置
                 .config(config().encoderConfig(encoderConfig().defaultContentCharset(defaultCharset())))
-                //  SSL 设置
+                // SSL 设置
                 .config(config().sslConfig(sslConfig().allowAllHostnames()));
 
         //设置ContentType
