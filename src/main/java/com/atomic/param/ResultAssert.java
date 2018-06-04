@@ -4,6 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.atomic.assertor.Assertor;
+import com.atomic.assertor.AssertorFactory;
+import com.atomic.assertor.RestfulAssertor;
+import com.atomic.assertor.UnitTestAssertor;
 import com.atomic.exception.ExceptionUtils;
 import com.atomic.util.ReflectionUtils;
 import com.coinsuper.common.model.BaseResult;
@@ -14,6 +18,7 @@ import com.google.common.collect.Maps;
 import io.restassured.response.Response;
 import org.apache.http.HttpEntity;
 import org.testng.Assert;
+import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import java.lang.reflect.Field;
@@ -74,7 +79,7 @@ public final class ResultAssert {
      * @param parameters 入参对象
      * @throws Exception 异常
      */
-    public static void assertResult(Object result, Type returnType, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResult(Object result, ITestResult testResult, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
         // 把入参和执行结果写入param中
         callback.afterTestMethod(param, result, parameters);
         // 如果是Result型，检测执行结果，assertResult不填的就不管，比如自动化测试
@@ -83,7 +88,7 @@ public final class ResultAssert {
             assertCheck(pagedResult, param);
         } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof Result) {
             Result resultNew = (Result) result;
-            assertCheck(resultNew, param, returnType);
+            assertCheck(resultNew, param, testResult);
         } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof BaseResult) {
             BaseResult baseResult = (BaseResult) result;
             assertCheck(baseResult, param);
@@ -97,12 +102,17 @@ public final class ResultAssert {
      * @param result 返回结果对象
      * @param param  入参excel集合
      */
-    private static void assertCheck(Result result, Map<String, Object> param, Type returnType) {
+    private static void assertCheck(Result result, Map<String, Object> param, ITestResult testResult) {
         if (ParamUtils.isExpectSuccess(param)) {
             Assert.assertTrue(result.isSuccess());
             //自动断言excel中expectedResult字段当值
             Object data = result.getData();
             autoAssertResult(data, param);
+
+            Assertor assertor = AssertorFactory.getAssertor(UnitTestAssertor.class);
+            // 执行 excel 中 exceptResult sheet 页中的断言
+            assertor.assertResult(testResult,result);
+
         } else if (isExpectFalse(param)) {
             assertCodeAndDec(result, param);
         }
@@ -711,7 +721,7 @@ public final class ResultAssert {
      * @param parameters 入参
      * @throws Exception 异常
      */
-    public static void assertResultForRest(Response response, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResultForRest(Response response,ITestResult testResult, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
         // 把入参和执行结果写入param中
         callback.afterTestMethod(context, response, parameters);
         // Assert.assertEquals(response.getStatusCode(), 200);
@@ -730,6 +740,10 @@ public final class ResultAssert {
             handleMap(expectMap, actualMap);
             expectMap.forEach((key, value) -> Assert.assertEquals(actualMap.get(key).toString(), value.toString()));
         }
+
+        // 执行 excel 中 exceptResult sheet 页中的断言
+        Assertor assertor = AssertorFactory.getAssertor(RestfulAssertor.class);
+        assertor.assertResult(testResult,response);
     }
 
     private static void handleMap(Map<String, Object> expectMap, Map<String, Object> actualMap) {

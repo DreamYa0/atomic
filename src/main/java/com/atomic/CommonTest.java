@@ -328,10 +328,10 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
                 System.out.println("-----------------------------执行智能化断言回放模式成功！-----------------------------");
                 resultCallBack(result, param, callback, parameters);
             } else {
-                assertResult(result, methodMeta.getReturnType(), param, callback, parameters);
+                assertResult(result, testResult, param, callback, parameters);
             }
         } else {
-            assertResult(result, methodMeta.getReturnType(), param, callback, parameters);
+            assertResult(result, testResult, param, callback, parameters);
         }
     }
 

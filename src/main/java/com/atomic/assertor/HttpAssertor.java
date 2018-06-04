@@ -8,10 +8,10 @@ import java.util.Map;
  * @Data 2018/5/19 下午9:17
  * @since 1.0.0
  */
-public class HttpAssertor implements Assertor{
+public class HttpAssertor extends AbstractAssertor{
 
     @Override
-    public void assertResult(Object result, Map<String, Object> context) {
+    protected void doAssert(Object result, Map<String, Object> excContext) {
 
     }
 }

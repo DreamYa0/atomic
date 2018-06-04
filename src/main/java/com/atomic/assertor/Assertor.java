@@ -1,6 +1,6 @@
 package com.atomic.assertor;
 
-import java.util.Map;
+import org.testng.ITestResult;
 
 /**
  * @author dreamyao
@@ -13,8 +13,8 @@ public interface Assertor {
     /**
      * 结果断言
      * @param result 返回结果
-     * @param context 入参集合
+     * @param testResult 测试上下文
      */
-    void assertResult(Object result, Map<String, Object> context);
+    void assertResult(ITestResult testResult,Object result);
 
 }

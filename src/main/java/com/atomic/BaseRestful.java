@@ -202,11 +202,11 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
                 resultCallBack(response, context, callback, parameters);
             } else {
                 // 自动断言
-                assertResultForRest(response, context, callback, parameters);
+                assertResultForRest(response, testResult, context, callback, parameters);
             }
         } else {
             // 自动断言
-            assertResultForRest(response, context, callback, parameters);
+            assertResultForRest(response, testResult, context, callback, parameters);
         }
         testCallBack(callBack, testResult);
     }

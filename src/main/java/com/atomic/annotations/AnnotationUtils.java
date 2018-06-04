@@ -366,14 +366,4 @@ public abstract class AnnotationUtils {
         }
         return null;
     }
-
-    /**
-     * 判断测试方法是否有@Parallel注解
-     * @param method
-     * @return
-     */
-    public static Boolean isParallel(Method method) {
-        Parallel parallel = method.getAnnotation(Parallel.class);
-        return parallel != null;
-    }
 }
