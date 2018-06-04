@@ -212,13 +212,18 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
     }
 
     private void startRunTest(Map<String, Object> param, IHookCallBack callBack, ITestResult testResult) throws Exception {
+        // 初始化DB
         initDb();
+
         // 先执行beforeTest方法
         beforeTest(param);
+
         // 自动断言前获取数据库数据，以及把入参的sql值赋值成真实的值
         getDataBeforeTest(param, this);
+
         // 调用方法
         commonTest(testResult);
+
         // 结果为 Y 才执行断言
         if (isExpectSuccess(param)) {
             execAssertMethod(param, callBack, testResult);
