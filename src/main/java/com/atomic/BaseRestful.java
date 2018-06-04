@@ -143,6 +143,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         setContentType(specification, context);
 
         if (isLoginUrlNoNull(context)) {
+            // 调用快捷登录
             headers = given().get(context.get(LOGIN_URL).toString()).getHeaders();
             specification = specification.headers(headers);
         } else if (isHttpHeaderNoNull(context) && context.get(HTTP_HEADER) != null) {
