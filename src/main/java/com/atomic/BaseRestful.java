@@ -8,10 +8,12 @@ import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.listener.SaveRunTime;
 import com.atomic.param.Constants;
+import com.atomic.param.HandleExcelParam;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
+import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.SaveResultUtils;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
@@ -92,19 +94,33 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
     }
 
     private void startTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
+
         Map<String, Object> context = TestNGUtils.getParamContext(testResult);
+
         //注入场景测试所需要的依赖方法的返回结果
         TestNGUtils.injectScenarioReturnResult(testResult, context);
+
         // 先执行beforeTestMethod
         beforeTest(context);
+
+        // 把 excel 中的变量转换为真实值
+        HandleExcelParam.getDataBeforeTest(new SqlTools(),context);
+
         // 检查Http接口测试入参必填字段
         ParamUtils.checkKeyWord(context);
+
         //记录方法调用开始时间
         SaveRunTime.startTestTime(testResult);
+
+        // 执行接口调用
         Response response = startRequest(testResult, context);
+
         //记录方法调用结束时间
         SaveRunTime.endTestTime(testResult);
+
+        // 缓存入参和返回值
         SaveResultUtils.saveTestResultInCache(response, testResult, context);
+
         execMethod(response, testResult, callBack, context);
     }
 

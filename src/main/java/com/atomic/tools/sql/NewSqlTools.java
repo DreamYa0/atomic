@@ -41,13 +41,12 @@ public class NewSqlTools {
     private final List<Map<String, Object>> mapList = Lists.newArrayList();
     private final List<String> pkValues = Lists.newCopyOnWriteArrayList();
     private volatile String ip;
-    private volatile String profile;
     private volatile Connection connection;
 
     private NewSqlTools() {
         //加载环境配置文件
         GlobalConfig.load();
-        profile = GlobalConfig.getProfile();
+        String profile = GlobalConfig.getProfile();
         Map<String, String> maps = CenterConfig.newInstance().readPropertyConfig(profile);
         ip = maps.get(JDBC_IP);
         dbUser = maps.get(JDBC_USER);
