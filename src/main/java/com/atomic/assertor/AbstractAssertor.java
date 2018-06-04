@@ -10,7 +10,6 @@ import org.springframework.util.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestResult;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +31,6 @@ public abstract class AbstractAssertor implements Assertor {
      */
     @Override
     public void assertResult(ITestResult testResult, Object result, Object instance) {
-        Method method = TestNGUtils.getTestMethod(testResult);
         String className = TestNGUtils.getTestCaseClassName(testResult);
         String resource = instance.getClass().getResource("").getPath();
         String xls = resource + className + ".xls";
