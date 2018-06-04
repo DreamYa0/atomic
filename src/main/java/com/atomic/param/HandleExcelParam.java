@@ -8,8 +8,6 @@ import com.atomic.param.handler.PhoneNoHandler;
 import com.atomic.param.handler.RandomParamHandler;
 import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.DataSourceUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -101,60 +99,5 @@ public final class HandleExcelParam {
             }
         }
         return value;
-    }
-
-    /*public static void handleUserKey(String key, Map<String, Object> param) {
-        if ("userkey".equalsIgnoreCase(key)) {
-            String value = param.get(key).toString();
-            String[] values = value.split(":");
-            if (values.length == 2) {
-                UserKeyConsole userKeyConsole = new UserKeyConsole();
-                if ("no".equalsIgnoreCase(values[1])) {
-                    param.put(key, userKeyConsole.getUserKey(values[0], false));
-                } else if ("yes".equalsIgnoreCase(values[1])) {
-                    param.put(key, userKeyConsole.getUserKey(values[0], true));
-                }
-            }
-        }
-    }*/
-
-    /**
-     * 用随机数来替换值
-     * @param value
-     */
-    public static Object randomParamValue(Object value) {
-        String[] values = value.toString().split(":");
-        if (values.length > 0) {
-            if (Constants.EXCEL_RANDOM.equals(values[0])) {
-                if ("String".equals(values[1])) {
-                    return RandomStringUtils.randomAlphabetic(Integer.valueOf(values[2]));
-                } else if ("int".equals(values[1])) {
-                    return randomInt(values[2], values[3]);
-                } else if ("double".equals(values[1])) {
-                    return randomDouble(values[2], values[3]);
-                } else if ("float".equals(values[1])) {
-                    return randomFloat(values[2], values[3]);
-                } else if ("long".equals(values[1])) {
-                    return randomLond(values[2], values[3]);
-                }
-            }
-        }
-        return value;
-    }
-
-    private static int randomInt(String startInclusive, String endInclusive) {
-        return RandomUtils.nextInt(Integer.valueOf(startInclusive), Integer.valueOf(endInclusive));
-    }
-
-    private static double randomDouble(String startInclusive, String endInclusive) {
-        return RandomUtils.nextDouble(Double.valueOf(startInclusive), Double.valueOf(endInclusive));
-    }
-
-    private static long randomLond(String startInclusive, String endInclusive) {
-        return RandomUtils.nextLong(Long.valueOf(startInclusive), Long.valueOf(endInclusive));
-    }
-
-    private static float randomFloat(String startInclusive, String endInclusive) {
-        return RandomUtils.nextFloat(Float.valueOf(startInclusive), Float.valueOf(endInclusive));
     }
 }

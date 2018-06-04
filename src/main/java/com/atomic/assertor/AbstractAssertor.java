@@ -20,22 +20,28 @@ import java.util.Map;
  * @date 2018/6/3 下午3:57
  * @since 1.0.0
  */
-public abstract class AbstractAssertor implements Assertor{
+public abstract class AbstractAssertor implements Assertor {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractAssertor.class);
 
+    /**
+     * 断言准备
+     * @param testResult 测试上下文
+     * @param result     返回结果
+     * @param instance   测试类实列
+     */
     @Override
-    public void assertResult(ITestResult testResult, Object result) {
+    public void assertResult(ITestResult testResult, Object result, Object instance) {
         Method method = TestNGUtils.getTestMethod(testResult);
         String className = testResult.getTestClass().getName();
-        String resource = this.getClass().getResource("").getPath();
+        String resource = instance.getClass().getResource("").getPath();
         String xls = resource + className + ".xls";
         ExcelUtils excelUtil = new ExcelUtils();
         List<Map<String, Object>> list = excelUtil.readDataByRow(xls, method.getName());
 
         Map<String, Object> param = TestNGUtils.getParamContext(testResult);
 
-        doAssert(result,list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString())));
+        doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString())));
     }
 
     protected void assertJsonPath(Map<String, Object> excContext, JsonPath resultPath) {
@@ -43,7 +49,7 @@ public abstract class AbstractAssertor implements Assertor{
         excContext.forEach((jsonPath, expecValue) -> {
             String actualResult = resultPath.getString(jsonPath);
             if (StringUtils.isEmpty(actualResult)) {
-                Assert.assertNotNull(actualResult,String.format("当前 JsonPath 路径不存在或 Result 返回值错误，JsonPath 路径为：%s",jsonPath));
+                Assert.assertNotNull(actualResult, String.format("当前 JsonPath 路径不存在或 Result 返回值错误，JsonPath 路径为：%s", jsonPath));
             } else {
                 Assert.assertEquals(actualResult, expecValue);
             }
@@ -52,7 +58,7 @@ public abstract class AbstractAssertor implements Assertor{
 
     /**
      * 执行断言
-     * @param result 返回结果
+     * @param result     返回结果
      * @param excContext 预期结果上下文
      */
     protected abstract void doAssert(Object result, Map<String, Object> excContext);

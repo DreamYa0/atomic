@@ -24,7 +24,7 @@ public class RandomParamHandler implements IHandler {
         return RandomUtils.nextDouble(Double.valueOf(startInclusive), Double.valueOf(endInclusive));
     }
 
-    private static long randomLond(String startInclusive, String endInclusive) {
+    private static long randomLong(String startInclusive, String endInclusive) {
         return RandomUtils.nextLong(Long.valueOf(startInclusive), Long.valueOf(endInclusive));
     }
 
@@ -51,7 +51,7 @@ public class RandomParamHandler implements IHandler {
                         } else if ("float".equals(values[1])) {
                             param.put(key, randomFloat(values[2], values[3]));
                         } else if ("long".equals(values[1])) {
-                            param.put(key, randomLond(values[2], values[3]));
+                            param.put(key, randomLong(values[2], values[3]));
                         }
                     }
                 }

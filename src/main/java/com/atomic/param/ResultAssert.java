@@ -79,7 +79,7 @@ public final class ResultAssert {
      * @param parameters 入参对象
      * @throws Exception 异常
      */
-    public static void assertResult(Object result, ITestResult testResult, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResult(Object result, ITestResult testResult, Object instance, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
         // 把入参和执行结果写入param中
         callback.afterTestMethod(param, result, parameters);
         // 如果是Result型，检测执行结果，assertResult不填的就不管，比如自动化测试
@@ -88,7 +88,7 @@ public final class ResultAssert {
             assertCheck(pagedResult, param);
         } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof Result) {
             Result resultNew = (Result) result;
-            assertCheck(resultNew, param, testResult);
+            assertCheck(resultNew, param, testResult,instance);
         } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof BaseResult) {
             BaseResult baseResult = (BaseResult) result;
             assertCheck(baseResult, param);
@@ -102,7 +102,7 @@ public final class ResultAssert {
      * @param result 返回结果对象
      * @param param  入参excel集合
      */
-    private static void assertCheck(Result result, Map<String, Object> param, ITestResult testResult) {
+    private static void assertCheck(Result result, Map<String, Object> param, ITestResult testResult, Object instance) {
         if (ParamUtils.isExpectSuccess(param)) {
             Assert.assertTrue(result.isSuccess());
             //自动断言excel中expectedResult字段当值
@@ -111,7 +111,7 @@ public final class ResultAssert {
 
             Assertor assertor = AssertorFactory.getAssertor(UnitTestAssertor.class);
             // 执行 excel 中 exceptResult sheet 页中的断言
-            assertor.assertResult(testResult,result);
+            assertor.assertResult(testResult,result,instance);
 
         } else if (isExpectFalse(param)) {
             assertCodeAndDec(result, param);
@@ -325,26 +325,6 @@ public final class ResultAssert {
                             Reporter.log("[ResultAssert#assertExpectedResult()]:{获取返回实际值异常！！}", true);
                         }
                     }
-                    /*try {
-                        Map<String, String> actualDataMap = JSON.parseObject(JSON.toJSONString(result.getData()), new TypeReference<Map<String, String>>() {});
-                        Map<String, String> expecDataMap = JSON.parseObject(expectedData, new TypeReference<Map<String, String>>() {});
-                        Set<String> actualKeys = actualDataMap.keySet();
-                        Set<String> expecKeys = expecDataMap.keySet();
-                        if (actualKeys.containsAll(expecKeys)) {
-                            Iterator<String> iterator = expecKeys.iterator();
-                            while (iterator.hasNext()) {
-                                String key = iterator.next();
-                                if (!actualDataMap.get(key).equals(expecDataMap.get(key))) {
-                                    return false;
-                                }
-                            }
-                            return true;
-                        }
-                    } catch (Exception e) {
-                        if (result.getData().toString().equals(expectedData)) {
-                            return true;
-                        }
-                    }*/
                 }
                 return true;
             }
@@ -655,32 +635,22 @@ public final class ResultAssert {
         } else {
             // expectedResult不填的就不管
             if (isExpectedResultNoNull(param)) {
-                /*JSONObject expectResultJSON = new JSONObject();
-                JSONObject resultJSON = new JSONObject();
-                try {
-                    // 获取期望结果
-                    String expectResultStr = param.get("expectedResult").toString();
-                    expectResultJSON = JSONObject.parseObject(expectResultStr);
-                    // 获取实际结果
-                    resultJSON = JSONObject.parseObject(result.toString());
-                } catch (Exception e) {
-                    Reporter.log("[ResultAssert#assertResult()]:{测试结果转换JSONObject异常！}", true);
-                    e.printStackTrace();
-                }
-                // 断言实际结果与预期结果
-                assertJSON(expectResultJSON, resultJSON);*/
                 String expectJsonResult = param.get(Constants.EXPECTED_RESULT).toString();
                 String actualResult = result.toString();
+
                 Map<String, Object> expectMap = JSON.parseObject(expectJsonResult, new TypeReference<Map<String, Object>>() {
                 });
                 Map<String, Object> actualMap = JSON.parseObject(actualResult, new TypeReference<Map<String, Object>>() {
                 });
+
                 Assert.assertTrue(expectMap.size() <= actualMap.size());
                 List<String> expectKeys = Lists.newArrayList(expectMap.keySet());
                 List<String> actualKeys = Lists.newArrayList(actualMap.keySet());
                 actualKeys.removeAll(expectKeys);
                 actualKeys.forEach(actualMap::remove);
+
                 handleMap(expectMap, actualMap);
+
                 expectMap.forEach((key, value) -> Assert.assertEquals(actualMap.get(key).toString(), value.toString()));
             } else {
                 Reporter.log("[ResultAssert#assertResult() ]:{测试结果需手动断言！}", true);
@@ -721,7 +691,7 @@ public final class ResultAssert {
      * @param parameters 入参
      * @throws Exception 异常
      */
-    public static void assertResultForRest(Response response,ITestResult testResult, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResultForRest(Response response,ITestResult testResult, Object instance, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
         // 把入参和执行结果写入param中
         callback.afterTestMethod(context, response, parameters);
         // Assert.assertEquals(response.getStatusCode(), 200);
@@ -743,7 +713,7 @@ public final class ResultAssert {
 
         // 执行 excel 中 exceptResult sheet 页中的断言
         Assertor assertor = AssertorFactory.getAssertor(RestfulAssertor.class);
-        assertor.assertResult(testResult,response);
+        assertor.assertResult(testResult,response,instance);
     }
 
     private static void handleMap(Map<String, Object> expectMap, Map<String, Object> actualMap) {
