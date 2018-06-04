@@ -1,6 +1,7 @@
 package com.atomic.param;
 
 import io.restassured.response.Response;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -58,12 +59,21 @@ public final class ParamPrint {
      * @param map        入参上下文
      * @param parameters 接口入参
      */
+    @SuppressWarnings("unchecked")
     public static void resultPrint(String method, Response response, Map<String, Object> map, Object... parameters) {
         Lock lock = new ReentrantLock();
         lock.lock();
         try {
             System.out.println("------------------" + method + " request------------------------");
-            System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
+
+            Map<String, Object> param = (Map<String, Object>) parameters[0];
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("data")) {
+                Object paramJsonValue = param.get("data");
+                System.out.println("入参：\n" + formatJson(paramJsonValue.toString()));
+            } else {
+                System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
+            }
+
             if (map.get(Constants.CASE_NAME) == null) {
                 System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
             } else {
@@ -85,18 +95,27 @@ public final class ParamPrint {
      * @param map        入参上下文
      * @param parameters 接口入参
      */
+    @SuppressWarnings("unchecked")
     public static void resultPrint(String method, String result, Map<String, Object> map, Object... parameters) {
         Lock lock = new ReentrantLock();
         lock.lock();
         try {
             System.out.println("------------------" + method + " request------------------------");
-            System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
+
+            Map<String, Object> param = (Map<String, Object>) parameters[0];
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("data")) {
+                Object paramJsonValue = param.get("data");
+                System.out.println("入参：\n" + formatJson(paramJsonValue.toString()));
+            } else {
+                System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
+            }
+
             if (map.get(Constants.CASE_NAME) == null) {
                 System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
             } else {
                 System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
             }
-            System.out.println("出参：" + formatJson(result));
+            System.out.println("出参：\n" + formatJson(result));
             System.out.println("------------------------------------------------");
             System.out.println("");
         } finally {
@@ -127,7 +146,7 @@ public final class ParamPrint {
                 case '[':
                     sb.append(current);
                     if (!isInQuotationMarks) {
-                        sb.append('\n');
+                        // sb.append('\n');
                         indent++;
                         addIndentBlank(sb, indent);
                     }
@@ -135,7 +154,7 @@ public final class ParamPrint {
                 case '}':
                 case ']':
                     if (!isInQuotationMarks) {
-                        sb.append('\n');
+                        // sb.append('\n');
                         indent--;
                         addIndentBlank(sb, indent);
                     }
@@ -144,7 +163,7 @@ public final class ParamPrint {
                 case ',':
                     sb.append(current);
                     if (last != '\\' && !isInQuotationMarks) {
-                        sb.append('\n');
+                        // sb.append('\n');
                         addIndentBlank(sb, indent);
                     }
                     break;

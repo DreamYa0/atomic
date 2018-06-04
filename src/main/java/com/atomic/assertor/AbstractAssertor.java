@@ -33,15 +33,15 @@ public abstract class AbstractAssertor implements Assertor {
     @Override
     public void assertResult(ITestResult testResult, Object result, Object instance) {
         Method method = TestNGUtils.getTestMethod(testResult);
-        String className = testResult.getTestClass().getName();
+        String className = TestNGUtils.getTestCaseClassName(testResult);
         String resource = instance.getClass().getResource("").getPath();
         String xls = resource + className + ".xls";
         ExcelUtils excelUtil = new ExcelUtils();
-        List<Map<String, Object>> list = excelUtil.readDataByRow(xls, method.getName());
+        List<Map<String, Object>> list = excelUtil.readDataByRow(xls, "exceptResult");
 
         Map<String, Object> param = TestNGUtils.getParamContext(testResult);
 
-        doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString())));
+        doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1));
     }
 
     protected void assertJsonPath(Map<String, Object> excContext, JsonPath resultPath) {

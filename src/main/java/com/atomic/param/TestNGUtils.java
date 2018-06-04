@@ -3,6 +3,7 @@ package com.atomic.param;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.util.ReflectionUtils;
 import com.atomic.util.SaveResultUtils;
+import org.testng.IClass;
 import org.testng.ITestResult;
 
 import java.lang.reflect.Method;
@@ -124,5 +125,17 @@ public final class TestNGUtils {
      */
     public static Method getTestMethod(ITestResult testResult) {
         return testResult.getMethod().getConstructorOrMethod().getMethod();
+    }
+
+    /**
+     * 获取测试用例的Class名称(非全限定名称)
+     * @param testResult 测试结果上下文
+     * @return
+     */
+    public static String getTestCaseClassName(ITestResult testResult) {
+        IClass iClass = testResult.getTestClass();
+        String testClassName = iClass.getName();
+        String[] names = testClassName.split("\\.");
+        return names[names.length - 1];
     }
 }

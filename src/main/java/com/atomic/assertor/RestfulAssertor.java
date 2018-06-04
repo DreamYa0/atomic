@@ -29,8 +29,7 @@ public class RestfulAssertor  extends AbstractAssertor{
         excContext.remove(Constants.CASE_INDEX);
 
         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(excContext))) {
-            String respString = response.getBody().print();
-            JsonPath path = new JsonPath(respString);
+            JsonPath path = response.getBody().jsonPath();
             assertJsonPath(excContext, path);
         }
     }
