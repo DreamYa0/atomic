@@ -171,14 +171,20 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
             } else {
                 response = specification.when().get(uri);
             }
-        } else if (Constants.HTTP_HOST.equalsIgnoreCase(httpMode) && isJsonContext(context)) {
+        } else if (Constants.HTTP_POST.equalsIgnoreCase(httpMode) && isJsonContext(context)) {
             // POST Json请求
             if (parameters == null || parameters.size() == 0) {
                 response = specification.when().post(uri);
-            } else if (parameters.keySet().contains(Constants.DEFAULT_SINGLE_PARAM_NAME)) {
-                response = specification.body(parameters.get(Constants.DEFAULT_SINGLE_PARAM_NAME).toString()).when().post(uri);
+            } else if (parameters.keySet().contains("request")) {
+                response = specification.body(parameters.get("request").toString()).when().post(uri);
             } else {
-                response = specification.body(parameters).when().post(uri);
+
+                Map<String, Object> param = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, parameters);
+                param.remove(Constants.CASE_INDEX);
+                // 把param设置会测试上下文中
+                TestNGUtils.setParamContext(testResult,param);
+
+                response = specification.body(param).when().post(uri);
             }
         } else {
             // POST 表单提交
@@ -201,7 +207,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
     }
 
     private void execMethod(Response response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {
-        Map<String, Object> parameters = ParamUtils.getParameters(context);
+        Map<String, Object> parameters = TestNGUtils.getParamContext(testResult);
         String result = response.body().asString();
         // 打印测试结果
         resultPrint(getTestMethodName(testResult), response, context, parameters);

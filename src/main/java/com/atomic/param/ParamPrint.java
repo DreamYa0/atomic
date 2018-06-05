@@ -67,8 +67,8 @@ public final class ParamPrint {
             System.out.println("------------------" + method + " request------------------------");
 
             Map<String, Object> param = (Map<String, Object>) parameters[0];
-            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("data")) {
-                Object paramJsonValue = param.get("data");
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("request")) {
+                Object paramJsonValue = param.get("request");
                 System.out.println("入参：\n" + formatJson(paramJsonValue.toString()));
             } else {
                 System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
@@ -103,8 +103,8 @@ public final class ParamPrint {
             System.out.println("------------------" + method + " request------------------------");
 
             Map<String, Object> param = (Map<String, Object>) parameters[0];
-            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("data")) {
-                Object paramJsonValue = param.get("data");
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("request")) {
+                Object paramJsonValue = param.get("request");
                 System.out.println("入参：\n" + formatJson(paramJsonValue.toString()));
             } else {
                 System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));

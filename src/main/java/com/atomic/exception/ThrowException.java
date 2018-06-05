@@ -62,6 +62,8 @@ public abstract class ThrowException {
             throw new GetBeanException(e);
         } else if (e instanceof CenterConfigException) {
             throw new CenterConfigException(e);
+        } else {
+            throw new RuntimeException(e);
         }
     }
 }

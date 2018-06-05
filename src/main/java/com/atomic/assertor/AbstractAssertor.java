@@ -31,11 +31,8 @@ public abstract class AbstractAssertor implements Assertor {
      */
     @Override
     public void assertResult(ITestResult testResult, Object result, Object instance) {
-        String className = TestNGUtils.getTestCaseClassName(testResult);
-        String resource = instance.getClass().getResource("").getPath();
-        String xls = resource + className + ".xls";
         ExcelUtils excelUtil = new ExcelUtils();
-        List<Map<String, Object>> list = excelUtil.readDataByRow(xls, "exceptResult");
+        List<Map<String, Object>> list = excelUtil.readDataByRow(testResult,instance,"exceptResult");
 
         Map<String, Object> param = TestNGUtils.getParamContext(testResult);
 

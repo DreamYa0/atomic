@@ -493,7 +493,7 @@ public final class ParamUtils {
     private static List<String> getRemoveKey() {
         List<String> removeKey = new ArrayList<>();
         removeKey.add(Constants.CASE_NAME);
-        removeKey.add(Constants.CASE_INDEX);
+        // removeKey.add(Constants.CASE_INDEX);
         removeKey.add(Constants.ASSERT_RESULT);
         removeKey.add(Constants.TEST_ONLY);
         removeKey.add(Constants.ASSERT_CODE);

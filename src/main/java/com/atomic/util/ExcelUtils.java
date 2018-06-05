@@ -1,6 +1,7 @@
 package com.atomic.util;
 
 import com.atomic.param.Constants;
+import com.atomic.param.TestNGUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.testng.ITestResult;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author dreamyao
@@ -174,7 +180,7 @@ public class ExcelUtils {
             this.errorInfo = "文件名不是excel格式";
             return false;
         }
-        System.out.println(filePath);
+        // System.out.println(filePath);
         File file = new File(filePath);
         if (!file.exists()) {
             this.errorInfo = "文件不存在";
@@ -313,5 +319,13 @@ public class ExcelUtils {
             }
         }
         return datas;
+    }
+
+    public List<Map<String, Object>> readDataByRow(ITestResult testResult, Object instance, String sheetName) {
+        String className = TestNGUtils.getTestCaseClassName(testResult);
+        String resource = instance.getClass().getResource("").getPath();
+        String xls = resource + className + ".xls";
+        ExcelUtils excelUtil = new ExcelUtils();
+        return excelUtil.readDataByRow(xls, sheetName);
     }
 }

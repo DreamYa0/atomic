@@ -96,6 +96,10 @@ public final class TestNGUtils {
         return (Map<String, Object>) testResult.getParameters()[0];
     }
 
+    public static void setParamContext(ITestResult testResult,Map<String, Object> context) {
+        testResult.getParameters()[0] = context;
+    }
+
     /**
      * 注入场景测试所需要的依赖方法的返回结果
      * @param iTestResult 测试结果上下问

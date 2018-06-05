@@ -8,6 +8,11 @@ import com.atomic.param.handler.PhoneNoHandler;
 import com.atomic.param.handler.RandomParamHandler;
 import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.DataSourceUtils;
+import com.atomic.util.ExcelUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+import org.testng.ITestResult;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +20,8 @@ import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -23,6 +30,8 @@ import java.util.Map;
  * @title 通用excel中关键字解析工具类
  */
 public final class HandleExcelParam {
+
+    private static final Logger logger = LoggerFactory.getLogger(HandleExcelParam.class);
 
     private HandleExcelParam() {
     }
@@ -99,5 +108,34 @@ public final class HandleExcelParam {
             }
         }
         return value;
+    }
+
+    /**
+     * 把excel入参中多个sheet，组合为真正入参的map集合
+     * @param instance 测试类实列
+     * @param context  接口入参map集合
+     * @return paramter map集合
+     */
+    public static Map<String, Object> assemblyParamMap2RequestMap(ITestResult testResult, Object instance, Map<String, Object> context) {
+        if (Boolean.FALSE.equals(CollectionUtils.isEmpty(context))) {
+            Set<String> keys = context.keySet();
+            for (String key : keys) {
+                Object value = context.get(key);
+                if (Objects.isNull(value)|| "".equals(value)) {
+                    ExcelUtils excel = new ExcelUtils();
+                    try {
+                        List<Map<String, Object>> maps = excel.readDataByRow(testResult, instance, key);
+                        // 当前Excel testMethod Sheet也
+                        Map<String, Object> map = maps.get(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()) - 1);
+                        Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);
+                        assemblyMap.remove(Constants.CASE_INDEX);
+                        context.put(key, assemblyMap);
+                    } catch (Exception e) {
+                        // 如果Sheet不存在，则按照原逻辑处理
+                    }
+                }
+            }
+        }
+        return context;
     }
 }
