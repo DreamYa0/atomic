@@ -1,7 +1,5 @@
 package com.atomic;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.CenterConfig;
 import com.atomic.enums.CheckMode;
@@ -18,6 +16,8 @@ import com.atomic.tools.sql.NewSqlTools;
 import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.SaveResultUtils;
 import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
@@ -109,7 +109,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         beforeTest(context);
 
         // 把 excel 中的变量转换为真实值
-        HandleExcelParam.getDataBeforeTest(new SqlTools(),context);
+        HandleExcelParam.getDataBeforeTest(new SqlTools(), context);
 
         // 检查Http接口测试入参必填字段
         ParamUtils.checkKeyWord(context);
@@ -152,8 +152,11 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
             headers = given().get(context.get(LOGIN_URL).toString()).getHeaders();
             specification = specification.headers(headers);
         } else if (isHttpHeaderNoNull(context) && context.get(HTTP_HEADER) != null) {
-            List<Header> headerList = JSON.parseObject(context.get(HTTP_HEADER).toString(), new TypeReference<List<Header>>() {
-            });
+
+            Gson gson = new Gson();
+            // 把Header json字符串反序列化为List<Header>
+            List<Header> headerList = gson.fromJson(context.get(HTTP_HEADER).toString(), new TypeToken<List<Header>>() {
+            }.getType());
             specification = specification.headers(new Headers(headerList));
         }
         return getResponse(testResult, specification, context);
@@ -191,7 +194,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
                 param.remove(Constants.CASE_INDEX);
                 // 把param设置会测试上下文中
-                TestNGUtils.setParamContext(testResult,newParam);
+                TestNGUtils.setParamContext(testResult, newParam);
 
                 response = specification.body(param).when().post(uri);
             }
@@ -234,11 +237,11 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
                 resultCallBack(response, context, callback, parameters);
             } else {
                 // 自动断言
-                assertResultForRest(response, testResult,this, context, callback, parameters);
+                assertResultForRest(response, testResult, this, context, callback, parameters);
             }
         } else {
             // 自动断言
-            assertResultForRest(response, testResult,this, context, callback, parameters);
+            assertResultForRest(response, testResult, this, context, callback, parameters);
         }
         testCallBack(callBack, testResult);
     }

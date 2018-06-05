@@ -25,10 +25,6 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.xml.XmlSuite;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -92,8 +88,7 @@ public class ReportListener implements IReporter {
                 for (ISuiteResult r : iSuiteResultMap.values()) {
                     ExtentTest resultNode;
                     ITestContext context = r.getTestContext();
-                    // 统计测试结果数据
-                    getResultInfo(context);
+
                     if (createSuiteResultNode) {
                         // 没有创建suite的情况下，将在SuiteResult的创建为一级节点，否则创建为suite的一个子节点。
                         if (null == suiteTest) {
@@ -142,7 +137,7 @@ public class ReportListener implements IReporter {
             // 统计完成后清除suites集合，以免重复展示
             suites.clear();
         }
-        // TODO 暂时做输出展示，后面会把报告地址同步给devops流水线用
+        // 暂时做输出展示
         Mongodb tools = new Mongodb.Builder().build().connectMongodb();
         String Id = tools.getIdByExample("name", projectName + "#" + ExtentManager.newInstance().countBuild(projectName));
         String reportURL = "http://172.17.31.34:1337/#/report-summary?id=" + Id;
@@ -153,7 +148,6 @@ public class ReportListener implements IReporter {
         System.out.println();
         System.out.println("======================================================================================");
         System.out.println();
-        countResultInfo(reportURL);
     }
 
     private void buildTestNodes(ExtentTest extentTest, IResultMap resultMap, Status status) {
@@ -318,44 +312,5 @@ public class ReportListener implements IReporter {
             name = result.getMethod().getMethodName();
         }
         return name;
-    }
-
-    private void getResultInfo(ITestContext context) {
-        passedTests.add(context.getPassedTests().size());
-        failedTests.add(context.getFailedTests().size());
-        skippedTests.add(context.getSkippedTests().size());
-        allTestMethod.add(context.getAllTestMethods().length);
-    }
-
-    private void countResultInfo(String reportURL) {
-        int pass = passedTests.stream().mapToInt(value -> value).sum();
-        int fail = failedTests.stream().mapToInt(value -> value).sum();
-        int skip = skippedTests.stream().mapToInt(value -> value).sum();
-        int allMethod = allTestMethod.stream().mapToInt(value -> value).sum();
-        int total = pass + fail + skip;
-        int successRate = (int) (((float) pass / total) * 100);
-        try {
-            File outFile = new File("report.conf");
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outFile));
-            bufferedWriter.write("total=" + allMethod);
-            bufferedWriter.newLine();
-            bufferedWriter.write("success=" + pass);
-            bufferedWriter.newLine();
-            bufferedWriter.write("fail=" + fail);
-            bufferedWriter.newLine();
-            bufferedWriter.write("skip=" + skip);
-            bufferedWriter.newLine();
-            bufferedWriter.write("casenum=" + total);
-            bufferedWriter.newLine();
-            bufferedWriter.write("successRate=" + successRate);
-            bufferedWriter.newLine();
-            bufferedWriter.write("status=" + (fail == 0 ? "Successful" : "Failed"));
-            bufferedWriter.newLine();
-            bufferedWriter.write("reportUrl=" + reportURL);
-            bufferedWriter.flush();
-            bufferedWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
