@@ -93,7 +93,7 @@ public final class Constants {
     public static final String OLD_SQL_ = "m_old_sql_";
 
     /** 测试用例的说明，比如参数type无效 */
-    public static final String EXCEL_DESC = "err";
+    public static final String EXCEL_DESC = "caseName";
 
     /** testmethodmeta对象 */
     public static final String TESTMETHODMETA = "testmethodmeta";

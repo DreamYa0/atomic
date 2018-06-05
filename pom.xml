@@ -527,20 +527,6 @@
                 <artifactId>maven-archetype-plugin</artifactId>
                 <version>2.4</version>
             </plugin>
-            <plugin>
-                <groupId>com.atomic.plugin</groupId>
-                <artifactId>unittest-generator</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-                <configuration>
-                    <!-- 待测试类的物理地址 -->
-                    <restFulTestMap>
-                        <package>unittest</package>
-                        <className>TestNewPages</className>
-                    </restFulTestMap>
-                    <!-- 生成测试类和excel的物理地址，到src/test为止 -->
-                    <testDirectory>${user.dir}/src/test</testDirectory>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>
