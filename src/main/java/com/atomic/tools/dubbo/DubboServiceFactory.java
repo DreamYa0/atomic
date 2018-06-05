@@ -107,7 +107,7 @@ public class DubboServiceFactory {
         //为获取覆盖率做全局配置,强制指定请求服务地址
         try {
             if (GlobalConfig.hostDomain != null) {
-                String url = "META_INF.dubbo://" + GlobalConfig.hostDomain + "/"
+                String url = "dubbo://" + GlobalConfig.hostDomain + "/"
                         + clazz.getName();
                 T t = getServiceByUrl(clazz, url, version);
                 checkService(t, clazz);

@@ -4,6 +4,7 @@ package com.atomic.config;
 import com.atomic.enums.TestMode;
 import com.atomic.util.FileUtils;
 import com.google.common.collect.Lists;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -11,7 +12,10 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Created by luoqinqin on 16/5/23.
+ * @author dreamyao
+ * @title
+ * @date 16/5/23 下午7:55
+ * @since 1.0.0
  */
 public class GlobalConfig {
 
@@ -45,10 +49,10 @@ public class GlobalConfig {
             if (properties.containsKey("hostDomain")) {
                 hostDomain = properties.getProperty("hostDomain");
             }
-            if (properties.containsKey("projectName")) {
+            if (properties.containsKey("projectName") && Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("projectName")))) {
                 projectName = properties.getProperty("projectName");
             }
-            if (properties.containsKey("runner")) {
+            if (properties.containsKey("runner") && Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("runner")))) {
                 runner = properties.getProperty("runner");
             }
             if (properties.containsKey("runMode")) {
