@@ -49,8 +49,8 @@ public final class TestNGUtils {
 
     /**
      * 把参数和结果注入到测试函数，先注入默认值，防止执行时参数不匹配
-     * @param map
-     * @param testMethod
+     * @param map 待处理的入参map集合
+     * @param testMethod 测试上下文
      * @return
      * @throws Exception
      */
@@ -65,7 +65,7 @@ public final class TestNGUtils {
                 objects[i] = null;
                 // 基本类型要重新赋值
                 /*if (testMethod.getGenericParameterTypes()[i] instanceof Class) {
-					Class paramClass = (Class) testMethod.getGenericParameterTypes()[i];
+                    Class paramClass = (Class) testMethod.getGenericParameterTypes()[i];
 					if (paramClass.isPrimitive()) {
 						objects[i] = StringUtils.json2Bean(paramClass.getSimpleName(), "0", null);
 					}
@@ -87,22 +87,28 @@ public final class TestNGUtils {
     }
 
     /**
-     * 获取入参
+     * 从测试上下文中获取入参
      * @param testResult 测试结果视图
-     * @return
+     * @return 待处理的入参map集合
      */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> getParamContext(ITestResult testResult) {
         return (Map<String, Object>) testResult.getParameters()[0];
     }
 
-    public static void setParamContext(ITestResult testResult,Map<String, Object> context) {
+    /**
+     * 把处理后的参数从新设置回测试上下文中
+     * @param testResult 测试上下文
+     * @param context    处理后的入参map集合
+     */
+    public static void setParamContext(ITestResult testResult, Map<String, Object> context) {
         testResult.getParameters()[0] = context;
     }
 
     /**
      * 注入场景测试所需要的依赖方法的返回结果
-     * @param iTestResult 测试结果上下问
+     * @param iTestResult 测试结果上下文
+     * @param context 处理后的入参map集合
      */
     public static void injectScenarioReturnResult(ITestResult iTestResult, Map<String, Object> context) {
         //获取接口所依赖的返回值并注入到context中
