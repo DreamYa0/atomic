@@ -48,11 +48,13 @@ public class RollBackListener extends TestListenerAdapter {
     public void onTestStart(ITestResult testResult) {
         //实现单库多表数据回滚
         if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
-            startRollBack(testResult);//开启监听，当为@RollBack注解时执行单库,多表数据回滚
+            // 开启监听，当为@RollBack注解时执行单库,多表数据回滚
+            startRollBack(testResult);
         } else if (AnnotationUtils.isRollBackAllMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
-            //实现多库多表数据回滚
+            // 实现多库多表数据回滚
             try {
-                startRollBackAll(testResult);//当为@RollBackAll注解时执行多库,多表数据回滚
+                // 当为@RollBackAll注解时执行多库,多表数据回滚
+                startRollBackAll(testResult);
             } catch (RollBackException e) {
                 Reporter.log("-----------------回滚数据库限制不能超过5个！--------------");
                 throw new RollBackException("回滚数据库限制不能超过5个！");
