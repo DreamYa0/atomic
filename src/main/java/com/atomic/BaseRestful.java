@@ -6,7 +6,9 @@ import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.CenterConfig;
 import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
+import com.atomic.listener.RollBackListener;
 import com.atomic.listener.SaveRunTime;
+import com.atomic.listener.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.HandleExcelParam;
 import com.atomic.param.ITestResultCallback;
@@ -15,6 +17,7 @@ import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
 import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.SaveResultUtils;
+import com.google.common.collect.Maps;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
@@ -24,6 +27,7 @@ import org.testng.IHookable;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.Listeners;
 
 import java.util.List;
 import java.util.Map;
@@ -65,6 +69,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @Data 2018/05/30 10:48
  */
 // @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
+@Listeners({ScenarioRollBackListener.class, RollBackListener.class})
 public abstract class BaseRestful extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
@@ -180,9 +185,13 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
             } else {
 
                 Map<String, Object> param = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, parameters);
+
+                // 复制一份新的入参map集合，存入测试上下文中
+                Map<String, Object> newParam = Maps.newHashMap(param);
+
                 param.remove(Constants.CASE_INDEX);
                 // 把param设置会测试上下文中
-                TestNGUtils.setParamContext(testResult,param);
+                TestNGUtils.setParamContext(testResult,newParam);
 
                 response = specification.body(param).when().post(uri);
             }
