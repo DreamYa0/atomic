@@ -50,11 +50,9 @@ public final class HandleExcelParam {
         param.keySet().stream().filter(key -> param.get(key) != null).forEach(key -> {
             try {
                 param.put(key, getRealValue(sqlTools, param, key));
-                // param.put(key, randomParamValue(param.get(key)));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            // handleUserKey(key, param);
         });
 
         IHandler randomParamHandler = new RandomParamHandler();
@@ -125,7 +123,6 @@ public final class HandleExcelParam {
                     ExcelUtils excel = new ExcelUtils();
                     try {
                         List<Map<String, Object>> maps = excel.readDataByRow(testResult, instance, key);
-                        // 当前Excel testMethod Sheet也
                         Map<String, Object> map = maps.get(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()) - 1);
                         Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);
                         assemblyMap.remove(Constants.CASE_INDEX);
