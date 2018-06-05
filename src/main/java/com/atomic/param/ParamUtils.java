@@ -41,10 +41,7 @@ public final class ParamUtils {
      * @return
      */
     public static boolean isValueTrue(Object value) {
-        if (value == null) {
-            return false;
-        }
-        return "1".equalsIgnoreCase(value.toString()) || Constants.EXCEL_YES.equalsIgnoreCase(value.toString());
+        return value != null && ("1".equalsIgnoreCase(value.toString()) || Constants.EXCEL_YES.equalsIgnoreCase(value.toString()));
     }
 
     /**
@@ -80,10 +77,7 @@ public final class ParamUtils {
      * @return
      */
     public static boolean isHttpModeNoNull(Map<String, Object> param) {
-        if (param.get(Constants.HTTP_MODE) == null || "".equals(param.get(Constants.HTTP_MODE))) {
-            return false;
-        }
-        return true;
+        return !(param.get(Constants.HTTP_MODE) == null || "".equals(param.get(Constants.HTTP_MODE)));
     }
 
     /**
@@ -92,10 +86,7 @@ public final class ParamUtils {
      * @return
      */
     public static boolean isHttpHostNoNull(Map<String, Object> param) {
-        if (param.get(Constants.HTTP_HOST) == null || "".equals(param.get(Constants.HTTP_HOST))) {
-            return false;
-        }
-        return true;
+        return !(param.get(Constants.HTTP_HOST) == null || "".equals(param.get(Constants.HTTP_HOST)));
     }
 
     /**
@@ -104,31 +95,19 @@ public final class ParamUtils {
      * @return
      */
     public static boolean isHttpMethodNoNull(Map<String, Object> param) {
-        if (param.get(Constants.HTTP_METHOD) == null || "".equals(param.get(Constants.HTTP_METHOD))) {
-            return false;
-        }
-        return true;
+        return !(param.get(Constants.HTTP_METHOD) == null || "".equals(param.get(Constants.HTTP_METHOD)));
     }
 
     public static boolean isContentTypeNoNull(Map<String, Object> param) {
-        if (param.get(Constants.CONTENT_TYPE) == null || "".equals(param.get(Constants.CONTENT_TYPE))) {
-            return false;
-        }
-        return true;
+        return !(param.get(Constants.CONTENT_TYPE) == null || "".equals(param.get(Constants.CONTENT_TYPE)));
     }
 
     public static boolean isHttpHeaderNoNull(Map<String, Object> param) {
-        if (param.get(Constants.HTTP_HEADER) == null) {
-            return false;
-        }
-        return true;
+        return param.get(Constants.HTTP_HEADER) != null;
     }
 
     public static boolean isLoginUrlNoNull(Map<String, Object> param) {
-        if (param.get(Constants.LOGIN_URL) == null || "".equals(param.get(Constants.LOGIN_URL))) {
-            return false;
-        }
-        return true;
+        return !(param.get(Constants.LOGIN_URL) == null || "".equals(param.get(Constants.LOGIN_URL)));
     }
 
     /**
@@ -137,10 +116,7 @@ public final class ParamUtils {
      * @return 是否存在
      */
     public static boolean isExpectedResultNoNull(Map<String, Object> param) {
-        if (param.get(Constants.EXPECTED_RESULT) == null || "".equals(param.get(Constants.EXPECTED_RESULT))) {
-            return false;
-        }
-        return true;
+        return !(param.get(Constants.EXPECTED_RESULT) == null || "".equals(param.get(Constants.EXPECTED_RESULT)));
     }
 
     /**
@@ -149,10 +125,7 @@ public final class ParamUtils {
      * @return 是否有
      */
     public static boolean isSidParam(Map<String, Object> param) {
-        if (param.get("sid") != null && !"".equals(param.get("sid"))) {
-            return true;
-        }
-        return false;
+        return param.get("sid") != null && !"".equals(param.get("sid"));
     }
 
     /**
@@ -161,10 +134,7 @@ public final class ParamUtils {
      * @return 是否有
      */
     public static boolean isActionInfoParam(Map<String, Object> param) {
-        if (param.get("actionInfo") != null && !"".equals(param.get("actionInfo"))) {
-            return true;
-        }
-        return false;
+        return param.get("actionInfo") != null && !"".equals(param.get("actionInfo"));
     }
 
     /**
