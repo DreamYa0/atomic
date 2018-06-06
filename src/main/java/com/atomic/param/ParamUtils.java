@@ -284,7 +284,6 @@ public final class ParamUtils {
     private static Object generateParametersNew(Type paramType, Type parameterizedType, Map<String, Object> param, String paramName) throws Exception {
         Class requestClass = ((ParameterizedTypeImpl) paramType).getRawType();
         Object request;
-        Object baseRequest;
         Object data;
         if (requestClass.isInterface()) {
             request = JSON.parseObject(getString(param, paramName), paramType);
