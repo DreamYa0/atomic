@@ -198,7 +198,7 @@ public final class MethodMetaUtils {
         methodMeta.setInterfaceClass(interfaceType);
         methodMeta.setTestClass(testClass);
         // 测试方法名称是固定的
-        methodMeta.setTestMethod(ReflectionUtils.getMethod(testClass, "assertCheck"));
+        methodMeta.setTestMethod(ReflectionUtils.getMethod(testClass, "testCase"));
         methodMeta.setParamTypes(declaredInterfaceMethod.getGenericParameterTypes());
         methodMeta.setReturnType(declaredInterfaceMethod.getGenericReturnType());
         methodMeta.setParamNames(ReflectionUtils.getMethodParamNames(declaredInterfaceMethod));

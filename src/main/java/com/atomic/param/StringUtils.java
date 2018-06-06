@@ -82,8 +82,12 @@ public final class StringUtils {
         } else {
             // 支持sql语句
             // value = getSqlValue(value, type);
+
             // 按照json解析
-            return JSON.parseObject(value, type);
+            // fastjson不能反序列化，如：en-SB等类型的字符串
+            // return JSON.parseObject(value, type);
+            Gson gson = new Gson();
+            return gson.fromJson(value, type);
         }
     }
 
@@ -287,7 +291,7 @@ public final class StringUtils {
      * @return Method对象
      * @throws Exception .{@link Exception}
      */
-    private static Method getMethod(Class<?> clazz, String methodName, final Class<?>... parameterTypes) throws Exception {
+    public static Method getMethod(Class<?> clazz, String methodName, final Class<?>... parameterTypes) throws Exception {
         Method method;
         try {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);

@@ -11,9 +11,12 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.http.util.Args;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -23,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**
@@ -31,6 +35,8 @@ import java.util.Optional;
  * @version 1.0 Created by dreamyao on 2017/5/9.
  */
 public final class ParamUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(ParamUtils.class);
 
     private ParamUtils() {
     }
@@ -284,6 +290,10 @@ public final class ParamUtils {
             request = JSON.parseObject(getString(param, paramName), paramType);
         } else {
             request = ReflectionUtils.initFromClass(requestClass);
+
+            // 为请求入参对象公共属性设置值
+            generateCommonParameters(request, param);
+
             if (parameterizedType instanceof ParameterizedType) {
                 data = JSON.parseObject(getString(param, paramName), parameterizedType);
             } else {
@@ -335,6 +345,62 @@ public final class ParamUtils {
             setRequestData(request, data);
         }
         return request;
+    }
+
+    /**
+     * 构造入参请求对象公共属性的值
+     * @param request 入参Request或者BaseRequest对象
+     * @param param   入参map集合
+     */
+    private static void generateCommonParameters(Object request, Map<String, Object> param) {
+
+        try {
+            // 获取类中以及父类中的所有属性
+            List<Field> fields = ReflectionUtils.getAllFieldsList(request.getClass());
+
+            // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
+            List<Field> collect = fields.stream()
+                    .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID") || field.getName().equals("data")))
+                    .collect(Collectors.toList());
+
+            for (Field field : collect) {
+
+                // 公共属性为基本类型
+                String fieldName = field.getName();
+                Type fieldType = field.getGenericType();
+
+                if (StringUtils.isBasicType((Class) fieldType) && param.containsKey(fieldName)) {
+                    String fieldValue = param.get(fieldName).toString();
+
+                    try {
+                        Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
+                        field.setAccessible(true);
+                        field.set(request,actualValue);
+                    } catch (Exception e) {
+                        logger.error("给请求入参对象公共基本类型属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
+                    }
+
+                } else if (param.containsKey(fieldName)) {
+                    // 公共属性为自定义对象
+                    String fieldValue = param.get(fieldName).toString();
+
+                    try {
+                        // 如果excel包含属性字段名称，默认excel中的值为Json格式
+                        Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
+                        field.setAccessible(true);
+                        field.set(request,actualValue);
+                    } catch (Exception e) {
+                        logger.error("给请求入参对象公共自定义对象属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
+                    }
+                } else {
+                    // 实例化field所表示的对象
+                    Object commonObj = ReflectionUtils.initFromClass((Class) field.getGenericType());
+                    StringUtils.transferMap2Bean(commonObj, param);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("给请求入参对象公共属性设值失败！", e);
+        }
     }
 
     /**
