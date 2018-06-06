@@ -301,38 +301,6 @@ public final class ParamUtils {
                 if (StringUtils.isBasicType(paramClass)) {
                     data = StringUtils.json2Bean(paramClass.getSimpleName(), getString(param, paramName), parameterizedType);
                     setRequestData(request, data);
-                    if (isLanguageParam(param)) {
-                        baseRequest = ReflectionUtils.initFromClass(request.getClass().getSuperclass());
-                        Optional.ofNullable(ReflectionUtils.getField(baseRequest, Object.class, "language")).ifPresent(field -> {
-                            field.setAccessible(true);
-                            try {
-                                field.set(request, param.get("language"));
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    } /* else if (isSidParam(param)) {
-                        baseRequest = ReflectionUtils.initFromClass(request.getClass().getSuperclass());
-                        Optional.ofNullable(getField(baseRequest, Object.class, "sid")).ifPresent(field -> {
-                            field.setAccessible(true);
-                            try {
-                                field.set(request,param.get("sid"));
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    } *//* else if (isActionInfoParam(param)) {
-                        baseRequest = ReflectionUtils.initFromClass(request.getClass().getSuperclass());
-                        Optional.ofNullable(getField(baseRequest, Object.class, "actionInfo")).ifPresent(field -> {
-                            Object actionInfo = JSON.parseObject(param.get("actionInfo").toString(), field.getType());
-                            field.setAccessible(true);
-                            try {
-                                field.set(request,actionInfo);
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                    }*/
                     return request;
                 } else {
                     data = ReflectionUtils.initFromClass(paramClass);
