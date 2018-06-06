@@ -8,9 +8,6 @@ import com.atomic.enums.CheckMode;
 import com.atomic.exception.MethodMetaException;
 import com.atomic.exception.ParameterException;
 import com.atomic.exception.ThrowException;
-import com.atomic.listener.IntegrationTestRollBackListener;
-import com.atomic.listener.ReportListener;
-import com.atomic.listener.SaveResultListener;
 import com.atomic.param.AutoTest;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
@@ -26,7 +23,6 @@ import com.atomic.util.FileUtils;
 import com.atomic.util.MapUtils;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.ArrayUtils;
-import org.mockito.MockitoAnnotations;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -36,7 +32,6 @@ import org.testng.IHookCallBack;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
@@ -91,14 +86,12 @@ import static org.apache.commons.io.FileUtils.readFileToString;
  * @version 1.0
  */
 @SqlConfig
-@Listeners({SaveResultListener.class, ReportListener.class, IntegrationTestRollBackListener.class})
+// @Listeners({SaveResultListener.class, ReportListener.class, IntegrationTestRollBackListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
 public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBase {
 
     @BeforeClass(alwaysRun = true)
     protected void beforeClass() throws Exception {
-        // 增加用户自己mock的功能
-        MockitoAnnotations.initMocks(this);
         // 加载内存数据库
         initEmbeddedDataSource();
     }
