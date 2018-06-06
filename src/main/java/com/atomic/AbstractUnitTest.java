@@ -7,7 +7,6 @@ import com.atomic.param.TestNGUtils;
 import com.atomic.util.CsvUtils;
 import com.atomic.util.ExcelUtils;
 import com.google.common.collect.Sets;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -24,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-@ContextConfiguration(locations = {"/test-service.xml"})
+// @ContextConfiguration(locations = {"/test-service.xml"})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, SoaMockListener.class})
 public abstract class AbstractUnitTest extends AbstractTestNGSpringContextTests {
 
