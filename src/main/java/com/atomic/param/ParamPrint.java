@@ -1,5 +1,7 @@
 package com.atomic.param;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.restassured.response.Response;
 import org.springframework.util.CollectionUtils;
 
@@ -66,12 +68,14 @@ public final class ParamPrint {
         try {
             System.out.println("------------------" + method + " request------------------------");
 
-            Map<String, Object> param = (Map<String, Object>) parameters[0];
-            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("request")) {
-                Object paramJsonValue = param.get("request");
+            Map<String, Object> printParam = Maps.newHashMap((Map<String, Object>) parameters[0]);
+            printParam.remove(Constants.CASE_INDEX);
+
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(printParam)) && printParam.containsKey("request")) {
+                Object paramJsonValue = printParam.get("request");
                 System.out.println("入参：\n" + formatJson(paramJsonValue.toString()));
             } else {
-                System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
+                System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(Lists.newArrayList(printParam), true, Constants.DATE_FORMAT));
             }
 
             if (map.get(Constants.CASE_NAME) == null) {
@@ -102,12 +106,14 @@ public final class ParamPrint {
         try {
             System.out.println("------------------" + method + " request------------------------");
 
-            Map<String, Object> param = (Map<String, Object>) parameters[0];
-            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param)) && param.containsKey("request")) {
-                Object paramJsonValue = param.get("request");
+            Map<String, Object> printParam = Maps.newHashMap((Map<String, Object>) parameters[0]);
+            printParam.remove(Constants.CASE_INDEX);
+
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(printParam)) && printParam.containsKey("request")) {
+                Object paramJsonValue = printParam.get("request");
                 System.out.println("入参：\n" + formatJson(paramJsonValue.toString()));
             } else {
-                System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(parameters, true, Constants.DATE_FORMAT));
+                System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(Lists.newArrayList(printParam), true, Constants.DATE_FORMAT));
             }
 
             if (map.get(Constants.CASE_NAME) == null) {

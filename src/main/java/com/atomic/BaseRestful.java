@@ -15,6 +15,7 @@ import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
 import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.SaveResultUtils;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -32,6 +33,7 @@ import org.testng.annotations.Listeners;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
@@ -155,8 +157,20 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
             Gson gson = new Gson();
             // 把Header json字符串反序列化为List<Header>
-            List<Header> headerList = gson.fromJson(context.get(HTTP_HEADER).toString(), new TypeToken<List<Header>>() {
+            String headerStr = context.get(HTTP_HEADER).toString();
+            List<Map<String,String>> headerMapList = gson.fromJson(headerStr, new TypeToken<List<Map<String,String>>>() {
             }.getType());
+
+            List<Header> headerList = Lists.newArrayList();
+
+            for (Map<String, String> header : headerMapList) {
+                Set<Map.Entry<String, String>> entries = header.entrySet();
+                for (Map.Entry<String, String> entry : entries) {
+                    Header head = new Header(entry.getKey(), entry.getValue());
+                    headerList.add(head);
+                }
+            }
+
             specification = specification.headers(new Headers(headerList));
         }
         return getResponse(testResult, specification, context);
