@@ -121,36 +121,6 @@ public abstract class AnnotationUtils {
     }
 
     /**
-     * 判断@ServicesVersion注解是否存在
-     * @param method
-     * @return
-     */
-    public static boolean isServiceVersion(Method method) {
-        Annotation[] annotations = method.getAnnotations();
-        if (annotations != null) {
-            ServiceVersion serviceVersion = method.getAnnotation(ServiceVersion.class);
-            if (serviceVersion == null) {
-                return false;
-            }
-            if ("".equals(serviceVersion.version())) {
-                Reporter.log("AnnotationUtils#isServiceVersion()]:{} ---> dubbo服务版本号不能为空！");
-                throw new AnnotationException("dubbo服务版本号不能为空！");
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 获取dubbo版本号
-     * @param method
-     * @return
-     */
-    public static String getServiceVersion(Method method) {
-        ServiceVersion serviceVersion = method.getAnnotation(ServiceVersion.class);
-        return serviceVersion.version();
-    }
-
-    /**
      * 判断@AutoTest注解是否存在
      * @param method
      * @return
