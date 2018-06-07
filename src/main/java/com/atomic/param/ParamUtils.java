@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.atomic.exception.ParameterException;
 import com.atomic.param.entity.MethodMeta;
+import com.atomic.util.ExcelUtils;
 import com.atomic.util.ReflectionUtils;
 import com.coinsuper.common.model.BaseRequest;
 import com.google.common.collect.Lists;
@@ -13,6 +14,7 @@ import com.google.gson.GsonBuilder;
 import org.apache.http.util.Args;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
@@ -239,11 +241,11 @@ public final class ParamUtils {
     }
 
     private static Object generateParametersNew(Type type, Map<String, Object> param, String paramName) throws Exception {
-        // 类
+        // 类，如：方法xxxx(Request)
         if (type instanceof Class) {
             return generateParametersNew(param, (Class) type, paramName);
         } else {
-            // 泛型，取出泛型对象中的参数
+            // 泛型，取出泛型对象中的参数，如：方法xxxx(Request<T>)中的T
             Type parameterizedType = ((ParameterizedType) type).getActualTypeArguments()[0];
             return generateParametersNew(type, parameterizedType, param, paramName);
         }
@@ -341,8 +343,10 @@ public final class ParamUtils {
 
                     try {
                         Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
+
+                        // 按照正常情况是根据set方法来设值，但是为了兼容lombok插件采用这种不是很优雅的方式
                         field.setAccessible(true);
-                        field.set(request,actualValue);
+                        field.set(request, actualValue);
                     } catch (Exception e) {
                         logger.error("给请求入参对象公共基本类型属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
                     }
@@ -354,15 +358,36 @@ public final class ParamUtils {
                     try {
                         // 如果excel包含属性字段名称，默认excel中的值为Json格式
                         Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
+
+                        // 按照正常情况是根据set方法来设值，但是为了兼容lombok插件采用这种不是很优雅的方式
                         field.setAccessible(true);
-                        field.set(request,actualValue);
+                        field.set(request, actualValue);
                     } catch (Exception e) {
                         logger.error("给请求入参对象公共自定义对象属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
                     }
                 } else {
+                    // 采用excel多sheet进行设计
                     // 实例化field所表示的对象
                     Object commonObj = ReflectionUtils.initFromClass((Class) field.getGenericType());
-                    StringUtils.transferMap2Bean(commonObj, param);
+
+                    try {
+                        Object object = param.get(Constants.TESTMETHODMETA);
+                        MethodMeta methodMeta = (MethodMeta) object;
+
+                        String sheetName = field.getName();
+                        ExcelUtils excel = new ExcelUtils();
+                        List<Map<String, Object>> sheetParams = excel.readDataByRow(methodMeta, sheetName);
+
+                        if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
+
+                            Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1);
+                            sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
+                            StringUtils.transferMap2Bean(commonObj, sheetParam);
+                        }
+                    } catch (Exception e) {
+                        // 如果MethodMeta、Sheet不存在，则按照原逻辑处理
+                        StringUtils.transferMap2Bean(commonObj, param);
+                    }
                 }
             }
         } catch (Exception e) {

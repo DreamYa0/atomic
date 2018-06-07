@@ -2,6 +2,7 @@ package com.atomic.util;
 
 import com.atomic.param.Constants;
 import com.atomic.param.TestNGUtils;
+import com.atomic.param.entity.MethodMeta;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
@@ -321,11 +322,32 @@ public class ExcelUtils {
         return datas;
     }
 
+    /**
+     * 读取对应的excel sheet页数据
+     * @param testResult 测试上下文
+     * @param instance   测试类实列
+     * @param sheetName  excel sheet页名称
+     * @return excel sheet页数据
+     */
     public List<Map<String, Object>> readDataByRow(ITestResult testResult, Object instance, String sheetName) {
         String className = TestNGUtils.getTestCaseClassName(testResult);
         String resource = instance.getClass().getResource("").getPath();
         String xls = resource + className + ".xls";
         ExcelUtils excelUtil = new ExcelUtils();
         return excelUtil.readDataByRow(xls, sheetName);
+    }
+
+    /**
+     * 读取对应的excel sheet页数据
+     * @param methodMeta
+     * @param sheetName excel sheet页名称
+     * @return
+     */
+    public List<Map<String, Object>> readDataByRow(MethodMeta methodMeta, String sheetName) {
+        Class testClass = methodMeta.getTestClass();
+        String className = testClass.getSimpleName();
+        String resource = testClass.getResource("").getPath();
+        String xls = resource + className + ".xls";
+        return readDataByRow(xls, sheetName);
     }
 }

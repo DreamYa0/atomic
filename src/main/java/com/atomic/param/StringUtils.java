@@ -2,7 +2,9 @@ package com.atomic.param;
 
 import com.alibaba.fastjson.JSON;
 import com.atomic.exception.QueryDataException;
+import com.atomic.param.entity.MethodMeta;
 import com.atomic.util.DataSourceUtils;
+import com.atomic.util.ExcelUtils;
 import com.atomic.util.ReflectionUtils;
 import com.google.gson.Gson;
 import org.springframework.util.CollectionUtils;
@@ -149,28 +151,27 @@ public final class StringUtils {
      * @return
      */
     private static <T> T json2Bean(Gson gson, String jsonString, Class<T> type) {
-        T t = gson.fromJson(jsonString, type);
-        return t;
+        return gson.fromJson(jsonString, type);
     }
 
     /**
      * 格式化string为Date
-     * @param datestr
+     * @param dateStr
      * @return date
      */
-    private static Date parseDate(String datestr) {
-        if (isExcelValueEmpty(datestr)) {
+    private static Date parseDate(String dateStr) {
+        if (isExcelValueEmpty(dateStr)) {
             return null;
         }
         try {
-            String fmtstr;
-            if (datestr.indexOf(':') > 0) {
-                fmtstr = "yyyy-MM-dd HH:mm:ss";
+            String fmtStr;
+            if (dateStr.indexOf(':') > 0) {
+                fmtStr = "yyyy-MM-dd HH:mm:ss";
             } else {
-                fmtstr = "yyyy-MM-dd";
+                fmtStr = "yyyy-MM-dd";
             }
-            SimpleDateFormat sdf = new SimpleDateFormat(fmtstr);
-            return sdf.parse(datestr);
+            SimpleDateFormat sdf = new SimpleDateFormat(fmtStr);
+            return sdf.parse(dateStr);
         } catch (Exception e) {
             Reporter.log("格式化String为Date异常！");
             return null;
@@ -226,8 +227,8 @@ public final class StringUtils {
 
     /**
      * set属性的值到Bean，不支持的类型没有赋值
-     * @param bean
-     * @param valMap
+     * @param bean Request<T>中的T
+     * @param valMap excel入参map集合
      */
     protected static void transferMap2Bean(Object bean, Map<String, Object> valMap) {
         Class cls = bean.getClass();
@@ -236,26 +237,59 @@ public final class StringUtils {
         for (Field field : fields) {
             try {
                 Object obj = valMap.get(field.getName());
-                if (obj == null) {
-                    continue;
-                }
-                String value = obj.toString();
-                if (isExcelValueEmpty(value)) {
-                    continue;
-                }
-                String fieldType = field.getType().getSimpleName();
-                String fieldSetName = parSetName(field.getName(), fieldType);
-                String fieldIsSetName = parIsSetName(field.getName());
-                Method fieldSetMet;
-                if (getMethod(cls, fieldSetName) != null) {
-                    fieldSetMet = getMethod(cls, fieldSetName);
-                } else if (getMethod(cls, fieldIsSetName) != null) {
-                    fieldSetMet = getMethod(cls, fieldIsSetName);
+                Type genericType = field.getGenericType();
+
+                if (obj == null || isExcelValueEmpty(obj.toString())) {
+                    // 默认excel sheet中没有对应此属性的值或属性值为""
+
+                    if (isBasicType((Class) genericType)) {
+                        // 基本类型
+                        continue;
+                    } else {
+                        // 自定义对象,且excel中未有对应字段的值或属性值为""，则采用excel多sheet进行设计
+
+                        // 实例化自定义对象
+                        Object fieldObj = ReflectionUtils.initFromClass((Class) genericType);
+
+                        try {
+                            Object object = valMap.get(Constants.TESTMETHODMETA);
+                            MethodMeta methodMeta = (MethodMeta) object;
+
+                            String sheetName = field.getName();
+                            ExcelUtils excel = new ExcelUtils();
+                            List<Map<String, Object>> sheetParams = excel.readDataByRow(methodMeta, sheetName);
+
+                            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
+                                Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(valMap.get(Constants.CASE_INDEX).toString()) - 1);
+                                sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
+                                transferMap2Bean(fieldObj, sheetParam);
+                            }
+
+                        } catch (Exception e) {
+                            // 如果MethodMeta、Sheet不存在，则按照原逻辑处理,从默认sheet页中获取值来进行设置
+                            transferMap2Bean(fieldObj, valMap);
+                        }
+                    }
+
                 } else {
-                    continue;
+
+                    String value = obj.toString();
+
+                    String fieldType = field.getType().getSimpleName();
+                    String fieldSetName = parSetName(field.getName(), fieldType);
+                    String fieldIsSetName = parIsSetName(field.getName());
+                    Method fieldSetMet;
+                    if (getMethod(cls, fieldSetName) != null) {
+                        fieldSetMet = getMethod(cls, fieldSetName);
+                    } else if (getMethod(cls, fieldIsSetName) != null) {
+                        fieldSetMet = getMethod(cls, fieldIsSetName);
+                    } else {
+                        continue;
+                    }
+
+                    Object object = json2Bean(fieldType, value, genericType);
+                    fieldSetMet.invoke(bean, object);
                 }
-                Object object = json2Bean(fieldType, value, field.getGenericType());
-                fieldSetMet.invoke(bean, object);
             } catch (Exception e) {
                 Reporter.log("excel中的值转化为入参对象值异常！", true);
                 Reporter.log(String.format("StringUtil_transferMap2Bean error, field is %s, value is %s ", field.getName(), valMap.get(field.getName())) + e);
@@ -291,7 +325,7 @@ public final class StringUtils {
      * @return Method对象
      * @throws Exception .{@link Exception}
      */
-    public static Method getMethod(Class<?> clazz, String methodName, final Class<?>... parameterTypes) throws Exception {
+    private static Method getMethod(Class<?> clazz, String methodName, final Class<?>... parameterTypes) throws Exception {
         Method method;
         try {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);
