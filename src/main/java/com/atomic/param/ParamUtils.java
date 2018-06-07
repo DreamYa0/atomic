@@ -19,6 +19,7 @@ import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,7 +30,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -266,30 +266,25 @@ public final class ParamUtils {
     @SuppressWarnings("unchecked")
     private static Object generateParametersNew(Map<String, Object> param, Class clazz, String paramName) throws Exception {
 
-        // 如接口请求参数中，存在HttpSession时，如Controller层入参可能存在HttpSession
         if (clazz.equals(HttpSession.class)) {
 
-            Object httpSession = param.get(paramName);
-            if (Objects.nonNull(httpSession)) {
-                return httpSession;
-            } else {
-                // 用null占位，否则可能会出现调用方式参数个数和传入参数个数不匹配而报错
-                return null;
-            }
+            // 如接口请求参数中，存在HttpSession时，如Controller层入参可能存在HttpSession
+            return param.get(Constants.HTTP_SESSION);
 
         } else if (clazz.equals(HttpServletRequest.class)) {
 
             // 如接口请求参数中，存在HttpServletRequest时，如Controller层入参可能存在HttpServletRequest
-            Object httpServletRequest = param.get(paramName);
-            if (Objects.nonNull(httpServletRequest)) {
-                return httpServletRequest;
-            } else {
-                // 用null占位，否则可能会出现调用方式参数个数和传入参数个数不匹配而报错
-                return null;
-            }
+            return param.get(Constants.HTTP_SERVLET_REQUEST);
+
+        } else if (clazz.equals(HttpServletResponse.class)) {
+
+            // 如接口请求参数中，存在HttpServletResponse时，如Controller层入参可能存在HttpServletResponse
+            return param.get(Constants.HTTP_SERVLET_RESPONSE);
 
         } else if (clazz.isInterface()) {
+
             // 暂时不会出现接口入参为接口的情况，暂不处理
+
         }
 
         Object value;

@@ -22,6 +22,7 @@ import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.util.FileUtils;
 import com.atomic.util.MapUtils;
 import com.google.common.collect.Maps;
+import mockit.Capturing;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.test.context.TestExecutionListeners;
@@ -33,6 +34,9 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.File;
@@ -89,6 +93,13 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 // @Listeners({SaveResultListener.class, ReportListener.class, IntegrationTestRollBackListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
 public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBase {
+
+    @Capturing
+    protected HttpSession session;
+    @Capturing
+    protected HttpServletRequest request;
+    @Capturing
+    protected HttpServletResponse response;
 
     @BeforeClass(alwaysRun = true)
     protected void beforeClass() throws Exception {
@@ -280,51 +291,78 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
     }
 
     private void prepareExecMethod(ITestResult testResult, Object paramValue, Map<String, Object> param, final MethodMeta methodMeta, ITestResultCallback callback) throws Exception {
+
         // 如果有新值，替换成新值
         Map<String, Object> newParam = Maps.newHashMap(param);
         if (paramValue != null) {
             newParam.put(methodMeta.getMultiTimeField(), paramValue);
         }
-        // 构造入参
+
+        // 设置mock对象
+        newParam.put(Constants.HTTP_SESSION, session);
+        newParam.put(Constants.HTTP_SERVLET_REQUEST, request);
+        newParam.put(Constants.HTTP_SERVLET_RESPONSE, response);
+
+        // 构造请求入参对象
         final Object[] parameters = generateParametersNew(methodMeta, newParam);
+
         if ((!isAutoTest(param) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) && isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
             saveTestRequestInCache(parameters[0], testResult, param);
         }
+
         param.put(PARAMETER_NAME_, parameters);
         // 备注有可能有额外信息
         param.put(EXCEL_DESC, newParam.get(EXCEL_DESC));
+
         execMethod(testResult, methodMeta, param, callback, parameters);
     }
 
     private void execMethod(ITestResult testResult, MethodMeta methodMeta, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
+
         Method method = methodMeta.getInterfaceMethod();
         Object interfaceObj = methodMeta.getInterfaceObj();
+
         // 记录方法调用开始时间
         startTestTime(testResult);
+
+        // 调用方法
         Object result = method.invoke(interfaceObj, parameters);
+
         // 记录方法调用结束时间
         endTestTime(testResult);
+
         if (!isAutoTest(param) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) {
             // 实现测试方法名、入参、返回结果、入参、CASE_INDEX数据入库
             // saveScenarioTestData(parameters, result, null, param, getTestCaseClassName(testResult));
             saveTestResultInCache(result, testResult, param);
         }
+
         if (isAutoTest(param) && !AnnotationUtils.isPrintResult(methodMeta.getTestMethod())) {
             System.out.println(method.getName() + "-----------------------------测试用例执行完一个-----------------------------");
         } else {
             // parameters 可能被接口改变，打印出来看起来就像有问题
             resultPrint(method.getName(), result, param, parameters);
         }
+
         if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(param)) {
+
             if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
+
+                // 断言录制模式
                 recMode(parameters[0], result, methodMeta);
+
                 System.out.println("-----------------------------执行智能化断言录制模式成功！-----------------------------");
                 resultCallBack(result, param, callback, parameters);
+
             } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
+
+                // 断言回放模式
                 replayMode(parameters[0], result, methodMeta);
+
                 System.out.println("-----------------------------执行智能化断言回放模式成功！-----------------------------");
                 resultCallBack(result, param, callback, parameters);
+
             } else {
                 assertResult(result, testResult,this, param, callback, parameters);
             }

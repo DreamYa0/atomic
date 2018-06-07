@@ -175,4 +175,13 @@ public final class Constants {
 
     /** 日期时间格式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    /** HttpSession 接口对象 */
+    public static final String HTTP_SESSION = "_session";
+
+    /** HttpServletRequest 接口对象 */
+    public static final String HTTP_SERVLET_REQUEST = "_servlet_request";
+
+    /** HttpServletResponse 接口对象 */
+    public static final String HTTP_SERVLET_RESPONSE = "_servlet_response";
 }
