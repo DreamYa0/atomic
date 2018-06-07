@@ -220,7 +220,7 @@ public final class StringUtils {
             }
         } else {
             Reporter.log("请检查sql语句格式是否有误或查询数据是否存在！sql：" + sql + "");
-            throw new QueryDataException(String.format("请检查sql语句格式是否有误或查询数据是否存在！sql ：", sql));
+            throw new QueryDataException(String.format("请检查sql语句格式是否有误或查询数据是否存在！sql ：%s", sql));
         }
         return value;
     }
