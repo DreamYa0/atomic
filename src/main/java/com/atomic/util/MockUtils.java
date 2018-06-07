@@ -21,6 +21,49 @@ public final class MockUtils {
 
     /**
      * 方法mock
+     * <pre>
+     *     // mock 接口的方法，如mybatis的mapper
+     *     @Transactional
+     *     @SpringBootTest(classes = WebApplication.class)
+     *     public class TestOrderCreate extends BaseTestCase<OrderManagerController> {
+     *
+     *         @Capturing
+     *         private HttpSession session;
+     *
+     *         @Override
+     *         public void beforeTest(Map<String, Object> context) {
+     *             MockUtils.mock(session, "getAttribute", 1602578701956947969L, "userNo");
+     *         }
+     *
+     *         @Test(dataProvider = Data.SINGLE,enabled = true)
+     *         public void testCase(Map<String, Object> context, Object result) {
+     *
+     *         }
+     *     }
+     *
+     *     // mock Spring Bean、mock工具类
+     *     @Transactional
+     *     @SpringBootTest(classes = WebApplication.class)
+     *     public class TestUserSymbolAdd extends BaseTestCase<MemberUserController> {
+     *
+     *         @Autowired
+     *         private MemberUserSymbolService memberUserSymbolService;
+     *
+     *         @Override
+     *         public void beforeTest(Map<String, Object> context) {
+     *             // mock Bean
+     *             MockUtils.mock(memberUserSymbolService, "addUserSymbol", "mock返回值", ""mock入参");
+     *
+     *             // mock工具类
+     *             MockUtils.mock(new MemberCheckUtil(), "getUserNo", "mock返回值", ""mock入参");
+     *         }
+     *
+     *         @Test(dataProvider = Data.SINGLE,enabled = true)
+     *         public void testCase(Map<String, Object> context, Object result) {
+     *
+     *         }
+     *     }
+     * </pre>
      * @param mockInstance mock对象实列
      * @param mockMethod   mock方法名称
      * @param mockReturn   mock返回结果
