@@ -276,7 +276,9 @@ public final class StringUtils {
                     String value = obj.toString();
 
                     String fieldType = field.getType().getSimpleName();
-                    String fieldSetName = parSetName(field.getName(), fieldType);
+                    Object object = json2Bean(fieldType, value, genericType);
+
+                    /*String fieldSetName = parSetName(field.getName(), fieldType);
                     String fieldIsSetName = parIsSetName(field.getName());
                     Method fieldSetMet;
                     if (getMethod(cls, fieldSetName) != null) {
@@ -286,9 +288,11 @@ public final class StringUtils {
                     } else {
                         continue;
                     }
+                    fieldSetMet.invoke(bean, object);*/
 
-                    Object object = json2Bean(fieldType, value, genericType);
-                    fieldSetMet.invoke(bean, object);
+                    // 由于普遍使用lombok注解来生成getter、setter方法，故使用此方式给属性设值，而不采用setter方法来设值
+                    field.setAccessible(true);
+                    field.set(bean, object);
                 }
             } catch (Exception e) {
                 Reporter.log("excel中的值转化为入参对象值异常！", true);
