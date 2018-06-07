@@ -84,16 +84,28 @@ public final class ResultAssert {
         callback.afterTestMethod(param, result, parameters);
         // 如果是Result型，检测执行结果，assertResult不填的就不管，比如自动化测试
         if (param.get(Constants.ASSERT_RESULT) != null && result instanceof PagedResult) {
+
             PagedResult pagedResult = (PagedResult) result;
             assertCheck(pagedResult, param);
+
         } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof Result) {
+
             Result resultNew = (Result) result;
             assertCheck(resultNew, param, testResult,instance);
+
         } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof BaseResult) {
+
             BaseResult baseResult = (BaseResult) result;
             assertCheck(baseResult, param);
+
         } else {
-            Reporter.log("[ResultAssert#assertResult()]:{} ---> 返回类型未继承BaseResult,请自行执行断言！", true);
+
+            Assertor assertor = AssertorFactory.getAssertor(UnitTestAssertor.class);
+            // 执行 excel 中 exceptResult sheet 页中的断言
+            assertor.assertResult(testResult,result,instance);
+            Reporter.log("------------------ 返回类型未继承BaseResult,请自行执行断言！------------------", true);
+            System.out.println();
+
         }
     }
 

@@ -6,6 +6,7 @@ import com.atomic.util.ExcelUtils;
 import io.restassured.path.json.JsonPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.testng.Assert;
 import org.testng.ITestResult;
@@ -31,12 +32,17 @@ public abstract class AbstractAssertor implements Assertor {
      */
     @Override
     public void assertResult(ITestResult testResult, Object result, Object instance) {
-        ExcelUtils excelUtil = new ExcelUtils();
-        List<Map<String, Object>> list = excelUtil.readDataByRow(testResult,instance,"exceptResult");
+        try {
+            ExcelUtils excelUtil = new ExcelUtils();
+            List<Map<String, Object>> list = excelUtil.readDataByRow(testResult,instance,"exceptResult");
+            Map<String, Object> param = TestNGUtils.getParamContext(testResult);
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param))) {
+                doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1));
+            }
 
-        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
-
-        doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1));
+        } catch (NumberFormatException e) {
+            logger.error("excel中名称为exceptResult的sheet页不存在", e);
+        }
     }
 
     protected void assertJsonPath(Map<String, Object> excContext, JsonPath resultPath) {
