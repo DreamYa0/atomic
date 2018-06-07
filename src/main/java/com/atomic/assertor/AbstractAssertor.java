@@ -40,8 +40,8 @@ public abstract class AbstractAssertor implements Assertor {
                 doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1));
             }
 
-        } catch (NumberFormatException e) {
-            logger.error("excel中名称为exceptResult的sheet页不存在", e);
+        } catch (Exception e) {
+            logger.info("---------------- excel中名称为exceptResult的sheet页不存在或值为空，请进行手动断言！ ----------------");
         }
     }
 
