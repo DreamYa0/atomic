@@ -291,6 +291,8 @@ public final class ParamUtils {
         // 基础类和包装类
         if (StringUtils.isBasicType(clazz)) {
             value = StringUtils.json2Bean(clazz.getSimpleName(), StringUtils.getValue(param.get(paramName)), clazz);
+        } else if (clazz.isEnum()) {
+            value = StringUtils.json2Bean(clazz.getSimpleName(), StringUtils.getValue(param.get(paramName)), clazz);
         } else {
             // 复杂类
             value = ReflectionUtils.initFromClass(clazz);
