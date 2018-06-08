@@ -18,7 +18,7 @@ import java.io.File;
 /**
  * 通用测试框架与平台数据对接工具类
  * @author dreamyao
- * @version 1.0 Created by dreamyao on 2017/6/8.
+ * @version 1.0
  */
 final class ExtentManager {
 
@@ -44,7 +44,8 @@ final class ExtentManager {
 
     private void createInstance(String projectName) {
         extent = new ExtentReports();
-        extent.attachReporter(createHtmlReporter(projectName), createExtentXReporter(projectName));
+        // extent.attachReporter(createHtmlReporter(projectName), createExtentXReporter(projectName));
+        extent.attachReporter(createHtmlReporter(projectName));
         extent.setReportUsesManualConfiguration(true);
     }
 
@@ -66,7 +67,7 @@ final class ExtentManager {
         htmlReporter.config().setLevel(Status.INFO);
         htmlReporter.config().setProtocol(Protocol.HTTP);
         htmlReporter.config().setResourceCDN(ResourceCDN.EXTENTREPORTS);
-        htmlReporter.config().setExtentXUrl("http://172.17.31.34:1337/#/");
+        // htmlReporter.config().setExtentXUrl("http://172.17.31.34:1337/#/");
         return htmlReporter;
     }
 

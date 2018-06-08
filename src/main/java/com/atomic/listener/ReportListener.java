@@ -1,13 +1,9 @@
 package com.atomic.listener;
 
-import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.GlobalConfig;
-import com.atomic.enums.CheckMode;
 import com.atomic.param.Constants;
 import com.atomic.param.HandleMethodName;
-import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
-import com.atomic.param.assertcheck.AssertCheck;
 import com.atomic.param.entity.QaResult;
 import com.atomic.util.CIDbUtils;
 import com.aventstack.extentreports.ExtentReports;
@@ -138,7 +134,7 @@ public class ReportListener implements IReporter {
             suites.clear();
         }
         // 暂时做输出展示
-        Mongodb tools = new Mongodb.Builder().build().connectMongodb();
+        /*Mongodb tools = new Mongodb.Builder().build().connectMongodb();
         String Id = tools.getIdByExample("name", projectName + "#" + ExtentManager.newInstance().countBuild(projectName));
         String reportURL = "http://172.17.31.34:1337/#/report-summary?id=" + Id;
         System.out.println();
@@ -147,7 +143,7 @@ public class ReportListener implements IReporter {
         System.out.println("报告地址：" + reportURL + "：报告地址");
         System.out.println();
         System.out.println("======================================================================================");
-        System.out.println();
+        System.out.println();*/
     }
 
     private void buildTestNodes(ExtentTest extentTest, IResultMap resultMap, Status status) {
@@ -197,7 +193,7 @@ public class ReportListener implements IReporter {
                 // 将用例的log输出报告中
                 outputList.forEach(test::warning);
                 // 展示测试的入参和出参
-                Map<String, String> map = getParamAndReturn(result);
+                /*Map<String, String> map = getParamAndReturn(result);
                 if (map != null) {
                     test.info("入参：" + map.get("param"));
                     test.info("出参：" + map.get("returnValue"));
@@ -215,7 +211,7 @@ public class ReportListener implements IReporter {
                             test.info("预期返回值：" + expectedReturn);
                         }
                     }
-                }
+                }*/
                 if (result.getThrowable() != null) {
                     test.log(status, result.getThrowable());
                 } else {
