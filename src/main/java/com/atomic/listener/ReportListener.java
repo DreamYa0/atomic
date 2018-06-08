@@ -14,6 +14,7 @@ import com.aventstack.extentreports.model.TestAttribute;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import io.restassured.response.Response;
 import org.springframework.util.CollectionUtils;
 import org.testng.IReporter;
 import org.testng.IResultMap;
@@ -201,7 +202,9 @@ public class ReportListener implements IReporter {
                 if (Boolean.FALSE.equals(CollectionUtils.isEmpty(context))) {
                     Gson gson = new Gson();
                     test.info("入参：" + gson.toJson(context.get(Constants.PARAMETER_NAME_)));
-                    test.info("出参：" + gson.toJson(context.get(Constants.RESULT_NAME)));
+
+                    Response response = (Response) context.get(Constants.RESULT_NAME);
+                    test.info("出参：" + response.asString());
 
                     ExcelUtils excel = new ExcelUtils();
                     Map<String, Object> exceptResult = excel.readDataByRow(result, "exceptResult", Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));

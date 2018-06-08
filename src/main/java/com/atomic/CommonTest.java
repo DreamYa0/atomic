@@ -314,7 +314,6 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             saveTestRequestInCache(parameters[0], testResult, context);
         }
 
-        context.put(PARAMETER_NAME_, parameters);
         // 备注有可能有额外信息
         context.put(EXCEL_DESC, newParam.get(EXCEL_DESC));
 

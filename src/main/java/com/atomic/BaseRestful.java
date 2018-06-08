@@ -214,7 +214,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
                 // 把入参和返回结果存入context中方便后续打印输出、测试报告展示等操作
                 context.put(Constants.PARAMETER_NAME_, param);
-                context.put(Constants.RESULT_NAME, response.getBody().asString());
+
             }
         } else {
             // POST 表单提交
