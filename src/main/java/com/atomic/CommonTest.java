@@ -8,6 +8,7 @@ import com.atomic.enums.CheckMode;
 import com.atomic.exception.MethodMetaException;
 import com.atomic.exception.ParameterException;
 import com.atomic.exception.ThrowException;
+import com.atomic.listener.ReportListener;
 import com.atomic.param.AutoTest;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
@@ -33,6 +34,7 @@ import org.testng.IHookCallBack;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,6 +93,7 @@ import static org.apache.commons.io.FileUtils.readFileToString;
  */
 @SqlConfig
 // @Listeners({SaveResultListener.class, ReportListener.class, IntegrationTestRollBackListener.class})
+@Listeners({ReportListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
 public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBase {
 
