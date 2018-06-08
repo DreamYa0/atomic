@@ -4,6 +4,7 @@ import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.CenterConfig;
 import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
+import com.atomic.listener.ReportListener;
 import com.atomic.listener.RollBackListener;
 import com.atomic.listener.SaveRunTime;
 import com.atomic.listener.ScenarioRollBackListener;
@@ -71,7 +72,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @Data 2018/05/30 10:48
  */
 // @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class})
+@Listeners({ScenarioRollBackListener.class, RollBackListener.class,ReportListener.class})
 public abstract class BaseRestful extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
