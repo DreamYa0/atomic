@@ -69,8 +69,8 @@ public class GlobalConfig {
             System.err.println("配置文件参数非法,请检查test.properties的配置");
             e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("读取test.properties失败");
-            e.printStackTrace();
+            /*System.out.println("读取test.properties失败");
+            e.printStackTrace();*/
         }
     }
 

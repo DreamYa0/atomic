@@ -45,14 +45,6 @@ public class ReportListener implements IReporter {
     private List<Integer> passedTests = Lists.newArrayList();
     private List<Integer> allTestMethod = Lists.newArrayList();
 
-    public ReportListener() {
-        // 加载环境配置文件
-        GlobalConfig.load();
-        this.projectName = GlobalConfig.projectName;
-        String runAuthors = GlobalConfig.runner;
-        this.runAuthor = runAuthors.split(",");
-    }
-
     @Override
     public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
         boolean createSuiteNode = false;
@@ -71,6 +63,13 @@ public class ReportListener implements IReporter {
                 int suitePassSize = 0;
                 int suiteSkipSize = 0;
                 ExtentTest suiteTest = null;
+
+                // 加载环境配置文件
+                GlobalConfig.load();
+                this.projectName = GlobalConfig.projectName;
+                String runAuthors = GlobalConfig.runner;
+                this.runAuthor = runAuthors.split(",");
+
                 extent = ExtentManager.getInstance(projectName);
                 // 存在多个suite的情况下，在报告中将同一个一个suite的测试结果归为一类，创建一级节点。
                 if (createSuiteNode) {
