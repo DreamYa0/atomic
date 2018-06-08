@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -305,11 +306,7 @@ public class ReportListener implements IReporter {
         String className = HandleMethodName.getTestClassName(result);
         String methodName = HandleMethodName.getTestMethodName(result);
         StringBuilder sb = new StringBuilder();
-        sb.append(className);
-        sb.append(".");
-        sb.append(methodName);
-        sb.append("() -> ");
-        sb.append("CaseName：");
+
         Map<String, Object> param = null;
         try {
             param = TestNGUtils.getParamContext(result);
@@ -317,6 +314,20 @@ public class ReportListener implements IReporter {
             System.out.println("---------------------" + className + "#" + methodName + "--------------------");
             e.printStackTrace();
         }
+
+        if (Objects.nonNull(param) && Objects.nonNull(param.get(Constants.HTTP_METHOD))) {
+            Object uri = param.get(Constants.HTTP_METHOD);
+            sb.append(uri);
+            sb.append(" --> ");
+            sb.append("CaseName：");
+        } else {
+            sb.append(className);
+            sb.append(".");
+            sb.append(methodName);
+            sb.append("() -> ");
+            sb.append("CaseName：");
+        }
+
         if (param != null) {
             if (param.get(Constants.CASE_NAME) == null) {
                 sb.append(param.get(Constants.EXCEL_DESC).toString());
