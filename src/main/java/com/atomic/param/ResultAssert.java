@@ -103,8 +103,8 @@ public final class ResultAssert {
             Assertor assertor = AssertorFactory.getAssertor(UnitTestAssertor.class);
             // 执行 excel 中 exceptResult sheet 页中的断言
             assertor.assertResult(testResult,result,instance);
-            Reporter.log("------------------ 返回类型未继承BaseResult,请自行执行断言！------------------", true);
-            System.out.println();
+            /*Reporter.log("------------------ 返回类型未继承BaseResult,请自行执行断言！------------------", true);
+            System.out.println();*/
 
         }
     }
