@@ -350,4 +350,18 @@ public class ExcelUtils {
         String xls = resource + className + ".xls";
         return readDataByRow(xls, sheetName);
     }
+
+    public Map<String, Object> readDataByRow(ITestResult testResult, String sheetName,int index) {
+        try {
+            String className = TestNGUtils.getTestCaseClassName(testResult);
+            Class<? extends Class> clazz = testResult.getTestClass().getRealClass().getClass();
+            String resource = clazz.getResource("").getPath();
+            String xls = resource + className + ".xls";
+            ExcelUtils excelUtil = new ExcelUtils();
+            List<Map<String, Object>> maps = excelUtil.readDataByRow(xls, sheetName);
+            return maps.get(index - 1);
+        } catch (Exception e) {
+            return Maps.newHashMap();
+        }
+    }
 }

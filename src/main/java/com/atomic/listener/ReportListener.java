@@ -6,12 +6,15 @@ import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.entity.QaResult;
 import com.atomic.util.CIDbUtils;
+import com.atomic.util.ExcelUtils;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.model.TestAttribute;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import org.springframework.util.CollectionUtils;
 import org.testng.IReporter;
 import org.testng.IResultMap;
 import org.testng.ISuite;
@@ -192,18 +195,32 @@ public class ReportListener implements IReporter {
                 // 将用例的log输出报告中
                 outputList.forEach(test::warning);
                 // 展示测试的入参和出参
+
+
+                Map<String, Object> context = TestNGUtils.getParamContext(result);
+                if (Boolean.FALSE.equals(CollectionUtils.isEmpty(context))) {
+                    Gson gson = new Gson();
+                    test.info("入参：" + gson.toJson(context.get(Constants.PARAMETER_NAME_)));
+                    test.info("出参：" + gson.toJson(context.get(Constants.RESULT_NAME)));
+
+                    ExcelUtils excel = new ExcelUtils();
+                    Map<String, Object> exceptResult = excel.readDataByRow(result, "exceptResult", Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
+                    test.info("断言内容：" + gson.toJson(exceptResult));
+                }
+
+
                 /*Map<String, String> map = getParamAndReturn(result);
                 if (map != null) {
                     test.info("入参：" + map.get("param"));
                     test.info("出参：" + map.get("returnValue"));
-                    if ((AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
+                    if ((AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(context) &&
                             AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(result)) == CheckMode.NORMAL) || (!AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result))
-                            || !ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)))) {
+                            || !ParamUtils.isAutoAssert(context))) {
                         if (map.get("expected_return") != null) {
                             test.info("预期返回值：" + map.get("expected_return"));
                         }
                     }
-                    if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(TestNGUtils.getParamContext(result)) &&
+                    if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(context) &&
                             AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(result)) == CheckMode.REPLAY) {
                         String expectedReturn = AssertCheck.getExpectedReturn(HandleMethodName.getTestMethodName(result), map.get("param"));
                         if (expectedReturn != null) {
