@@ -20,28 +20,28 @@ public final class TestNGUtils {
 
     /**
      * 把参数和结果注入到测试函数
-     * @param param
+     * @param context
      * @param testResult
      * @throws Exception
      */
-    public static void injectResultAndParameters(Map<String, Object> param, ITestResult testResult, Object testInstance) throws Exception {
+    public static void injectResultAndParameters(Map<String, Object> context, ITestResult testResult, Object testInstance) throws Exception {
         Method testMethod = TestNGUtils.getTestMethod(testResult);
         int parameters = testMethod.getGenericParameterTypes().length;
         if (parameters > 1) {
             // 获取测试函数的入参名称列表
             String[] paramNames = ReflectionUtils.getMethodParamNames(testMethod);
             // 第一个参数是Map<String,Object> context
-            testResult.getParameters()[0] = ParamUtils.getParamContextWithoutExtraInfo(param);
+            testResult.getParameters()[0] = ParamUtils.getParamContextWithoutExtraInfo(context);
             for (int i = 1; i < parameters; i++) {
                 // Type paramType = testMethod.getGenericParameterTypes()[i];
                 // 入参根据名字来注入值，如果名字获取失败，则使用类型匹配
                 String paramName = i < paramNames.length ? paramNames[i] : null;
                 if (paramName != null && paramName.equals("result")) {
-                    testResult.getParameters()[i] = param.get(Constants.RESULT_NAME);
+                    testResult.getParameters()[i] = context.get(Constants.RESULT_NAME);
                 }
                 // 现在没有入参了
                 /*else {
-                    testResult.getParameters()[i] = getParameter(param, paramName, paramType, testInstance);
+                    testResult.getParameters()[i] = getParameter(context, paramName, paramType, testInstance);
 				}*/
             }
         }

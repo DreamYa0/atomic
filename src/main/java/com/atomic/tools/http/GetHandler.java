@@ -2,6 +2,7 @@ package com.atomic.tools.http;
 
 import com.atomic.param.Constants;
 import com.atomic.param.ParamUtils;
+import com.google.common.collect.Maps;
 
 import java.util.Map;
 
@@ -19,11 +20,15 @@ public class GetHandler implements IHandler {
     @SuppressWarnings("unchecked")
     public <T> HttpResponse handle(T t, HttpRequest request) {
         if (Map.class.isInstance(t)) {
-            Map<String, Object> param = (Map<String, Object>) t;
-            boolean isGet = Constants.HTTP_GET.equalsIgnoreCase(param.get(Constants.HTTP_MODE).toString());
+            Map<String, Object> context = (Map<String, Object>) t;
+
+            Map<String, Object> newContext = Maps.newHashMap(context);
+
+            boolean isGet = Constants.HTTP_GET.equalsIgnoreCase(newContext.get(Constants.HTTP_MODE).toString());
             if (isGet) {
                 request.method(Method.GET);
-                Map<String, Object> newParam = ParamUtils.getParameters(param);
+                Map<String, Object> newParam = ParamUtils.getParameters(newContext);
+                // TODO: 2018/6/9 递归处理map
                 if (!newParam.isEmpty()) {
                     request.form(newParam);
                 }

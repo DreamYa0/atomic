@@ -74,35 +74,35 @@ public final class ResultAssert {
     /**
      * 测试结果断言
      * @param result     返回结果对象
-     * @param param      入参excel集合
+     * @param context      入参excel集合
      * @param callback   回调函数
      * @param parameters 入参对象
      * @throws Exception 异常
      */
-    public static void assertResult(Object result, ITestResult testResult, Object instance, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResult(Object result, ITestResult testResult, Object instance, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
         // 把入参和执行结果写入param中
-        callback.afterTestMethod(param, result, parameters);
+        callback.afterTestMethod(context, result, parameters);
         // 如果是Result型，检测执行结果，assertResult不填的就不管，比如自动化测试
-        if (param.get(Constants.ASSERT_RESULT) != null && result instanceof PagedResult) {
+        if (context.get(Constants.ASSERT_RESULT) != null && result instanceof PagedResult) {
 
             PagedResult pagedResult = (PagedResult) result;
-            assertCheck(pagedResult, param);
+            assertCheck(pagedResult, context);
 
-        } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof Result) {
+        } else if (context.get(Constants.ASSERT_RESULT) != null && result instanceof Result) {
 
             Result resultNew = (Result) result;
-            assertCheck(resultNew, param, testResult,instance);
+            assertCheck(resultNew, context, testResult, instance);
 
-        } else if (param.get(Constants.ASSERT_RESULT) != null && result instanceof BaseResult) {
+        } else if (context.get(Constants.ASSERT_RESULT) != null && result instanceof BaseResult) {
 
             BaseResult baseResult = (BaseResult) result;
-            assertCheck(baseResult, param);
+            assertCheck(baseResult, context);
 
         } else {
 
             Assertor assertor = AssertorFactory.getAssertor(UnitTestAssertor.class);
             // 执行 excel 中 exceptResult sheet 页中的断言
-            assertor.assertResult(testResult,result,instance);
+            assertor.assertResult(testResult, result, instance);
             /*Reporter.log("------------------ 返回类型未继承BaseResult,请自行执行断言！------------------", true);
             System.out.println();*/
 
@@ -112,60 +112,60 @@ public final class ResultAssert {
     /**
      * 执行初步基本断言，断言内容包括Success、Code、Description
      * @param result 返回结果对象
-     * @param param  入参excel集合
+     * @param context  入参excel集合
      */
-    private static void assertCheck(Result result, Map<String, Object> param, ITestResult testResult, Object instance) {
-        if (ParamUtils.isExpectSuccess(param)) {
+    private static void assertCheck(Result result, Map<String, Object> context, ITestResult testResult, Object instance) {
+        if (ParamUtils.isExpectSuccess(context)) {
             Assert.assertTrue(result.isSuccess());
             //自动断言excel中expectedResult字段当值
             Object data = result.getData();
-            autoAssertResult(data, param);
+            autoAssertResult(data, context);
 
             Assertor assertor = AssertorFactory.getAssertor(UnitTestAssertor.class);
             // 执行 excel 中 exceptResult sheet 页中的断言
-            assertor.assertResult(testResult,result,instance);
+            assertor.assertResult(testResult, result, instance);
 
-        } else if (isExpectFalse(param)) {
-            assertCodeAndDec(result, param);
+        } else if (isExpectFalse(context)) {
+            assertCodeAndDec(result, context);
         }
     }
 
     /**
      * 异常流程不进行expectedResult断言
      * @param result 返回值对象
-     * @param param  入参
+     * @param context  入参
      */
-    private static void assertCheck(BaseResult result, Map<String, Object> param) {
-        if (ParamUtils.isExpectSuccess(param)) {
+    private static void assertCheck(BaseResult result, Map<String, Object> context) {
+        if (ParamUtils.isExpectSuccess(context)) {
             Assert.assertTrue(result.isSuccess());
-        } else if (isExpectFalse(param)) {
-            assertCodeAndDec(result, param);
+        } else if (isExpectFalse(context)) {
+            assertCodeAndDec(result, context);
         }
     }
 
     /**
      * 是否期望结果为N
-     * @param param 入参
+     * @param context 入参
      * @return
      */
-    public static boolean isExpectFalse(Map<String, Object> param) {
-        return Constants.EXCEL_NO.equals(param.get(Constants.ASSERT_RESULT));
+    public static boolean isExpectFalse(Map<String, Object> context) {
+        return Constants.EXCEL_NO.equals(context.get(Constants.ASSERT_RESULT));
     }
 
     /**
      * 针对 PagedResult 返回值对象进行断言
      * @param result 返回值对象
-     * @param param  入参
+     * @param context  入参
      */
     @SuppressWarnings("unchecked")
-    private static void assertCheck(PagedResult result, Map<String, Object> param) {
-        assertCheck((BaseResult) result, param);
-        if (isExpectedResultNoNull(param)) {
+    private static void assertCheck(PagedResult result, Map<String, Object> context) {
+        assertCheck((BaseResult) result, context);
+        if (isExpectedResultNoNull(context)) {
             //自动断言excel中expectedResult字段当值
             List<Field> fields = ReflectionUtils.getAllFieldsList(result.getClass());
             List<Field> newField = fields.stream().filter(field -> "data".equals(field.getName())).collect(toList());
             Map<String, Object> map = Maps.newHashMap();
-            map.put("data", param.get("expectedResult"));
+            map.put("data", context.get("expectedResult"));
             handleParameterTypeFields(newField, result, map);
         }
     }
@@ -173,26 +173,26 @@ public final class ResultAssert {
     /**
      * 异常流程断言Code和Description
      * @param result 返回结果对象
-     * @param param  入参excel集合
+     * @param context  入参excel集合
      */
-    private static void assertCodeAndDec(BaseResult result, Map<String, Object> param) {
+    private static void assertCodeAndDec(BaseResult result, Map<String, Object> context) {
         Assert.assertFalse(result.isSuccess());
         //增加期望为 N 时对Code和Description的断言
-        if (isCodeNoNull(param)) {
-            Assert.assertEquals(result.getCode(), param.get(Constants.ASSERT_CODE));
+        if (isCodeNoNull(context)) {
+            Assert.assertEquals(result.getCode(), context.get(Constants.ASSERT_CODE));
         }
-        if (isDescriptionNoNull(param)) {
-            Assert.assertEquals(result.getMsg(), param.get(Constants.ASSERT_MSG));
+        if (isDescriptionNoNull(context)) {
+            Assert.assertEquals(result.getMsg(), context.get(Constants.ASSERT_MSG));
         }
     }
 
     /**
      * 当期望Description不为空时返回true
-     * @param param 入参
+     * @param context 入参
      * @return
      */
-    private static boolean isDescriptionNoNull(Map<String, Object> param) {
-        if (param.get(Constants.ASSERT_MSG) == null || "".equals(param.get(Constants.ASSERT_MSG))) {
+    private static boolean isDescriptionNoNull(Map<String, Object> context) {
+        if (context.get(Constants.ASSERT_MSG) == null || "".equals(context.get(Constants.ASSERT_MSG))) {
             return false;
         }
         return true;
@@ -200,11 +200,11 @@ public final class ResultAssert {
 
     /**
      * 当期望Code不为空时返回true
-     * @param param 入参
+     * @param context 入参
      * @return
      */
-    private static boolean isCodeNoNull(Map<String, Object> param) {
-        if (param.get(Constants.ASSERT_CODE) == null || "".equals(param.get(Constants.ASSERT_CODE))) {
+    private static boolean isCodeNoNull(Map<String, Object> context) {
+        if (context.get(Constants.ASSERT_CODE) == null || "".equals(context.get(Constants.ASSERT_CODE))) {
             return false;
         }
         return true;
@@ -212,11 +212,11 @@ public final class ResultAssert {
 
     /**
      * 当预期断言内容不为空时，进行自动断言
-     * @param param 入参
+     * @param context 入参
      * @return
      */
-    private static boolean isExpectedResultNoNull(Map<String, Object> param) {
-        if (param.get(Constants.EXPECTED_RESULT) == null || "".equals(param.get(Constants.EXPECTED_RESULT))) {
+    private static boolean isExpectedResultNoNull(Map<String, Object> context) {
+        if (context.get(Constants.EXPECTED_RESULT) == null || "".equals(context.get(Constants.EXPECTED_RESULT))) {
             return false;
         }
         return true;
@@ -632,22 +632,21 @@ public final class ResultAssert {
 
     /**
      * HttP接口测试结果断言
-     * @param result     Http接口返回值
-     * @param param      Excel测试用例字段
-     * @param callback   回调函数
-     * @param parameters Http接口入参
+     * @param result   Http接口返回值
+     * @param context  Excel测试用例字段
+     * @param callback 回调函数
      * @throws Exception 异常
      */
-    public static void assertResult(final Object result, final Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResult(final Object result, final Map<String, Object> context, ITestResultCallback callback) throws Exception {
         // 把入参和执行结果写入param中
-        callback.afterTestMethod(param, result, parameters);
+        callback.afterTestMethod(context, result, context.get(Constants.PARAMETER_NAME_));
         // result为HttpEntity实现类，则跳过自动断言
         if (result instanceof HttpEntity) {
             Reporter.log("[ResultAssert#assertResult() ]:{测试结果需手动断言！}", true);
         } else {
             // expectedResult不填的就不管
-            if (isExpectedResultNoNull(param)) {
-                String expectJsonResult = param.get(Constants.EXPECTED_RESULT).toString();
+            if (isExpectedResultNoNull(context)) {
+                String expectJsonResult = context.get(Constants.EXPECTED_RESULT).toString();
                 String actualResult = result.toString();
 
                 Map<String, Object> expectMap = JSON.parseObject(expectJsonResult, new TypeReference<Map<String, Object>>() {
@@ -700,12 +699,11 @@ public final class ResultAssert {
      * @param response   rest请求响应结果
      * @param context    入参上下文
      * @param callback   回调
-     * @param parameters 入参
      * @throws Exception 异常
      */
-    public static void assertResultForRest(Response response,ITestResult testResult, Object instance, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResultForRest(Response response, ITestResult testResult, Object instance, Map<String, Object> context, ITestResultCallback callback) throws Exception {
         // 把入参和执行结果写入param中
-        callback.afterTestMethod(context, response, parameters);
+        callback.afterTestMethod(context, response, context.get(Constants.PARAMETER_NAME_));
         // Assert.assertEquals(response.getStatusCode(), 200);
         if (isExpectedResultNoNull(context)) {
             String expectJsonResult = context.get(Constants.EXPECTED_RESULT).toString();
@@ -725,7 +723,7 @@ public final class ResultAssert {
 
         // 执行 excel 中 exceptResult sheet 页中的断言
         Assertor assertor = AssertorFactory.getAssertor(RestfulAssertor.class);
-        assertor.assertResult(testResult,response,instance);
+        assertor.assertResult(testResult, response, instance);
     }
 
     private static void handleMap(Map<String, Object> expectMap, Map<String, Object> actualMap) {
@@ -925,15 +923,14 @@ public final class ResultAssert {
 
     /**
      * 用于断言录制、回放模式时把result写入param中
-     * @param result     返回结果对象
-     * @param param      入参excel集合
-     * @param callback   回调函数
-     * @param parameters 入参对象
+     * @param result   返回结果对象
+     * @param context  入参excel集合
+     * @param callback 回调函数
      * @throws Exception 异常
      */
-    public static void resultCallBack(Object result, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void resultCallBack(Object result, Map<String, Object> context, ITestResultCallback callback) throws Exception {
         // 把入参和执行结果写入param中
-        callback.afterTestMethod(param, result, parameters);
+        callback.afterTestMethod(context, result, context.get(Constants.PARAMETER_NAME_));
     }
 
     /**

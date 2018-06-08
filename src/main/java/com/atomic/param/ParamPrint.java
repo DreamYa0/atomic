@@ -1,7 +1,6 @@
 package com.atomic.param;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.restassured.response.Response;
 import org.springframework.util.CollectionUtils;
 
@@ -56,20 +55,19 @@ public final class ParamPrint {
 
     /**
      * REST 接口出参入参打印
-     * @param method     测试方法名称
-     * @param response   接口返回结果对象
-     * @param map        入参上下文
-     * @param parameters 接口入参
+     * @param method   测试方法名称
+     * @param response 接口返回结果对象
+     * @param context  入参上下文
      */
     @SuppressWarnings("unchecked")
-    public static void resultPrint(String method, Response response, Map<String, Object> map, Object... parameters) {
+    public static void resultPrint(String method, Response response, Map<String, Object> context) {
         Lock lock = new ReentrantLock();
         lock.lock();
         try {
             System.out.println("------------------" + method + " request------------------------");
 
-            Map<String, Object> printParam = Maps.newHashMap((Map<String, Object>) parameters[0]);
-            printParam.remove(Constants.CASE_INDEX);
+            Map<String, Object> printParam = (Map<String, Object>) context.get(Constants.PARAMETER_NAME_);
+
 
             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(printParam)) && printParam.containsKey("request")) {
                 Object paramJsonValue = printParam.get("request");
@@ -78,10 +76,10 @@ public final class ParamPrint {
                 System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(Lists.newArrayList(printParam), true, Constants.DATE_FORMAT));
             }
 
-            if (map.get(Constants.CASE_NAME) == null) {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
+            if (context.get(Constants.CASE_NAME) == null) {
+                System.out.println("------------------" + method + " 期望 (" + context.get(Constants.ASSERT_RESULT) + ")(" + context.get(Constants.EXCEL_DESC) + ")------------------------");
             } else {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
+                System.out.println("------------------" + method + " 期望 (" + context.get(Constants.ASSERT_RESULT) + ")(" + context.get(Constants.CASE_NAME) + ")------------------------");
             }
             System.out.println("出参：");
             response.body().prettyPrint();
@@ -94,20 +92,19 @@ public final class ParamPrint {
 
     /**
      * HTTP 接口出参入参打印
-     * @param method     测试方法名称
-     * @param result     接口返回结果对象
-     * @param map        入参上下文
-     * @param parameters 接口入参
+     * @param method  测试方法名称
+     * @param result  接口返回结果对象
+     * @param context 入参上下文
      */
     @SuppressWarnings("unchecked")
-    public static void resultPrint(String method, String result, Map<String, Object> map, Object... parameters) {
+    public static void resultPrint(String method, String result, Map<String, Object> context) {
         Lock lock = new ReentrantLock();
         lock.lock();
         try {
             System.out.println("------------------" + method + " request------------------------");
 
-            Map<String, Object> printParam = Maps.newHashMap((Map<String, Object>) parameters[0]);
-            printParam.remove(Constants.CASE_INDEX);
+            Map<String, Object> printParam = (Map<String, Object>) context.get(Constants.PARAMETER_NAME_);
+
 
             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(printParam)) && printParam.containsKey("request")) {
                 Object paramJsonValue = printParam.get("request");
@@ -116,10 +113,10 @@ public final class ParamPrint {
                 System.out.println("入参：" + ParamUtils.getJSONStringWithDateFormat(Lists.newArrayList(printParam), true, Constants.DATE_FORMAT));
             }
 
-            if (map.get(Constants.CASE_NAME) == null) {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.EXCEL_DESC) + ")------------------------");
+            if (context.get(Constants.CASE_NAME) == null) {
+                System.out.println("------------------" + method + " 期望 (" + context.get(Constants.ASSERT_RESULT) + ")(" + context.get(Constants.EXCEL_DESC) + ")------------------------");
             } else {
-                System.out.println("------------------" + method + " 期望 (" + map.get(Constants.ASSERT_RESULT) + ")(" + map.get(Constants.CASE_NAME) + ")------------------------");
+                System.out.println("------------------" + method + " 期望 (" + context.get(Constants.ASSERT_RESULT) + ")(" + context.get(Constants.CASE_NAME) + ")------------------------");
             }
             System.out.println("出参：\n" + formatJson(result));
             System.out.println("------------------------------------------------");

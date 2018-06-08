@@ -45,7 +45,6 @@ import static com.atomic.param.Constants.HTTP_HOST;
 import static com.atomic.param.Constants.HTTP_PROXY;
 import static com.atomic.param.HandleMethodName.getTestMethodName;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.getParameters;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
@@ -148,42 +147,54 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
     }
 
     private void execute(Map<String, Object> context, IHookCallBack callBack, ITestResult testResult, HttpRequest request) throws Exception {
+
         IHandler getHandler = new GetHandler();
         IHandler postHandler = new PostHandler();
         getHandler.setHandler(postHandler);
+
         //记录方法调用开始时间
         startTestTime(testResult);
+
         HttpResponse response = getHandler.handle(context, request);
+
         //记录方法调用结束时间
         endTestTime(testResult);
+
         saveTestResultInCache(response, testResult, context);
+
         handleResponse(response, testResult, callBack, context);
     }
 
     private void handleResponse(HttpResponse response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {
-        Map<String, Object> parameters = getParameters(context);
+
         String result = response.body();
+
         // 打印测试结果
-        resultPrint(getTestMethodName(testResult), result, context, parameters);
+        resultPrint(getTestMethodName(testResult), result, context);
+
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
+
         //返回result为String，则检测是否需要录制回放和自动断言
         if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+
             if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
-                recMode(parameters, result, TestNGUtils.getHttpMethod(testResult));
+
+                recMode(context.get(Constants.PARAMETER_NAME_), result, TestNGUtils.getHttpMethod(testResult));
                 System.out.println("-----------------------执行智能化断言录制模式成功！-------------------------");
-                resultCallBack(response, context, callback, parameters);
+                resultCallBack(response, context, callback);
+
             } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
-                replayMode(parameters, result, TestNGUtils.getHttpMethod(testResult), context, callback);
+                replayMode(result, TestNGUtils.getHttpMethod(testResult), context, callback);
                 System.out.println("-----------------------执行智能化断言回放模式成功！-------------------------");
-                resultCallBack(response, context, callback, parameters);
+                resultCallBack(response, context, callback);
             } else {
                 // 自动断言
-                assertResult(result, context, callback, parameters);
+                assertResult(result, context, callback);
             }
         } else {
             // 自动断言
-            assertResult(result, context, callback, parameters);
+            assertResult(result, context, callback);
         }
         testCallBack(callBack, testResult);
 

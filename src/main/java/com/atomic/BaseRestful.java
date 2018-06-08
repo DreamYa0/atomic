@@ -181,8 +181,12 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         Response response;
         String httpMode = context.get(HTTP_MODE).toString();
         String uri = context.get(HTTP_METHOD).toString();
+
+        // 复制一份否则操作时会影响到测试上下文中的context
+        Map<String, Object> newContext = Maps.newHashMap(context);
+
         // Http接口入参
-        Map<String, Object> parameters = ParamUtils.getParameters(context);
+        Map<String, Object> parameters = ParamUtils.getParameters(newContext);
 
         if (isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
@@ -202,16 +206,15 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
                 response = specification.body(parameters.get("request").toString()).when().post(uri);
             } else {
 
+                // 构造出真正的入参
                 Map<String, Object> param = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, parameters);
-
-                // 复制一份新的入参map集合，存入测试上下文中
-                Map<String, Object> newParam = Maps.newHashMap(param);
-
                 param.remove(Constants.CASE_INDEX);
-                // 把param设置会测试上下文中
-                TestNGUtils.setParamContext(testResult, newParam);
 
                 response = specification.body(param).when().post(uri);
+
+                // 把入参和返回结果存入context中方便后续打印输出、测试报告展示等操作
+                context.put(Constants.PARAMETER_NAME_, param);
+                context.put(Constants.RESULT_NAME, response.getBody().asString());
             }
         } else {
             // POST 表单提交
@@ -234,29 +237,34 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
     }
 
     private void execMethod(Response response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {
-        Map<String, Object> parameters = TestNGUtils.getParamContext(testResult);
+        // Map<String, Object> parameters = TestNGUtils.getParamContext(testResult);
         String result = response.body().asString();
         // 打印测试结果
-        resultPrint(getTestMethodName(testResult), response, context, parameters);
+        resultPrint(getTestMethodName(testResult), response, context);
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
         //返回result为String，则检测是否需要录制回放和自动断言
         if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+
             if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
-                recMode(parameters, result, TestNGUtils.getHttpMethod(testResult));
+
+                recMode(context.get(Constants.PARAMETER_NAME_), result, TestNGUtils.getHttpMethod(testResult));
                 System.out.println("-----------------------执行智能化断言录制模式成功！-------------------------");
-                resultCallBack(response, context, callback, parameters);
+                resultCallBack(response, context, callback);
+
             } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
-                replayMode(parameters, result, TestNGUtils.getHttpMethod(testResult), context, callback);
+
+                replayMode(result, TestNGUtils.getHttpMethod(testResult), context, callback);
                 System.out.println("-----------------------执行智能化断言回放模式成功！-------------------------");
-                resultCallBack(response, context, callback, parameters);
+                resultCallBack(response, context, callback);
+
             } else {
                 // 自动断言
-                assertResultForRest(response, testResult, this, context, callback, parameters);
+                assertResultForRest(response, testResult, this, context, callback);
             }
         } else {
             // 自动断言
-            assertResultForRest(response, testResult, this, context, callback, parameters);
+            assertResultForRest(response, testResult, this, context, callback);
         }
         testCallBack(callBack, testResult);
     }

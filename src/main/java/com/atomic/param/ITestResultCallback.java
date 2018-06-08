@@ -13,10 +13,10 @@ public interface ITestResultCallback {
 
     /**
      * 方法执行后回调
-     * @param param      接口入参map对象
+     * @param context      接口入参map对象
      * @param result     接口返回结果
      * @param parameters 接口入参对象
      * @throws Exception
      */
-    void afterTestMethod(Map<String, Object> param, Object result, Object... parameters) throws Exception;
+    void afterTestMethod(Map<String, Object> context, Object result, Object... parameters) throws Exception;
 }

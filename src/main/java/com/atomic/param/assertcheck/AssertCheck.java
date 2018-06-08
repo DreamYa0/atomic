@@ -3,6 +3,7 @@ package com.atomic.param.assertcheck;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atomic.exception.AssertCheckException;
+import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ResultAssert;
 import com.atomic.param.entity.MethodMeta;
@@ -95,21 +96,20 @@ public final class AssertCheck {
 
     /**
      * 执行录制断言与实际结果比较 - Http接口
-     * @param parameter  Http接口请求入参
      * @param result     Http接口请求结果
      * @param methodName Http接口测试类名
      * @param context    beforeTest传递参数
      * @param callback   回调函数，为testCase方法传入，入参和返回结果
      */
-    public static void replayMode(Object parameter, String result, String methodName, final Map<String, Object> context, ITestResultCallback callback) throws Exception {
+    public static void replayMode(String result, String methodName, final Map<String, Object> context, ITestResultCallback callback) throws Exception {
         try {
             JSONObject.parse(result);
         } catch (Exception e) {
             Reporter.log("[AssertCheck#handleException()]:{测试结果转换JSONObject异常！}");
-            ResultAssert.assertResult(result, context, callback, parameter);
+            ResultAssert.assertResult(result, context, callback);
         }
         String querySql = "select * from qa_auto_assert where method_name=? and method_param=?";
-        Object[] queryParam = {methodName, parameter.toString()};
+        Object[] queryParam = {methodName, context.get(Constants.PARAMETER_NAME_).toString()};
         QaAutoAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert == null) {
             Reporter.log("[AssertCheck#replayMode()]:{未录制有预期断言结果，请先执行断言录制！}");

@@ -45,7 +45,7 @@ public final class AssertCheckUtils {
 
     /**
      * 断言前需要获取数据库的值
-     * @param param
+     * @param context
      * @param testInstance
      * @throws IOException
      * @throws NoSuchMethodException
@@ -53,28 +53,28 @@ public final class AssertCheckUtils {
      * @throws SQLException
      * @throws InvocationTargetException
      */
-    public static void getDataBeforeTest(Map<String, Object> param, Object testInstance) throws Exception {
+    public static void getDataBeforeTest(Map<String, Object> context, Object testInstance) throws Exception {
         List<AssertItem> assertItemList = getAssertItemList(testInstance, true);
         if (!CollectionUtils.isEmpty(assertItemList)) {
             for (int i = 0; i < assertItemList.size(); i++) {
                 // 断言前获取数据
                 if (assertItemList.get(i).getAssertType() == AssertType.OLD_VALUE_BEFORE_TEST.getCode()) {
-                    param.put(Constants.ASSERT_ITEM_ + i, getOldValue(assertItemList.get(i), param));
+                    context.put(Constants.ASSERT_ITEM_ + i, getOldValue(assertItemList.get(i), context));
                     if (org.apache.commons.lang3.StringUtils.isEmpty(assertItemList.get(i).getOldValue())) {
-                        param.put(Constants.OLD_SQL_ + i, assertItemList.get(i).getOldSqlEntity().getSql());
+                        context.put(Constants.OLD_SQL_ + i, assertItemList.get(i).getOldSqlEntity().getSql());
                     }
                 }
             }
         }
         // 把入参的 sql 设置为真实的值
-        param.keySet().stream().filter(key -> param.get(key) != null).forEach(key -> {
+        context.keySet().stream().filter(key -> context.get(key) != null).forEach(key -> {
             try {
-                param.put(key, getRealValue(param, key));
-                // param.put(key, randomParamValue(param.get(key)));
+                context.put(key, getRealValue(context, key));
+                // context.put(key, randomParamValue(context.get(key)));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            // handleUserKey(key, param);
+            // handleUserKey(key, context);
         });
 
         IHandler randomParamHandler = new RandomParamHandler();
@@ -87,7 +87,7 @@ public final class AssertCheckUtils {
         cardHandler.setHandler(phoneNoHandler);
         phoneNoHandler.setHandler(emailHandler);
         emailHandler.setHandler(dateParamHandler);
-        randomParamHandler.handle(param);
+        randomParamHandler.handle(context);
     }
 
     /**

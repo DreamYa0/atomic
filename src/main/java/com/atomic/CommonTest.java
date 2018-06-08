@@ -126,11 +126,11 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             throw new ParameterException("获取测试入参异常！");
         }
         // 获取param
-        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
+        Map<String, Object> context = TestNGUtils.getParamContext(testResult);
         // 注入场景测试所需要的依赖方法的返回结果
-        TestNGUtils.injectScenarioReturnResult(testResult, param);
+        TestNGUtils.injectScenarioReturnResult(testResult, context);
         // 为mock注入caseIndex
-        getContext().setCaseIndex((Integer) param.get(Constants.CASE_INDEX));
+        getContext().setCaseIndex((Integer) context.get(Constants.CASE_INDEX));
         if (getContext().getMode() == TestMethodMode.REC) {
             deleteData();
         }
@@ -139,26 +139,26 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
         try {
             // 自动化测试
-            if (isAutoTest(param)) {
+            if (isAutoTest(context)) {
                 autoTest(callBack, testResult);
-            } else if (isMultiThreads(param)) {
+            } else if (isMultiThreads(context)) {
                 // 多线程测试
-                multiThreadTest(param, callBack, testResult);
+                multiThreadTest(context, callBack, testResult);
             } else {
-                startRunTest(param, callBack, testResult);
+                startRunTest(context, callBack, testResult);
             }
         } catch (Exception e) {
-            handleException(e, param, callBack, testResult);
+            handleException(e, context, callBack, testResult);
         }
     }
 
     /**
      * 是否需要多线程测试
-     * @param param 入参
+     * @param context 入参
      * @return
      */
-    private boolean isMultiThreads(Map<String, Object> param) {
-        if (!isExcelValueEmpty(param.get(THREAD_COUNT)) && Integer.valueOf(param.get(THREAD_COUNT).toString()) > 1) {
+    private boolean isMultiThreads(Map<String, Object> context) {
+        if (!isExcelValueEmpty(context.get(THREAD_COUNT)) && Integer.valueOf(context.get(THREAD_COUNT).toString()) > 1) {
             return true;
         } else {
             return false;
@@ -195,8 +195,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
     }
 
     @SuppressWarnings("unchecked")
-    private void multiThreadTest(final Map<String, Object> param, final IHookCallBack callBack, final ITestResult testResult) throws Exception {
-        int threadCount = Integer.valueOf(param.get(THREAD_COUNT).toString());
+    private void multiThreadTest(final Map<String, Object> context, final IHookCallBack callBack, final ITestResult testResult) throws Exception {
+        int threadCount = Integer.valueOf(context.get(THREAD_COUNT).toString());
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         // 构建完成服务
         CompletionService completionService = new ExecutorCompletionService(executor);
@@ -204,7 +204,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         for (int i = 1; i <= threadCount; i++) {
             // 向线程池提交任务
             completionService.submit(() -> {
-                startRunTest(param, callBack, testResult);
+                startRunTest(context, callBack, testResult);
                 return null;
             });
         }
@@ -218,46 +218,46 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         executor.shutdown();
     }
 
-    private void startRunTest(Map<String, Object> param, IHookCallBack callBack, ITestResult testResult) throws Exception {
+    private void startRunTest(Map<String, Object> context, IHookCallBack callBack, ITestResult testResult) throws Exception {
         // 初始化DB
         initDb();
 
         // 先执行beforeTest方法
-        beforeTest(param);
+        beforeTest(context);
 
         // 自动断言前获取数据库数据，以及把入参的sql值赋值成真实的值
-        getDataBeforeTest(param, this);
+        getDataBeforeTest(context, this);
 
         // 调用方法
         commonTest(testResult);
 
         // 结果为 Y 才执行断言
-        if (isExpectSuccess(param)) {
-            execAssertMethod(param, callBack, testResult);
+        if (isExpectSuccess(context)) {
+            execAssertMethod(context, callBack, testResult);
         }
     }
 
-    private void handleException(Exception e, Map<String, Object> param, IHookCallBack callBack, ITestResult testResult) {
+    private void handleException(Exception e, Map<String, Object> context, IHookCallBack callBack, ITestResult testResult) {
         // 期望结果为 Y 直接抛异常 ；beforeTest里面的异常也直接抛出
-        if (isExpectSuccess(param) || isExceptionThrowsBySpecialMethod(e, "beforeTest")) {
+        if (isExpectSuccess(context) || isExceptionThrowsBySpecialMethod(e, "beforeTest")) {
             Reporter.log("[ExceptionUtils#handleException()]:{} ---> beforeTest方法执行异常！");
             ThrowException.throwNewException(e);
             throw new RuntimeException(e);
         }
-        param.put(RESULT_NAME, exceptionDeal(e));
+        context.put(RESULT_NAME, exceptionDeal(e));
         try {
-            MethodMeta methodMeta = getMethodMeta(param, testResult, this);
-            resultPrint(methodMeta.getInterfaceMethod().getName(), param.get(RESULT_NAME), param, param.get(PARAMETER_NAME_));
+            MethodMeta methodMeta = getMethodMeta(context, testResult, this);
+            resultPrint(methodMeta.getInterfaceMethod().getName(), context.get(RESULT_NAME), context, context.get(PARAMETER_NAME_));
         } catch (Exception e1) {
             throw new MethodMetaException(e1);
         }
     }
 
-    private void execAssertMethod(Map<String, Object> param, IHookCallBack callBack, ITestResult testResult) throws Exception {
+    private void execAssertMethod(Map<String, Object> context, IHookCallBack callBack, ITestResult testResult) throws Exception {
         // 自动断言
-        AssertCheckUtils.assertCheck(this, param);
-        // 注入参数和结果，param 会去掉系统使用的一些数据
-        injectResultAndParameters(param, testResult, this);
+        AssertCheckUtils.assertCheck(this, context);
+        // 注入参数和结果，context 会去掉系统使用的一些数据
+        injectResultAndParameters(context, testResult, this);
         // 转断言
         super.run(callBack, testResult);
     }
@@ -274,11 +274,11 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
     }
 
     private void commonTest(final ITestResult testResult, final ITestResultCallback callback) throws Exception {
-        final Map<String, Object> param = TestNGUtils.getParamContext(testResult);
-        final MethodMeta methodMeta = getMethodMeta(param, testResult, this);
+        final Map<String, Object> context = TestNGUtils.getParamContext(testResult);
+        final MethodMeta methodMeta = getMethodMeta(context, testResult, this);
         // 先判断是不是foreach循环，不是就只执行一次
-        Object value = param.get(methodMeta.getMultiTimeField());
-        execMethodMulitTimes(value, paramValue -> prepareExecMethod(testResult, paramValue, param, methodMeta, callback));
+        Object value = context.get(methodMeta.getMultiTimeField());
+        execMethodMulitTimes(value, paramValue -> prepareExecMethod(testResult, paramValue, context, methodMeta, callback));
     }
 
     private void execMethodMulitTimes(Object paramValue, ITestMethodMultiTimes testMethod) throws Exception {
@@ -293,10 +293,10 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
     }
 
-    private void prepareExecMethod(ITestResult testResult, Object paramValue, Map<String, Object> param, final MethodMeta methodMeta, ITestResultCallback callback) throws Exception {
+    private void prepareExecMethod(ITestResult testResult, Object paramValue, Map<String, Object> context, final MethodMeta methodMeta, ITestResultCallback callback) throws Exception {
 
         // 如果有新值，替换成新值
-        Map<String, Object> newParam = Maps.newHashMap(param);
+        Map<String, Object> newParam = Maps.newHashMap(context);
         if (paramValue != null) {
             newParam.put(methodMeta.getMultiTimeField(), paramValue);
         }
@@ -309,19 +309,19 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         // 构造请求入参对象
         final Object[] parameters = generateParametersNew(methodMeta, newParam);
 
-        if ((!isAutoTest(param) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) && isScenario(TestNGUtils.getTestMethod(testResult))) {
+        if ((!isAutoTest(context) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) && isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
-            saveTestRequestInCache(parameters[0], testResult, param);
+            saveTestRequestInCache(parameters[0], testResult, context);
         }
 
-        param.put(PARAMETER_NAME_, parameters);
+        context.put(PARAMETER_NAME_, parameters);
         // 备注有可能有额外信息
-        param.put(EXCEL_DESC, newParam.get(EXCEL_DESC));
+        context.put(EXCEL_DESC, newParam.get(EXCEL_DESC));
 
-        execMethod(testResult, methodMeta, param, callback, parameters);
+        execMethod(testResult, methodMeta, context, callback, parameters);
     }
 
-    private void execMethod(ITestResult testResult, MethodMeta methodMeta, Map<String, Object> param, ITestResultCallback callback, Object... parameters) throws Exception {
+    private void execMethod(ITestResult testResult, MethodMeta methodMeta, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
 
         Method method = methodMeta.getInterfaceMethod();
         Object interfaceObj = methodMeta.getInterfaceObj();
@@ -335,20 +335,20 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         // 记录方法调用结束时间
         endTestTime(testResult);
 
-        if (!isAutoTest(param) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) {
+        if (!isAutoTest(context) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) {
             // 实现测试方法名、入参、返回结果、入参、CASE_INDEX数据入库
-            // saveScenarioTestData(parameters, result, null, param, getTestCaseClassName(testResult));
-            saveTestResultInCache(result, testResult, param);
+            // saveScenarioTestData(parameters, result, null, context, getTestCaseClassName(testResult));
+            saveTestResultInCache(result, testResult, context);
         }
 
-        if (isAutoTest(param) && !AnnotationUtils.isPrintResult(methodMeta.getTestMethod())) {
+        if (isAutoTest(context) && !AnnotationUtils.isPrintResult(methodMeta.getTestMethod())) {
             System.out.println(method.getName() + "-----------------------------测试用例执行完一个-----------------------------");
         } else {
             // parameters 可能被接口改变，打印出来看起来就像有问题
-            resultPrint(method.getName(), result, param, parameters);
+            resultPrint(method.getName(), result, context, parameters);
         }
 
-        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(param)) {
+        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
 
             if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
 
@@ -356,7 +356,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
                 recMode(parameters[0], result, methodMeta);
 
                 System.out.println("-----------------------------执行智能化断言录制模式成功！-----------------------------");
-                resultCallBack(result, param, callback, parameters);
+                resultCallBack(result, context, callback);
 
             } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
 
@@ -364,13 +364,13 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
                 replayMode(parameters[0], result, methodMeta);
 
                 System.out.println("-----------------------------执行智能化断言回放模式成功！-----------------------------");
-                resultCallBack(result, param, callback, parameters);
+                resultCallBack(result, context, callback);
 
             } else {
-                assertResult(result, testResult,this, param, callback, parameters);
+                assertResult(result, testResult,this, context, callback, parameters);
             }
         } else {
-            assertResult(result, testResult,this, param, callback, parameters);
+            assertResult(result, testResult,this, context, callback, parameters);
         }
     }
 

@@ -97,13 +97,13 @@ public final class MethodMetaUtils {
      * @return 方法属性集合
      * @throws Exception
      */
-    public static MethodMeta getMethodMeta(Map<String, Object> param, ITestResult testResult, Object testInstance) throws Exception {
-        Object object = param.get(Constants.TESTMETHODMETA);
+    public static MethodMeta getMethodMeta(Map<String, Object> context, ITestResult testResult, Object testInstance) throws Exception {
+        Object object = context.get(Constants.TESTMETHODMETA);
         if (object != null) {
             return (MethodMeta) object;
         }
         MethodMeta methodMeta = generateMethodMeta(testResult, testInstance);
-        param.put(Constants.TESTMETHODMETA, methodMeta);
+        context.put(Constants.TESTMETHODMETA, methodMeta);
         return methodMeta;
     }
 
