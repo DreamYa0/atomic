@@ -203,8 +203,14 @@ public class ReportListener implements IReporter {
                     Gson gson = new Gson();
                     test.info("入参：" + gson.toJson(context.get(Constants.PARAMETER_NAME_)));
 
-                    Response response = (Response) context.get(Constants.RESULT_NAME);
-                    test.info("出参：" + response.asString());
+                    Object obj = context.get(Constants.RESULT_NAME);
+                    if (obj instanceof Response) {
+                        Response response = (Response) obj;
+                        test.info("出参：" + response.asString());
+                    } else {
+                        test.info("出参：" + gson.toJson(obj));
+                    }
+
 
                     ExcelUtils excel = new ExcelUtils();
                     Map<String, Object> exceptResult = excel.readDataByRow(result, "exceptResult", Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
