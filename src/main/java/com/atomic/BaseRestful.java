@@ -25,6 +25,7 @@ import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.springframework.util.CollectionUtils;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
@@ -71,7 +72,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @Data 2018/05/30 10:48
  */
 // @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class,ReportListener.class})
+@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
 public abstract class BaseRestful extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
@@ -158,7 +159,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
             Gson gson = new Gson();
             // 把Header json字符串反序列化为List<Header>
             String headerStr = context.get(HTTP_HEADER).toString();
-            List<Map<String,String>> headerMapList = gson.fromJson(headerStr, new TypeToken<List<Map<String,String>>>() {
+            List<Map<String, String>> headerMapList = gson.fromJson(headerStr, new TypeToken<List<Map<String, String>>>() {
             }.getType());
 
             List<Header> headerList = Lists.newArrayList();
@@ -189,16 +190,28 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
         if (Constants.HTTP_GET.equalsIgnoreCase(httpMode)) {
             if (parameters != null && parameters.size() > 0) {
+
+                parameters.remove(Constants.CASE_INDEX);
+
                 response = specification.params(parameters).when().get(uri);
+                context.put(Constants.PARAMETER_NAME_, parameters);
+
             } else {
                 response = specification.when().get(uri);
+                context.put(Constants.PARAMETER_NAME_, "");
             }
         } else if (Constants.HTTP_POST.equalsIgnoreCase(httpMode) && isJsonContext(context)) {
             // POST Json请求
-            if (parameters == null || parameters.size() == 0) {
-                response = specification.when().post(uri);
-            } else if (parameters.keySet().contains("request")) {
-                response = specification.body(parameters.get("request").toString()).when().post(uri);
+            if (parameters.keySet().contains("request")) {
+
+                String request = parameters.get("request").toString();
+
+                response = specification.body(request).when().post(uri);
+                context.put(Constants.PARAMETER_NAME_, parameters.get("request"));
+
+                Gson gson = new Gson();
+                parameters = gson.fromJson(request, new TypeToken<Map<String, Objects>>() {}.getType());
+
             } else {
 
                 // 构造出真正的入参
@@ -212,11 +225,19 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
             }
         } else {
-            // POST 表单提交
-            if (parameters != null && parameters.size() > 0) {
+
+            parameters.remove(Constants.CASE_INDEX);
+
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(parameters))) {
+
+                // POST 有参表单提交
                 response = specification.params(parameters).when().post(uri);
+                context.put(Constants.PARAMETER_NAME_, parameters);
+
             } else {
+                // POST 无参表单提交
                 response = specification.when().post(uri);
+                context.put(Constants.PARAMETER_NAME_, "");
             }
         }
 
