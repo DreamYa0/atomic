@@ -12,6 +12,7 @@ import com.atomic.param.Constants;
 import com.atomic.param.HandleExcelParam;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
+import com.atomic.param.ResultAssert;
 import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
 import com.atomic.tools.sql.SqlTools;
@@ -36,7 +37,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ThrowException.throwNewException;
@@ -53,7 +53,6 @@ import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
 import static com.atomic.param.ResultAssert.assertResultForRest;
-import static com.atomic.param.ResultAssert.resultCallBack;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.param.assertcheck.AssertCheck.recMode;
 import static com.atomic.param.assertcheck.AssertCheck.replayMode;
@@ -185,13 +184,9 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         // 复制一份否则操作时会影响到测试上下文中的context
         Map<String, Object> newContext = Maps.newHashMap(context);
 
-        // Http接口入参
+        // 去除excel中的描述字段
         Map<String, Object> parameters = ParamUtils.getParameters(newContext);
 
-        if (isScenario(TestNGUtils.getTestMethod(testResult))) {
-            // 保存测试场景接口入参对象
-            saveTestRequestInCache(parameters, testResult, context);
-        }
         if (Constants.HTTP_GET.equalsIgnoreCase(httpMode)) {
             if (parameters != null && parameters.size() > 0) {
                 response = specification.params(parameters).when().get(uri);
@@ -207,13 +202,13 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
             } else {
 
                 // 构造出真正的入参
-                Map<String, Object> param = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, parameters);
-                param.remove(Constants.CASE_INDEX);
+                parameters = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, parameters);
+                parameters.remove(Constants.CASE_INDEX);
 
-                response = specification.body(param).when().post(uri);
+                response = specification.body(parameters).when().post(uri);
 
                 // 把入参和返回结果存入context中方便后续打印输出、测试报告展示等操作
-                context.put(Constants.PARAMETER_NAME_, param);
+                context.put(Constants.PARAMETER_NAME_, parameters);
 
             }
         } else {
@@ -224,20 +219,26 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
                 response = specification.when().post(uri);
             }
         }
+
+        if (isScenario(TestNGUtils.getTestMethod(testResult))) {
+            // 保存测试场景接口入参对象
+            saveTestRequestInCache(parameters, testResult, context);
+        }
+
         return response;
     }
 
     /**
      * 判断 ContentType 是否为 application/json
-     * @param param 入参 map 集合
+     * @param context 入参 map 集合
      * @return boolean
      */
-    private boolean isJsonContext(Map<String, Object> param) {
-        return Objects.nonNull(param.get(Constants.CONTENT_TYPE)) && Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(param.get(Constants.CONTENT_TYPE).toString());
+    private boolean isJsonContext(Map<String, Object> context) {
+        return Objects.nonNull(context.get(Constants.CONTENT_TYPE)) && Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(context.get(Constants.CONTENT_TYPE).toString());
     }
 
     private void execMethod(Response response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {
-        // Map<String, Object> parameters = TestNGUtils.getParamContext(testResult);
+
         String result = response.body().asString();
         // 打印测试结果
         resultPrint(getTestMethodName(testResult), response, context);
@@ -246,17 +247,17 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         //返回result为String，则检测是否需要录制回放和自动断言
         if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
 
-            if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
+            if (AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
 
                 recMode(context.get(Constants.PARAMETER_NAME_), result, TestNGUtils.getHttpMethod(testResult));
                 System.out.println("-----------------------执行智能化断言录制模式成功！-------------------------");
-                resultCallBack(response, context, callback);
+                ResultAssert.resultCallBack(response, context, callback);
 
-            } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
+            } else if (AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
 
                 replayMode(result, TestNGUtils.getHttpMethod(testResult), context, callback);
                 System.out.println("-----------------------执行智能化断言回放模式成功！-------------------------");
-                resultCallBack(response, context, callback);
+                ResultAssert.resultCallBack(response, context, callback);
 
             } else {
                 // 自动断言

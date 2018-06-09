@@ -26,7 +26,7 @@ public final class AssertCheck {
     }
 
     /**
-     * 录制智能化断言相关数据 - Dubbo接口
+     * 录制智能化断言相关数据 - 单测
      * @param parameter  测试入参
      * @param result     测试返回结果
      * @param methodMeta 测试相关属性
@@ -76,7 +76,7 @@ public final class AssertCheck {
     }
 
     /**
-     * 执行录制断言与实际结果比较 - Dubbo接口
+     * 执行录制断言与实际结果比较 - 单测
      * @param parameter
      * @param result
      * @param methodMeta
