@@ -330,11 +330,15 @@ public class ExcelUtils {
      * @return excel sheet页数据
      */
     public List<Map<String, Object>> readDataByRow(ITestResult testResult, Object instance, String sheetName) {
-        String className = TestNGUtils.getTestCaseClassName(testResult);
-        String resource = instance.getClass().getResource("").getPath();
-        String xls = resource + className + ".xls";
-        ExcelUtils excelUtil = new ExcelUtils();
-        return excelUtil.readDataByRow(xls, sheetName);
+        try {
+            String className = TestNGUtils.getTestCaseClassName(testResult);
+            String resource = instance.getClass().getResource("").getPath();
+            String xls = resource + className + ".xls";
+            ExcelUtils excelUtil = new ExcelUtils();
+            return excelUtil.readDataByRow(xls, sheetName);
+        } catch (Exception e) {
+            return Lists.newArrayList();
+        }
     }
 
     /**
@@ -344,11 +348,15 @@ public class ExcelUtils {
      * @return
      */
     public List<Map<String, Object>> readDataByRow(MethodMeta methodMeta, String sheetName) {
-        Class testClass = methodMeta.getTestClass();
-        String className = testClass.getSimpleName();
-        String resource = testClass.getResource("").getPath();
-        String xls = resource + className + ".xls";
-        return readDataByRow(xls, sheetName);
+        try {
+            Class testClass = methodMeta.getTestClass();
+            String className = testClass.getSimpleName();
+            String resource = testClass.getResource("").getPath();
+            String xls = resource + className + ".xls";
+            return readDataByRow(xls, sheetName);
+        } catch (Exception e) {
+            return Lists.newArrayList();
+        }
     }
 
     public Map<String, Object> readDataByRow(ITestResult testResult, String sheetName,int index) {

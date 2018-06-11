@@ -2,6 +2,7 @@ package com.atomic.param;
 
 import com.alibaba.fastjson.JSON;
 import com.atomic.exception.QueryDataException;
+import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.util.DataSourceUtils;
 import com.atomic.util.ExcelUtils;
@@ -269,6 +270,10 @@ public final class StringUtils {
 
                             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
                                 Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(valMap.get(Constants.CASE_INDEX).toString()) - 1);
+
+                                Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
+                                AssertCheckUtils.getDataBeforeTest(sheetParam,testObj);
+
                                 sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
                                 transferMap2Bean(fieldObj, sheetParam);
                             }

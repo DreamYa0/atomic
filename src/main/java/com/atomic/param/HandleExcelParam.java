@@ -119,14 +119,18 @@ public final class HandleExcelParam {
             Set<String> keys = context.keySet();
             for (String key : keys) {
                 Object value = context.get(key);
-                if (Objects.isNull(value)|| "".equals(value)) {
+                if (Objects.isNull(value) || "".equals(value)) {
                     ExcelUtils excel = new ExcelUtils();
                     try {
                         List<Map<String, Object>> maps = excel.readDataByRow(testResult, instance, key);
-                        Map<String, Object> map = maps.get(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()) - 1);
-                        Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);
-                        assemblyMap.remove(Constants.CASE_INDEX);
-                        context.put(key, assemblyMap);
+                        if (Boolean.FALSE.equals(CollectionUtils.isEmpty(maps))) {
+                            Map<String, Object> map = maps.get(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()) - 1);
+                            // 把excel中的值转换为真实值
+                            HandleExcelParam.getDataBeforeTest(new SqlTools(), map);
+                            Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);
+                            assemblyMap.remove(Constants.CASE_INDEX);
+                            context.put(key, assemblyMap);
+                        }
                     } catch (Exception e) {
                         // 如果Sheet不存在，则按照原逻辑处理
                     }

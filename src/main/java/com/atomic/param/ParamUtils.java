@@ -3,6 +3,7 @@ package com.atomic.param;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.atomic.exception.ParameterException;
+import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.util.ExcelUtils;
 import com.atomic.util.ReflectionUtils;
@@ -414,6 +415,10 @@ public final class ParamUtils {
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
 
                             Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1);
+
+                            Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
+                            AssertCheckUtils.getDataBeforeTest(sheetParam,testObj);
+
                             sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
                             StringUtils.transferMap2Bean(commonObj, sheetParam);
                         }

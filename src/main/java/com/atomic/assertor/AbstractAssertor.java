@@ -35,9 +35,12 @@ public abstract class AbstractAssertor implements Assertor {
         try {
             ExcelUtils excelUtil = new ExcelUtils();
             List<Map<String, Object>> list = excelUtil.readDataByRow(testResult,instance,"exceptResult");
-            Map<String, Object> param = TestNGUtils.getParamContext(testResult);
-            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param))) {
-                doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1));
+
+            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(list))) {
+                Map<String, Object> param = TestNGUtils.getParamContext(testResult);
+                if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param))) {
+                    doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1));
+                }
             }
 
         } catch (Exception e) {

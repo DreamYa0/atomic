@@ -78,7 +78,6 @@ import static com.atomic.param.StringUtils.isExcelValueEmpty;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.param.assertcheck.AssertCheck.recMode;
 import static com.atomic.param.assertcheck.AssertCheck.replayMode;
-import static com.atomic.param.assertcheck.AssertCheckUtils.getDataBeforeTest;
 import static com.atomic.tools.mock.data.MockContext.getContext;
 import static com.atomic.util.ApplicationUtils.getBean;
 import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
@@ -226,7 +225,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         beforeTest(context);
 
         // 自动断言前获取数据库数据，以及把入参的sql值赋值成真实的值
-        getDataBeforeTest(context, this);
+        AssertCheckUtils.getDataBeforeTest(context, this);
 
         // 调用方法
         commonTest(testResult);
