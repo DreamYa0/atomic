@@ -51,11 +51,15 @@ public abstract class AbstractAssertor implements Assertor {
     protected void assertJsonPath(Map<String, Object> excContext, JsonPath resultPath) {
         // 执行断言操作
         excContext.forEach((jsonPath, expecValue) -> {
-            String actualResult = resultPath.getString(jsonPath);
-            if (StringUtils.isEmpty(actualResult)) {
-                Assert.assertNotNull(actualResult, String.format("当前 JsonPath 路径不存在或 Result 返回值错误，JsonPath 路径为：%s", jsonPath));
-            } else {
-                Assert.assertEquals(actualResult, expecValue);
+
+            if (Boolean.FALSE.equals(StringUtils.isEmpty(jsonPath))) {
+
+                String actualResult = resultPath.getString(jsonPath);
+                if (StringUtils.isEmpty(actualResult)) {
+                    Assert.assertNotNull(actualResult, String.format("当前 JsonPath 路径不存在或 Result 返回值错误，JsonPath 路径为：%s", jsonPath));
+                } else {
+                    Assert.assertEquals(actualResult, expecValue);
+                }
             }
         });
     }
