@@ -417,10 +417,14 @@ public final class ParamUtils {
                             Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1);
 
                             Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
-                            AssertCheckUtils.getDataBeforeTest(sheetParam,testObj);
+                            AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
 
                             sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
                             StringUtils.transferMap2Bean(commonObj, sheetParam);
+                        } else {
+
+                            // 如果MethodMeta、Sheet不存在，则在默认sheet页中获取commonObj对象各个字段的值
+                            StringUtils.transferMap2Bean(commonObj, param);
                         }
                     } catch (Exception e) {
                         // 如果MethodMeta、Sheet不存在，则按照原逻辑处理
