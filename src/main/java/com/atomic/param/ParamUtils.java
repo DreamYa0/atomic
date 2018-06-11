@@ -430,6 +430,9 @@ public final class ParamUtils {
                         // 如果MethodMeta、Sheet不存在，则按照原逻辑处理
                         StringUtils.transferMap2Bean(commonObj, param);
                     }
+
+                    field.setAccessible(true);
+                    field.set(request, commonObj);
                 }
             }
         } catch (Exception e) {
