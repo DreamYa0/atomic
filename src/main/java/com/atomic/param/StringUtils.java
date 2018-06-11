@@ -14,6 +14,7 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -231,13 +232,20 @@ public final class StringUtils {
      * @param valMap excel入参map集合
      */
     protected static void transferMap2Bean(Object bean, Map<String, Object> valMap) {
+
         Class cls = bean.getClass();
         List<Field> fields = new ArrayList<>();
         ReflectionUtils.getAllFields(cls, fields);// 获取所有属性，包括继承的
         for (Field field : fields) {
             try {
+
                 Object obj = valMap.get(field.getName());
                 Type genericType = field.getGenericType();
+
+                if (genericType instanceof TypeVariable) {
+                    // 如果 Field 为类型变量，则跳过
+                    continue;
+                }
 
                 if (obj == null || isExcelValueEmpty(obj.toString())) {
                     // 默认excel sheet中没有对应此属性的值或属性值为""
@@ -296,7 +304,7 @@ public final class StringUtils {
                 }
             } catch (Exception e) {
                 Reporter.log("excel中的值转化为入参对象值异常！", true);
-                Reporter.log(String.format("StringUtil_transferMap2Bean error, field is %s, value is %s ", field.getName(), valMap.get(field.getName())) + e);
+                Reporter.log(String.format("StringUtil#transferMap2Bean error, field is %s, value is %s ", field.getName(), valMap.get(field.getName())) + e);
                 e.printStackTrace();
                 //continue;
                 // 把异常放入参里面去，打印出来，提醒用户数据有问题

@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -364,6 +365,11 @@ public final class ParamUtils {
                 // 公共属性为基本类型
                 String fieldName = field.getName();
                 Type fieldType = field.getGenericType();
+
+                if (fieldType instanceof TypeVariable) {
+                    // 如果 Field 为类型变量，则跳过
+                    continue;
+                }
 
                 if (StringUtils.isBasicType((Class) fieldType) && param.containsKey(fieldName)) {
                     String fieldValue = param.get(fieldName).toString();
