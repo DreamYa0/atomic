@@ -21,7 +21,7 @@ import java.sql.SQLException;
  */
 public final class CIDbUtils {
 
-    private static final String URL = "jdbc:mysql://10.200.173.91:3306/atomic_autotest?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=round";
+    private static final String URL = "jdbc:mysql://10.200.173.91:3306/atomic_autotest?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=round&useSSL=false";
     private static final String USER = "autotest";
     private static final String PASSWORD = "123456";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
