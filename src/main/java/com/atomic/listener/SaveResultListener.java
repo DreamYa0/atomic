@@ -35,45 +35,15 @@ public class SaveResultListener extends TestListenerAdapter {
     /**
      * 项目ID
      */
-    private final Integer projectId;
+    private volatile Integer projectId;
     /**
      * 测试用例执行者
      */
-    private final String runAuthor;
+    private volatile String runAuthor;
     /**
      * 用例执行轮数
      */
     private AtomicInteger round = new AtomicInteger(1);
-
-    public SaveResultListener() {
-        // 加载环境配置文件
-        GlobalConfig.load();
-        // 项目名称
-        String projectName = GlobalConfig.projectName;
-        this.runAuthor = GlobalConfig.runner;
-        if ("".equals(projectName) || "".equals(runAuthor)) {
-            throw new ListenerException("请在test.properties中填写：projectName、runner或修改其默认值！");
-        }
-        //TODO 2.0版本SQL会换成调用SOA服务接口
-        String queryProject = "select * from autotest_project where project_name= ?";
-        Object[] queryProjectParam = {projectName};
-        AutoTestProject autoTestProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
-        if (autoTestProject == null) {
-            String insertProject = "insert into autotest_project (project_name,project_status,author,create_time,update_time) values (?,?,?,?,?)";
-            Object[] insertProjectParam = {projectName, 1, runAuthor, new Date(), new Date()};
-            CIDbUtils.updateValue(insertProject, insertProjectParam);
-            AutoTestProject queryAutoTestProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
-            projectId = queryAutoTestProject.getId();
-        } else {
-            projectId = autoTestProject.getId();
-        }
-        String sql = "select * from autotest_result where project_id= ? order by create_time desc";
-        Object[] param = {projectId};
-        AutoTestResult qaMethod = CIDbUtils.queryQaMethodValue(sql, param);
-        if (qaMethod != null) {
-            round.set(round.get() + qaMethod.getRound());
-        }
-    }
 
     @Override
     public void onTestSuccess(ITestResult result) {
@@ -95,6 +65,7 @@ public class SaveResultListener extends TestListenerAdapter {
      * @param result
      */
     private void testResultIntoDatabase(ITestResult result) {
+        init();
         String methodName = null;
         String className = null;
         try {
@@ -159,6 +130,36 @@ public class SaveResultListener extends TestListenerAdapter {
         } catch (Exception e) {
             System.out.println("---------------------" + className + "#" + methodName + "--------------------");
             e.printStackTrace();
+        }
+    }
+
+    private void init(){
+        // 加载环境配置文件
+        GlobalConfig.load();
+        // 项目名称
+        String projectName = GlobalConfig.projectName;
+        this.runAuthor = GlobalConfig.runner;
+        if ("".equals(projectName) || "".equals(runAuthor)) {
+            throw new ListenerException("请在test.properties中填写：projectName、runner或修改其默认值！");
+        }
+        //TODO 2.0版本SQL会换成调用SOA服务接口
+        String queryProject = "select * from autotest_project where project_name= ?";
+        Object[] queryProjectParam = {projectName};
+        AutoTestProject autoTestProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
+        if (autoTestProject == null) {
+            String insertProject = "insert into autotest_project (project_name,project_status,author,create_time,update_time) values (?,?,?,?,?)";
+            Object[] insertProjectParam = {projectName, 1, runAuthor, new Date(), new Date()};
+            CIDbUtils.updateValue(insertProject, insertProjectParam);
+            AutoTestProject queryAutoTestProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
+            projectId = queryAutoTestProject.getId();
+        } else {
+            projectId = autoTestProject.getId();
+        }
+        String sql = "select * from autotest_result where project_id= ? order by create_time desc";
+        Object[] param = {projectId};
+        AutoTestResult qaMethod = CIDbUtils.queryQaMethodValue(sql, param);
+        if (qaMethod != null) {
+            round.set(round.get() + qaMethod.getRound());
         }
     }
 
