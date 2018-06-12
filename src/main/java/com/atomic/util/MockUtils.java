@@ -63,35 +63,24 @@ public final class MockUtils {
             Method method = ReflectionUtils.getMethod(mockClass, mockMethod);
 
             // 获取方法的访问修饰符
-            String modifiers = Modifier.toString(method.getModifiers());
+            boolean isStatic = Modifier.isStatic(method.getModifiers());
 
-            // 判断方法是否为静态方法
-            if (modifiers.contains("static")) {
-                // 静态方法mock
-                new Expectations(mockClass) {
-                    {
+            new Expectations(mockClass) {
+                {
+                    // 判断方法是否为静态方法
+                    if (isStatic) {
+                        // 静态方法mock
                         MethodUtils.invokeStaticMethod(mockClass, mockMethod, mockParamter);
-
-                        // 有返回值的方法
-                        if (Boolean.FALSE.equals("void".equals(method.getReturnType().getName()))) {
-                            result = mockReturn;
-                        }
-                    }
-                };
-
-            } else {
-                // 非静态方法mock（包括普通方法、final方法）
-                new Expectations(mockInstance) {
-                    {
+                    } else {
+                        // 非静态方法mock（包括普通方法、final方法）
                         MethodUtils.invokeMethod(mockInstance, mockMethod, mockParamter);
-
-                        // 有返回值的方法
-                        if (Boolean.FALSE.equals("void".equals(method.getReturnType().getName()))) {
-                            result = mockReturn;
-                        }
                     }
-                };
-            }
+                    // 有返回值的方法
+                    if (Boolean.FALSE.equals("void".equals(method.getReturnType().getName()))) {
+                        result = mockReturn;
+                    }
+                }
+            };
 
         } catch (Exception e) {
             logger.error("mock方法失败，mock方法名称为：{}", mockClass.getSimpleName() + "." + mockMethod, e);

@@ -23,7 +23,7 @@ import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.util.FileUtils;
 import com.atomic.util.MapUtils;
 import com.google.common.collect.Maps;
-import mockit.Capturing;
+import mockit.Mocked;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.test.context.TestExecutionListeners;
@@ -96,11 +96,11 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
 public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBase {
 
-    @Capturing
+    @Mocked
     protected HttpSession session;
-    @Capturing
+    @Mocked
     protected HttpServletRequest request;
-    @Capturing
+    @Mocked
     protected HttpServletResponse response;
 
     @BeforeClass(alwaysRun = true)
