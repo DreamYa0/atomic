@@ -16,6 +16,7 @@ import org.testng.TestListenerAdapter;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -117,7 +118,18 @@ public class SaveResultListener extends TestListenerAdapter {
             }
             Gson gson = new Gson();
             Object param = context.get(Constants.PARAMETER_NAME_);
-            if (Objects.nonNull(param) && Boolean.TRUE.equals(param instanceof Object[])) {
+
+            if (Objects.nonNull(param) && Boolean.TRUE.equals(param instanceof HashMap)) {
+
+                if (methodsReturn instanceof Response) {
+                    Response response = (Response) methodsReturn;
+                    insertData(projectId, className, methodName, caseName, param.toString(), response.body().asString(), expectedReturn, testStatus, round.get(), runAuthor);
+                } else {
+                    insertData(projectId, className, methodName, caseName, param.toString(), methodsReturn.toString(), expectedReturn, testStatus, round.get(), runAuthor);
+                }
+
+
+            } else if (Objects.nonNull(param)) {
 
                 Object[] methodsParameter = (Object[]) param;
                 String jsonParam;
@@ -134,14 +146,6 @@ public class SaveResultListener extends TestListenerAdapter {
                 }
                 insertData(projectId, className, methodName, caseName, jsonParam, jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
 
-            } else if (Objects.nonNull(param) && Objects.nonNull(context.get("m_parameter_0"))) {
-                Object methodsParameters = context.get("m_parameter_0");
-                if (methodsReturn instanceof Response) {
-                    Response response = (Response) methodsReturn;
-                    insertData(projectId, className, methodName, caseName, methodsParameters.toString(), response.body().asString(), expectedReturn, testStatus, round.get(), runAuthor);
-                } else {
-                    insertData(projectId, className, methodName, caseName, methodsParameters.toString(), methodsReturn.toString(), expectedReturn, testStatus, round.get(), runAuthor);
-                }
             } else {
                 String jsonReturn;
                 try {
