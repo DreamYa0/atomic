@@ -41,7 +41,7 @@ final class Mongodb {
             tableName = "report";
         }
         if (host == null) {
-            host = "192.168.142.4";
+            host = "10.200.173.91";
         }
         if (port == null) {
             port = 27017;

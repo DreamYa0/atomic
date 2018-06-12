@@ -44,8 +44,8 @@ final class ExtentManager {
 
     private void createInstance(String projectName) {
         extent = new ExtentReports();
-        // extent.attachReporter(createHtmlReporter(projectName), createExtentXReporter(projectName));
-        extent.attachReporter(createHtmlReporter(projectName));
+        extent.attachReporter(createHtmlReporter(projectName), createExtentXReporter(projectName));
+        // extent.attachReporter(createHtmlReporter(projectName));
         extent.setReportUsesManualConfiguration(true);
     }
 
@@ -67,15 +67,15 @@ final class ExtentManager {
         htmlReporter.config().setLevel(Status.INFO);
         htmlReporter.config().setProtocol(Protocol.HTTP);
         htmlReporter.config().setResourceCDN(ResourceCDN.EXTENTREPORTS);
-        // htmlReporter.config().setExtentXUrl("http://172.17.31.34:1337/#/");
+        htmlReporter.config().setExtentXUrl("http://10.200.173.92:1337/#/");
         return htmlReporter;
     }
 
     private ExtentXReporter createExtentXReporter(String projectName) {
-        ExtentXReporter extentx = new ExtentXReporter("192.168.142.4", 27017);
+        ExtentXReporter extentx = new ExtentXReporter("10.200.173.91", 27017);
         extentx.config().setProjectName(projectName);
         extentx.config().setReportName(projectName + "#" + countBuild(projectName));
-        extentx.config().setServerUrl("http://172.17.31.34:1337/#/");
+        extentx.config().setServerUrl("http://10.200.173.92:1337/#/");
         return extentx;
     }
 
