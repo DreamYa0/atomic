@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 /**
  * @author dreamyao
@@ -22,7 +21,7 @@ public final class MockUtils {
     /**
      * 普通对象的方法mock
      * <pre>
-     *     // mock SpringBean、mock工具类、mock普通类
+     *     // mock SpringBean、mock普通类
      *     @Transactional
      *     @SpringBootTest(classes = WebApplication.class)
      *     public class TestUserSymbolAdd extends BaseTestCase<MemberUserController> {
@@ -62,19 +61,10 @@ public final class MockUtils {
 
             Method method = ReflectionUtils.getMethod(mockClass, mockMethod);
 
-            // 获取方法的访问修饰符
-            boolean isStatic = Modifier.isStatic(method.getModifiers());
-
-            new Expectations(mockClass) {
+            new Expectations(mockInstance) {
                 {
-                    // 判断方法是否为静态方法
-                    if (isStatic) {
-                        // 静态方法mock
-                        MethodUtils.invokeStaticMethod(mockClass, mockMethod, mockParamter);
-                    } else {
-                        // 非静态方法mock（包括普通方法、final方法）
-                        MethodUtils.invokeMethod(mockInstance, mockMethod, mockParamter);
-                    }
+                    // 非静态方法mock（包括普通方法、final方法）
+                    MethodUtils.invokeMethod(mockInstance, mockMethod, mockParamter);
                     // 有返回值的方法
                     if (Boolean.FALSE.equals("void".equals(method.getReturnType().getName()))) {
                         result = mockReturn;
