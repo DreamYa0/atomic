@@ -1,8 +1,8 @@
 package com.atomic.util;
 
-import com.atomic.param.entity.QaAutoAssert;
-import com.atomic.param.entity.QaProject;
-import com.atomic.param.entity.QaResult;
+import com.atomic.param.entity.AutoTestAssert;
+import com.atomic.param.entity.AutoTestProject;
+import com.atomic.param.entity.AutoTestResult;
 import com.atomic.param.entity.QaScenarioData;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
@@ -21,10 +21,10 @@ import java.sql.SQLException;
  */
 public final class CIDbUtils {
 
-    private static final String URL = "jdbc:mysql://192.168.142.12:3306/zhubajie_qa_dubbo?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=round";
-    private static final String User = "root";
-    private static final String Password = "zhubajie";
-    private static final String Driver = "com.mysql.jdbc.Driver";
+    private static final String URL = "jdbc:mysql://10.200.173.91:3306/atomic_autotest?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=round";
+    private static final String USER = "autotest";
+    private static final String PASSWORD = "123456";
+    private static final String DRIVER = "com.mysql.jdbc.Driver";
     private static Connection conn;
 
     private CIDbUtils() {
@@ -36,9 +36,9 @@ public final class CIDbUtils {
      */
     private static Connection getConnection() {
         Connection conn = null;
-        DbUtils.loadDriver(Driver);//加载数据库驱动如果成功返回true否则返回false
+        DbUtils.loadDriver(DRIVER);//加载数据库驱动如果成功返回true否则返回false
         try {
-            conn = DriverManager.getConnection(URL, User, Password);//连接数据库
+            conn = DriverManager.getConnection(URL, USER, PASSWORD);//连接数据库
         } catch (SQLException e) {
             Reporter.log("连接数据库异常！", true);
         }
@@ -49,7 +49,7 @@ public final class CIDbUtils {
      * 返回数据库响应查询语句结果的Json数据封装结果值
      * 这个类负责在数据库中进行数据的查询，和对查询结果进行数据封装
      */
-    public static QaResult queryQaMethodValue(String sqlString, Object[] params) {
+    public static AutoTestResult queryQaMethodValue(String sqlString, Object[] params) {
         conn = getConnection();
         /**
          * QueryRunner：简化了数据库的增删改查操作，用来替代JDBC中的executeQuery、executeUpdate等方法，
@@ -60,7 +60,7 @@ public final class CIDbUtils {
          * 另外，可以调用相关的batch方法来批量操作INSERT、UPDATE或者DELETE等SQL语句
          */
         QueryRunner qr = new QueryRunner();//创建SQL执行类对象
-        QaResult obj = null;
+        AutoTestResult obj = null;
         try {
             /**
              * 执行SQL查询语句
@@ -76,7 +76,7 @@ public final class CIDbUtils {
              * 8.MapListHandler：将ResultSet中所有的数据存成List，List中存放的是Map
              * 8.ScalarHandler：将ResultSet中一条记录的某一列数据存成Object
              */
-            obj = qr.query(conn, sqlString, new BeanHandler<QaResult>(QaResult.class), params);
+            obj = qr.query(conn, sqlString, new BeanHandler<AutoTestResult>(AutoTestResult.class), params);
         } catch (SQLException e) {
             Reporter.log("[CIDbUtils#queryQaMethodValue]异常信息：{}", true);
         } finally {
@@ -89,12 +89,12 @@ public final class CIDbUtils {
      * 返回数据库响应查询语句结果的Json数据封装结果值
      * 这个类负责在数据库中进行数据的查询，和对查询结果进行数据封装
      */
-    public static QaProject queryQaProjectValue(String sqlString, Object[] params) {
+    public static AutoTestProject queryQaProjectValue(String sqlString, Object[] params) {
         conn = getConnection();
         QueryRunner qr = new QueryRunner();//创建SQL执行类对象
-        QaProject obj = null;
+        AutoTestProject obj = null;
         try {
-            obj = qr.query(conn, sqlString, new BeanHandler<>(QaProject.class), params);
+            obj = qr.query(conn, sqlString, new BeanHandler<>(AutoTestProject.class), params);
         } catch (SQLException e) {
             Reporter.log("[CIDbUtils#queryQaProjectValue]异常信息：{}", true);
         } finally {
@@ -109,12 +109,12 @@ public final class CIDbUtils {
      * @param params
      * @return
      */
-    public static QaAutoAssert queryQaAutoAssetValue(String sqlString, Object[] params) {
+    public static AutoTestAssert queryQaAutoAssetValue(String sqlString, Object[] params) {
         conn = getConnection();
         QueryRunner qr = new QueryRunner();//创建SQL执行类对象
-        QaAutoAssert obj = null;
+        AutoTestAssert obj = null;
         try {
-            obj = qr.query(conn, sqlString, new BeanHandler<>(QaAutoAssert.class), params);
+            obj = qr.query(conn, sqlString, new BeanHandler<>(AutoTestAssert.class), params);
         } catch (SQLException e) {
             Reporter.log("[CIDbUtils#queryQaAutoAssetValue]异常信息：{}", true);
         } finally {

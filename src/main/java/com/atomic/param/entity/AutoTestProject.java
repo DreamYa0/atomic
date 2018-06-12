@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Created by dreamyao on 2017/3/15.
  */
-public class QaProject implements Serializable {
+public class AutoTestProject implements Serializable {
 
     private Integer id;
 

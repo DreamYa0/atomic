@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Created by dreamyao on 2017/3/15.
  */
-public class QaResult implements Serializable {
+public class AutoTestResult implements Serializable {
 
     private Integer id;
 

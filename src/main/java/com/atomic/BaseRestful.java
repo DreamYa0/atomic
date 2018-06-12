@@ -6,6 +6,7 @@ import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.listener.ReportListener;
 import com.atomic.listener.RollBackListener;
+import com.atomic.listener.SaveResultListener;
 import com.atomic.listener.SaveRunTime;
 import com.atomic.listener.ScenarioRollBackListener;
 import com.atomic.param.Constants;
@@ -71,8 +72,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @title REST风格接口测试基类
  * @Data 2018/05/30 10:48
  */
-// @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
+@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
 public abstract class BaseRestful extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();

@@ -1,7 +1,7 @@
 package com.atomic.listener;
 
-import com.atomic.param.entity.QaProject;
-import com.atomic.param.entity.QaResult;
+import com.atomic.param.entity.AutoTestProject;
+import com.atomic.param.entity.AutoTestResult;
 import com.atomic.util.CIDbUtils;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ResourceCDN;
@@ -86,11 +86,11 @@ final class ExtentManager {
      */
     String countBuild(String projectName) {
         Integer projectId = getProjectId(projectName);
-        String sql = "select * from qa_result where project_id= ? order by create_time desc";
+        String sql = "select * from autotest_result where project_id= ? order by create_time desc";
         Object[] param = {projectId};
-        QaResult qaResult = CIDbUtils.queryQaMethodValue(sql, param);
-        if (qaResult != null) {
-            return qaResult.getRound().toString();
+        AutoTestResult autoTestResult = CIDbUtils.queryQaMethodValue(sql, param);
+        if (autoTestResult != null) {
+            return autoTestResult.getRound().toString();
         }
         return "1";
     }
@@ -101,12 +101,12 @@ final class ExtentManager {
      * @return
      */
     private Integer getProjectId(String projectName) {
-        String queryProject = "select * from qa_project where project_name= ?";
+        String queryProject = "select * from autotest_project where project_name= ?";
         Object[] queryProjectParam = {projectName};
-        QaProject qaProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
+        AutoTestProject autoTestProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
         Integer projectId = null;
-        if (qaProject != null) {
-            projectId = qaProject.getId();
+        if (autoTestProject != null) {
+            projectId = autoTestProject.getId();
         }
         return projectId;
     }

@@ -4,7 +4,7 @@ import com.atomic.config.GlobalConfig;
 import com.atomic.param.Constants;
 import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
-import com.atomic.param.entity.QaResult;
+import com.atomic.param.entity.AutoTestResult;
 import com.atomic.util.CIDbUtils;
 import com.atomic.util.ExcelUtils;
 import com.aventstack.extentreports.ExtentReports;
@@ -280,9 +280,9 @@ public class ReportListener implements IReporter {
         } else {
             caseName = param.get(Constants.CASE_NAME).toString();
         }
-        String sql = "SELECT * FROM qa_result WHERE class_name=? AND methods_name=? AND case_name=? order by create_time desc";
+        String sql = "SELECT * FROM autotest_result WHERE class_name=? AND methods_name=? AND case_name=? order by create_time desc";
         Object[] params = {className, methodName, caseName};
-        QaResult result = CIDbUtils.queryQaMethodValue(sql, params);
+        AutoTestResult result = CIDbUtils.queryQaMethodValue(sql, params);
         Map<String, String> resultMap = Maps.newHashMap();
         if (result != null) {
             resultMap.put("param", result.getMethods_parameter());

@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Created by dreamyao on 2017/6/18.
  */
-public class QaAutoAssert {
+public class AutoTestAssert {
 
     private Integer id;
     /** 被测方法名称 */

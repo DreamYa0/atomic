@@ -7,7 +7,7 @@ import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ResultAssert;
 import com.atomic.param.entity.MethodMeta;
-import com.atomic.param.entity.QaAutoAssert;
+import com.atomic.param.entity.AutoTestAssert;
 import com.atomic.util.CIDbUtils;
 import org.testng.Assert;
 import org.testng.Reporter;
@@ -32,13 +32,13 @@ public final class AssertCheck {
      * @param methodMeta 测试相关属性
      */
     public static void recMode(Object parameter, Object result, MethodMeta methodMeta) {
-        String querySql = "select * from qa_auto_assert where method_name=? and method_param=?";
+        String querySql = "select * from autotest_assert where method_name=? and method_param=?";
         Object[] queryParam = {methodMeta.getMethodName(), JSON.toJSONString(parameter)};
-        QaAutoAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
+        AutoTestAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert == null) {
             insertAssertValue(methodMeta.getMethodName(), parameter, result);
         } else {
-            String deleteSql = "delete from qa_auto_assert where method_name=? and method_param=?";
+            String deleteSql = "delete from autotest_assert where method_name=? and method_param=?";
             CIDbUtils.updateValue(deleteSql, queryParam);//删除存在的数据，从新插入新的数据
             insertAssertValue(methodMeta.getMethodName(), parameter, result);
         }
@@ -51,13 +51,13 @@ public final class AssertCheck {
      * @param methodName 测试相关属性
      */
     public static void recMode(Object parameter, String result, String methodName) {
-        String querySql = "select * from qa_auto_assert where method_name=? and method_param=?";
+        String querySql = "select * from autotest_assert where method_name=? and method_param=?";
         Object[] queryParam = {methodName, parameter.toString()};
-        QaAutoAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
+        AutoTestAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert == null) {
             insertAssertValue(methodName, parameter, result);
         } else {
-            String deleteSql = "delete from qa_auto_assert where method_name=? and method_param=?";
+            String deleteSql = "delete from autotest_assert where method_name=? and method_param=?";
             CIDbUtils.updateValue(deleteSql, queryParam);//删除存在的数据，从新插入新的数据
             insertAssertValue(methodName, parameter, result);
         }
@@ -70,7 +70,7 @@ public final class AssertCheck {
      * @param result
      */
     private static void insertAssertValue(String methodName, Object parameter, String result) {
-        String insertSql = "insert into qa_auto_assert (method_name,method_param,method_return,create_time) values(?,?,?,?)";
+        String insertSql = "insert into autotest_assert (method_name,method_param,method_return,create_time) values(?,?,?,?)";
         Object[] insertParam = {methodName, parameter.toString(), result, new Date()};
         CIDbUtils.updateValue(insertSql, insertParam);
     }
@@ -82,9 +82,9 @@ public final class AssertCheck {
      * @param methodMeta
      */
     public static void replayMode(Object parameter, Object result, MethodMeta methodMeta) {
-        String querySql = "select * from qa_auto_assert where method_name=? and method_param=?";
+        String querySql = "select * from autotest_assert where method_name=? and method_param=?";
         Object[] queryParam = {methodMeta.getMethodName(), JSON.toJSONString(parameter)};
-        QaAutoAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
+        AutoTestAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert == null) {
             Reporter.log("[AssertCheck#replayMode()]:{未录制有预期断言结果，请先执行断言录制！}");
             throw new AssertCheckException("未录制有预期断言结果，请先执行断言录制！");
@@ -108,9 +108,9 @@ public final class AssertCheck {
             Reporter.log("[AssertCheck#handleException()]:{测试结果转换JSONObject异常！}");
             ResultAssert.assertResult(result, context, callback);
         }
-        String querySql = "select * from qa_auto_assert where method_name=? and method_param=?";
+        String querySql = "select * from autotest_assert where method_name=? and method_param=?";
         Object[] queryParam = {methodName, context.get(Constants.PARAMETER_NAME_).toString()};
-        QaAutoAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
+        AutoTestAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert == null) {
             Reporter.log("[AssertCheck#replayMode()]:{未录制有预期断言结果，请先执行断言录制！}");
             throw new AssertCheckException("未录制有预期断言结果，请先执行断言录制！");
@@ -119,7 +119,7 @@ public final class AssertCheck {
     }
 
     private static void insertAssertValue(String methodName, Object parameter, Object result) {
-        String insertSql = "insert into qa_auto_assert (method_name,method_param,method_return,create_time) values(?,?,?,?)";
+        String insertSql = "insert into autotest_assert (method_name,method_param,method_return,create_time) values(?,?,?,?)";
         Object[] insertParam = {methodName, JSON.toJSONString(parameter), JSON.toJSONString(result), new Date()};
         CIDbUtils.updateValue(insertSql, insertParam);
     }
@@ -131,9 +131,9 @@ public final class AssertCheck {
      * @return
      */
     public static String getExpectedReturn(String methodName, String param) {
-        String querySql = "select * from qa_auto_assert where method_name=? and method_param=?";
+        String querySql = "select * from autotest_assert where method_name=? and method_param=?";
         Object[] queryParam = {methodName, param};
-        QaAutoAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
+        AutoTestAssert autoAssert = CIDbUtils.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert != null) {
             return autoAssert.getMethod_return();
         }
