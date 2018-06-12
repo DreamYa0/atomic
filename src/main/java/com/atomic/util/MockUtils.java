@@ -115,7 +115,7 @@ public final class MockUtils {
             Method method = ReflectionUtils.getMethod(mockClass, mockMethod);
             new Expectations() {
                 {
-                    method.invoke(mockInstance, mockParamter);
+                    MethodUtils.invokeMethod(mockInstance, mockMethod, mockParamter);
 
                     // 有返回值的方法
                     if (Boolean.FALSE.equals("void".equals(method.getReturnType().getName()))) {
