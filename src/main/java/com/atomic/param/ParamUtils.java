@@ -372,35 +372,27 @@ public final class ParamUtils {
                     continue;
                 }
 
-                if (StringUtils.isBasicType((Class) fieldType) && param.containsKey(fieldName)) {
+                if (param.containsKey(fieldName)) {
+                    // Excel中包含 公共属性为自定义对象或基本类型字段的值
                     String fieldValue = param.get(fieldName).toString();
 
-                    try {
-                        Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
+                    if (org.apache.commons.lang3.StringUtils.isNoneEmpty(fieldValue)) {
 
-                        // 按照正常情况是根据set方法来设值，但是为了兼容lombok插件采用这种不是很优雅的方式
-                        field.setAccessible(true);
-                        field.set(request, actualValue);
-                    } catch (Exception e) {
-                        logger.error("给请求入参对象公共基本类型属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
+                        try {
+                            // 如果excel包含属性字段名称，默认excel中的值为Json格式
+                            Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
+
+                            // 按照正常情况是根据set方法来设值，但是为了兼容lombok插件采用这种不是很优雅的方式
+                            field.setAccessible(true);
+                            field.set(request, actualValue);
+                        } catch (Exception e) {
+                            logger.error("给请求入参对象公共自定义对象属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
+                        }
                     }
 
-                } else if (param.containsKey(fieldName)) {
-                    // 公共属性为自定义对象
-                    String fieldValue = param.get(fieldName).toString();
 
-                    try {
-                        // 如果excel包含属性字段名称，默认excel中的值为Json格式
-                        Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
-
-                        // 按照正常情况是根据set方法来设值，但是为了兼容lombok插件采用这种不是很优雅的方式
-                        field.setAccessible(true);
-                        field.set(request, actualValue);
-                    } catch (Exception e) {
-                        logger.error("给请求入参对象公共自定义对象属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
-                    }
-                } else {
-                    // 采用excel多sheet进行设计
+                } else if (Boolean.FALSE.equals(StringUtils.isBasicType((Class) fieldType))){
+                    // 采用excel多sheet进行设计,且字段为自定义对象
                     // 实例化field所表示的对象
                     Object commonObj = ReflectionUtils.initFromClass((Class) field.getGenericType());
 
