@@ -317,6 +317,9 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         // 备注有可能有额外信息
         context.put(EXCEL_DESC, newParam.get(EXCEL_DESC));
 
+        // 把入参和返回结果存入context中方便后续打印输出、测试报告展示等操作
+        context.put(Constants.PARAMETER_NAME_, parameters);
+
         execMethod(testResult, methodMeta, context, callback, parameters);
     }
 
