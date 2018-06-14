@@ -22,7 +22,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-
 /**
  * @author dreamyao
  * @version 1.2.0
@@ -133,7 +132,7 @@ public class SaveResultListener extends TestListenerAdapter {
         }
     }
 
-    private void init(){
+    private void init() {
         // 加载环境配置文件
         GlobalConfig.load();
         // 项目名称
@@ -158,7 +157,7 @@ public class SaveResultListener extends TestListenerAdapter {
         String sql = "select * from autotest_result where project_id= ? order by create_time desc";
         Object[] param = {projectId};
         AutoTestResult qaMethod = CIDbUtils.queryQaMethodValue(sql, param);
-        if (qaMethod != null) {
+        if (Objects.nonNull(qaMethod) && Objects.equals(1, round.get())) {
             round.set(round.get() + qaMethod.getRound());
         }
     }
