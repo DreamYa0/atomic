@@ -12,9 +12,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.http.util.Args;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
@@ -28,7 +28,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -536,11 +535,10 @@ public final class ParamUtils {
      * @return
      */
     public static Map<String, Object> getParameters(Map<String, Object> context) {
-        Args.notNull(context, "入参字段不能为空！");
+        Assert.notNull(context, "入参字段不能为空！");
         if (!context.isEmpty()) {
             List<String> removeKey = getRemoveKey();
-            Map<String, Object> inParam = new HashMap<>();
-            inParam.putAll(context);
+            Map<String, Object> inParam = Maps.newHashMap(context);
             Iterator<Map.Entry<String, Object>> iterMap = inParam.entrySet().iterator();
             while (iterMap.hasNext()) {
                 Map.Entry<String, Object> entry = iterMap.next();
