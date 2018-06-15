@@ -334,13 +334,14 @@ public final class ParamUtils {
                     setRequestData(request, data);
                     return request;
                 } else {
-                    data = ReflectionUtils.initFromClass(paramClass);
+
                     if (param.containsKey("data")) {
                         // 当Excel中data字段值为Json时
                         String dataJson = param.get("data").toString();
                         data = StringUtils.json2Bean(new Gson(), dataJson, paramClass);
                     } else {
                         // 设置属性值
+                        data = ReflectionUtils.initFromClass(paramClass);
                         StringUtils.transferMap2Bean(data, param);
                     }
                 }
