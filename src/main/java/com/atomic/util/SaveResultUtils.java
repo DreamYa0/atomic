@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import org.testng.ITestResult;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static com.atomic.param.Constants.CASE_INDEX;
 
@@ -31,8 +32,10 @@ public final class SaveResultUtils {
      * @param context    入参上下文
      */
     public static void saveTestResultInCache(Object result, ITestResult testResult, Map<String, Object> context) {
-        String name = TestNGUtils.getTestCaseClassName(testResult) + "_" + context.get(CASE_INDEX);
-        testDataCache.put(name, result);
+        if (Objects.nonNull(result)) {
+            String name = TestNGUtils.getTestCaseClassName(testResult) + "_" + context.get(CASE_INDEX);
+            testDataCache.put(name, result);
+        }
     }
 
     /**
@@ -47,8 +50,10 @@ public final class SaveResultUtils {
     }
 
     public static void saveTestRequestInCache(Object parameters, ITestResult testResult, Map<String, Object> context) {
-        String name = TestNGUtils.getTestCaseClassName(testResult) + "_" + context.get(CASE_INDEX);
-        testRequestCache.put(name, parameters);
+        if (Objects.nonNull(parameters)) {
+            String name = TestNGUtils.getTestCaseClassName(testResult) + "_" + context.get(CASE_INDEX);
+            testRequestCache.put(name, parameters);
+        }
     }
 
     /**

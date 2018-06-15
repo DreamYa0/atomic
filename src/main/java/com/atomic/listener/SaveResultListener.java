@@ -139,7 +139,7 @@ public class SaveResultListener extends TestListenerAdapter {
         String projectName = GlobalConfig.projectName;
         this.runAuthor = GlobalConfig.runner;
         if ("".equals(projectName) || "".equals(runAuthor)) {
-            throw new ListenerException("请在test.properties中填写：projectName、runner或修改其默认值！");
+            throw new ListenerException("接口测试请在test.properties中填写：projectName、runner值，单测请在@EnableAtomic注解中填写projectName、runner值");
         }
         //TODO 2.0版本SQL会换成调用SOA服务接口
         String queryProject = "select * from autotest_project where project_name= ?";

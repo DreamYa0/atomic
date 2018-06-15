@@ -501,7 +501,7 @@ public final class ParamUtils {
             } else {
                 String jsonStr;
                 if (prettyFormat) {
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    Gson gson = new GsonBuilder().setDateFormat(dateFormat).setPrettyPrinting().create();
                     try {
                         jsonStr = gson.toJson(obj);
                     } catch (Exception e) {

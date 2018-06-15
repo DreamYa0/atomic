@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -89,9 +90,7 @@ public final class ReflectionUtils {
     public static void getAllFields(Class clazz, List<Field> fields) {
         if (clazz == null || fields == null || clazz == Object.class)
             return;
-        Field[] fs = clazz.getDeclaredFields();
-        fields.addAll(Lists.newArrayList(fs));
-        getAllFields(clazz.getSuperclass(), fields);
+        fields.addAll(getAllFieldsList(clazz));
     }
 
     /**
@@ -99,14 +98,14 @@ public final class ReflectionUtils {
      * @param clazz Class对象
      */
     public static List<Field> getAllFieldsList(final Class<?> clazz) {
-        final List<Field> fieldList = Lists.newArrayList();
         Class<?> currentClass = clazz;
+        final List<Field> allFields = new ArrayList<Field>();
         while (currentClass != null) {
             final Field[] declaredFields = currentClass.getDeclaredFields();
-            Collections.addAll(fieldList, declaredFields);
+            Collections.addAll(allFields, declaredFields);
             currentClass = currentClass.getSuperclass();
         }
-        return fieldList;
+        return allFields;
     }
 
     /**

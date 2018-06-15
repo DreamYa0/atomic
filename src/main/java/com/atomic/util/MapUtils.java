@@ -43,7 +43,7 @@ public final class MapUtils {
             }
             return Integer.valueOf(val.toString());
         } catch (Exception e) {
-            Reporter.log("[MapUtil#getInt()]:{数据转化异常！}");
+            Reporter.log("MapUtil#getInt() -> 数据转化异常！");
         }
         return null;
     }

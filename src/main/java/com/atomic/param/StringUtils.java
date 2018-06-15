@@ -236,7 +236,8 @@ public final class StringUtils {
 
         Class cls = bean.getClass();
         List<Field> fields = new ArrayList<>();
-        ReflectionUtils.getAllFields(cls, fields);// 获取所有属性，包括继承的
+        // 获取所有属性，包括继承的
+        ReflectionUtils.getAllFields(cls, fields);
         for (Field field : fields) {
             try {
 
