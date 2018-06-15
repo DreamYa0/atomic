@@ -335,8 +335,14 @@ public final class ParamUtils {
                     return request;
                 } else {
                     data = ReflectionUtils.initFromClass(paramClass);
-                    // 设置属性值
-                    StringUtils.transferMap2Bean(data, param);
+                    if (param.containsKey("data")) {
+                        // 当Excel中data字段值为Json时
+                        String dataJson = param.get("data").toString();
+                        data = StringUtils.json2Bean(new Gson(), dataJson, paramClass);
+                    } else {
+                        // 设置属性值
+                        StringUtils.transferMap2Bean(data, param);
+                    }
                 }
             }
             // 设置属性值

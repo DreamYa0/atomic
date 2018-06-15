@@ -152,7 +152,7 @@ public final class StringUtils {
      * @param <T>
      * @return
      */
-    private static <T> T json2Bean(Gson gson, String jsonString, Class<T> type) {
+    public static <T> T json2Bean(Gson gson, String jsonString, Class<T> type) {
         return gson.fromJson(jsonString, type);
     }
 
