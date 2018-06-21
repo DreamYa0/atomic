@@ -18,6 +18,7 @@ import com.atomic.param.values.AutoTestShortValues;
 import com.atomic.param.values.AutoTestStringValues;
 import com.atomic.param.values.IAutoTestValues;
 import com.atomic.util.ListUtils;
+import com.atomic.util.ReflectionUtils;
 import com.coinsuper.common.model.BaseRequest;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ArrayUtils;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.exception.ThrowException.throwNewException;
@@ -43,7 +45,6 @@ import static com.atomic.param.Constants.DATE_FORMAT;
 import static com.atomic.param.MethodMetaUtils.getMethodMeta;
 import static com.atomic.param.ParamUtils.getParamContextWithoutExtraInfo;
 import static com.atomic.param.ParamUtils.getParamName;
-import static com.atomic.param.ParamUtils.isParamTypeExtendsBaseRequest;
 import static com.atomic.param.StringUtils.getValue;
 import static com.atomic.param.StringUtils.isBasicType;
 import static java.util.Comparator.comparing;
@@ -172,30 +173,53 @@ public class AutoTest {
                     autoTestItemList.add(AutoTest.getAutoTestValues((Class) methodMeta.getParamTypes()[i], methodMeta.getParamNames()[i], autoTestValuesLevel));
                 }
             } else {
+                // XXX<T> 中的 T
                 Type paramType = getParamType(methodMeta.getDeclaredInterfaceMethod(), i);
                 // Request型
-                if (isParamTypeExtendsBaseRequest(methodMeta.getDeclaredInterfaceMethod(), i)) {
+                if (ParamUtils.isParamTypeExtendsBaseRequest(methodMeta.getDeclaredInterfaceMethod(), i)) {
                     Class paramClass = (Class) paramType;
                     if (BaseRequest.class.isAssignableFrom(paramClass)) {
                         // 获取该类的所有属性是基本类型的可能值
                         autoTestItemList.addAll(AutoTest.getAutoTestValues(paramClass.asSubclass(BaseRequest.class), autoTestValuesLevel));
-                    } else if (Number.class.isAssignableFrom(paramClass)) {
-                        // Request<? extend Number>
-                        // 单参数
-                        autoTestItemList.add(AutoTest.getAutoTestValues(paramClass.asSubclass(Number.class), getParamName(methodMeta, i), autoTestValuesLevel));
-                    } else if (String.class.isAssignableFrom(paramClass)) {
-                        // Request<String>
-                        // 单参数
-                        autoTestItemList.add(AutoTest.getAutoTestValues(paramClass, getParamName(methodMeta, i), autoTestValuesLevel));
                     } else {
-                        // Request<XXXDTO>
-                        // 获取该类的所有属性是基本类型的可能值
-                        autoTestItemList.addAll(AutoTest.getAutoTestValues(paramClass, autoTestValuesLevel));
+                        generateAutoTestParamClass(methodMeta, autoTestItemList, autoTestValuesLevel, i, paramClass);
                     }
                 } else {
                     // 其他泛型
+
+                    // 先自动生成公共字段的值
+                    autoTestItemList.addAll(getAutoTestCommonValues((Class) paramType, autoTestValuesLevel));
+                    // 在字段生成 T 的值
+                    Class paramClass = (Class) paramType;
+                    generateAutoTestParamClass(methodMeta, autoTestItemList, autoTestValuesLevel, i, paramClass);
+
                 }
             }
+        }
+    }
+
+    /**
+     * 生成XXX<T> 中 T 参数的值
+     * @param methodMeta          测试属性
+     * @param autoTestItemList    属性以及对应生成的值
+     * @param autoTestValuesLevel 等级
+     * @param i                   循环
+     * @param paramClass          T 的 Class 类型
+     * @throws ClassNotFoundException Class不存在
+     */
+    private static void generateAutoTestParamClass(MethodMeta methodMeta, List<AutoTestItem> autoTestItemList, int autoTestValuesLevel, int i, Class paramClass) throws ClassNotFoundException {
+        if (Number.class.isAssignableFrom(paramClass)) {
+            // Request<? extend Number>
+            // 单参数
+            autoTestItemList.add(getAutoTestValues(paramClass.asSubclass(Number.class), getParamName(methodMeta, i), autoTestValuesLevel));
+        } else if (String.class.isAssignableFrom(paramClass)) {
+            // Request<String>
+            // 单参数
+            autoTestItemList.add(getAutoTestValues(paramClass, getParamName(methodMeta, i), autoTestValuesLevel));
+        } else {
+            // Request<XXXDTO>
+            // 获取该类的所有属性是基本类型的可能值
+            autoTestItemList.addAll(getAutoTestValues(paramClass, autoTestValuesLevel));
         }
     }
 
@@ -208,19 +232,16 @@ public class AutoTest {
      */
     private static Type getParamType(Method method, int paramIndex) throws Exception {
         if (method.getGenericParameterTypes()[paramIndex] instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getRawType();
-            if (BaseRequest.class.isAssignableFrom((Class) rawType)) {
-                if (ArrayUtils.isEmpty(((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments())) {
-                    Reporter.log("[ParamUtils#getParamType()]:{} ---> 不能得到实际的类型参数！");
-                    throw new Exception("---------------不能得到实际的类型参数!---------------");
-                }
-                // Request<List<Integer>>型
-                if (((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments()[0] instanceof ParameterizedType) {
-                    return ((sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl) ((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments()[0]).getRawType();
-                } else {
-                    // Request<XXX>型
-                    return ((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments()[0];
-                }
+            if (ArrayUtils.isEmpty(((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments())) {
+                Reporter.log("[ParamUtils#getParamType()]:{} ---> 不能得到实际的类型参数！");
+                throw new Exception("---------------不能得到实际的类型参数!---------------");
+            }
+            // Request<List<Integer>>型
+            if (((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments()[0] instanceof ParameterizedType) {
+                return ((sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl) ((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments()[0]).getRawType();
+            } else {
+                // Request<XXX>型
+                return ((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getActualTypeArguments()[0];
             }
         }
         return method.getGenericParameterTypes()[paramIndex];
@@ -292,13 +313,49 @@ public class AutoTest {
     private static List<AutoTestItem> getAutoTestValues(Class clazz, int autoTestValuesLevel) throws ClassNotFoundException {
         List<AutoTestItem> list = Lists.newArrayList();
         Optional<Field[]> optionalFields = Optional.ofNullable(clazz.getDeclaredFields());
-        optionalFields.ifPresent(fields -> Arrays.stream(fields).parallel().filter(field -> isBasicType(field.getType().getSimpleName())).forEach(newField -> {
-            try {
-                list.add(getAutoTestValues(newField.getType(), newField.getName(), autoTestValuesLevel));
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+        optionalFields.ifPresent(fields -> Arrays.stream(fields).forEach(newField -> generateNestingAutoTestValues(newField, list, autoTestValuesLevel)));
+        return list;
+    }
+
+    /**
+     * 递归的为对象嵌套对象的所有Field设值
+     * @param field         field
+     * @param autoTestItems 属性和生成的值
+     */
+    private static void generateNestingAutoTestValues(Field field, List<AutoTestItem> autoTestItems, int autoTestValuesLevel) {
+        try {
+            if (isBasicType(field.getType().getSimpleName())) {
+                autoTestItems.add(getAutoTestValues(field.getType(), field.getName(), autoTestValuesLevel));
+            } else {
+                Type genericType = field.getGenericType();
+                List<Field> fields = ReflectionUtils.getAllFieldsList((Class) genericType);
+                for (Field newField : fields) {
+                    generateNestingAutoTestValues(newField, autoTestItems, autoTestValuesLevel);
+                }
             }
-        }));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 对 XXX<T> 中的XXX 中的公共字段设值
+     * @param clazz               入参对象Class
+     * @param autoTestValuesLevel 等级
+     * @return 属性和生成的值
+     */
+    private static List<AutoTestItem> getAutoTestCommonValues(Class clazz, int autoTestValuesLevel) {
+        List<AutoTestItem> list = Lists.newArrayList();
+        List<Field> fields = ReflectionUtils.getAllFieldsList(clazz);
+        // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
+        List<Field> collect = fields.stream()
+                .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID") || field.getName().equals("data")))
+                .collect(Collectors.toList());
+
+        for (Field field : collect) {
+            generateNestingAutoTestValues(field, list, autoTestValuesLevel);
+        }
         return list;
     }
 
@@ -464,8 +521,13 @@ public class AutoTest {
         int[] index = new int[autoTestItemList.size()];
         // 设置默认-1
         setArray(index, -1);
-        // int[] counts = new int[autoTestItemList.size()];// 每个参数的自动测试值的个数
-        // resetCounts(counts, autoTestItemList);// 计算每个属性的测试值个数
+
+        // 每个参数的自动测试值的个数
+        // int[] counts = new int[autoTestItemList.size()];
+
+        // 计算每个属性的测试值个数
+        // resetCounts(counts, autoTestItemList);
+
         // 计算每个属性的测试值个数
         int[] counts = autoTestItemList.stream().mapToInt(autoTestItem -> autoTestItem.getAutoTestValues().size()).toArray();
         List<Map<String, Object>> list = new ArrayList<>();
@@ -496,6 +558,7 @@ public class AutoTest {
          * 自动测试参数的自动测试列表
          */
         private List autoTestValues;
+
         public AutoTestItem(String paramName) {
             this.paramName = paramName;
         }
