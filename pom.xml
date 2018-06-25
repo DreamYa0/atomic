@@ -296,8 +296,8 @@
         <!-- MD5相关jar包 -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15</artifactId>
-            <version>1.46</version>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.59</version>
         </dependency>
         <!-- MD5相关jar包 -->
     </dependencies>
