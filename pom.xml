@@ -96,6 +96,11 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>${org.springframework.version}</version>
+        </dependency>
         <!-- spring相关jar包 -->
         <!-- rest-assured相关jar包开始 -->
         <dependency>
