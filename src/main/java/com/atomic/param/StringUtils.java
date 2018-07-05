@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 
@@ -287,10 +288,18 @@ public final class StringUtils {
 
                 } else {
 
-                    String value = obj.toString();
+                    // 如果obj为 beforeTest方法里面直接放入的对象时
+                    Object object;
+                    if (Objects.equals(genericType, obj.getClass())) {
 
-                    String fieldType = field.getType().getSimpleName();
-                    Object object = json2Bean(fieldType, value, genericType);
+                        object = obj;
+
+                    } else {
+
+                        String value = obj.toString();
+                        String fieldType = field.getType().getSimpleName();
+                        object = json2Bean(fieldType, value, genericType);
+                    }
 
                     /*String fieldSetName = parSetName(field.getName(), fieldType);
                     String fieldIsSetName = parIsSetName(field.getName());
