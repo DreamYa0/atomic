@@ -57,25 +57,17 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
-import static com.atomic.annotations.AnnotationUtils.getCheckMode;
-import static com.atomic.annotations.AnnotationUtils.isScenario;
+import static com.atomic.annotations.AnnotationUtils.*;
 import static com.atomic.exception.ExceptionUtils.isExceptionThrowsBySpecialMethod;
 import static com.atomic.listener.SaveRunTime.endTestTime;
 import static com.atomic.listener.SaveRunTime.startTestTime;
 import static com.atomic.param.AutoTest.generateAutoTestCases;
-import static com.atomic.param.Constants.EXCEL_DESC;
-import static com.atomic.param.Constants.PARAMETER_NAME_;
-import static com.atomic.param.Constants.RESULT_NAME;
-import static com.atomic.param.Constants.THREAD_COUNT;
+import static com.atomic.param.Constants.*;
 import static com.atomic.param.MethodMetaUtils.getMethodMeta;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.generateParametersNew;
+import static com.atomic.param.ParamUtils.*;
 import static com.atomic.param.ParamUtils.isAutoTest;
-import static com.atomic.param.ParamUtils.isExpectSuccess;
-import static com.atomic.param.ResultAssert.assertResult;
-import static com.atomic.param.ResultAssert.exceptionDeal;
-import static com.atomic.param.ResultAssert.resultCallBack;
+import static com.atomic.param.ResultAssert.*;
 import static com.atomic.param.StringUtils.isExcelValueEmpty;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.param.assertcheck.AssertCheck.recMode;
@@ -369,10 +361,10 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
                 resultCallBack(result, context, callback);
 
             } else {
-                assertResult(result, testResult,this, context, callback, parameters);
+                assertResult(result, testResult, this, context, callback, parameters);
             }
         } else {
-            assertResult(result, testResult,this, context, callback, parameters);
+            assertResult(result, testResult, this, context, callback, parameters);
         }
     }
 
