@@ -42,7 +42,7 @@ public final class StringUtils {
      */
     public static boolean isBasicType(Class clz) {
         try {
-            return clz.isPrimitive() || Arrays.asList("String", "Date").contains(clz.getSimpleName()) || ((Class) clz.getField("TYPE").get(null)).isPrimitive();
+            return clz.isPrimitive() || Arrays.asList("String", "Date", "BigDecimal").contains(clz.getSimpleName()) || ((Class) clz.getField("TYPE").get(null)).isPrimitive();
         } catch (Exception e) {
             return false;
         }
@@ -229,7 +229,7 @@ public final class StringUtils {
 
     /**
      * set属性的值到Bean，不支持的类型没有赋值
-     * @param bean Request<T>中的T
+     * @param bean   Request<T>中的T
      * @param valMap excel入参map集合
      */
     protected static void transferMap2Bean(Object bean, Map<String, Object> valMap) {
@@ -273,7 +273,7 @@ public final class StringUtils {
                                 Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(valMap.get(Constants.CASE_INDEX).toString()) - 1);
 
                                 Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
-                                AssertCheckUtils.getDataBeforeTest(sheetParam,testObj);
+                                AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
 
                                 sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
                                 transferMap2Bean(fieldObj, sheetParam);
