@@ -292,11 +292,13 @@ public final class StringUtils {
 
                             sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
                             transferMap2Bean(fieldObj, sheetParam);
+                            setFieldValue(bean, field, fieldObj);
                         }
 
                     } catch (Exception e) {
                         // 如果MethodMeta、Sheet不存在，则按照原逻辑处理,从默认sheet页中获取值来进行设置
                         transferMap2Bean(fieldObj, valMap);
+                        setFieldValue(bean, field, fieldObj);
                     }
 
                 } else {
@@ -327,8 +329,7 @@ public final class StringUtils {
                     fieldSetMet.invoke(bean, object);*/
 
                     // 由于普遍使用lombok注解来生成getter、setter方法，故使用此方式给属性设值，而不采用setter方法来设值
-                    field.setAccessible(true);
-                    field.set(bean, object);
+                    setFieldValue(bean, field, object);
                 }
             } catch (Exception e) {
                 Reporter.log("excel中的值转化为入参对象值异常！", true);
@@ -355,6 +356,11 @@ public final class StringUtils {
                 }
             }
         }
+    }
+
+    private static void setFieldValue(Object bean, Field field, Object fieldObj) throws IllegalAccessException {
+        field.setAccessible(true);
+        field.set(bean, fieldObj);
     }
 
     /**
