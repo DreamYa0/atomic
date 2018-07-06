@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -239,7 +240,13 @@ public final class StringUtils {
         List<Field> fields = new ArrayList<>();
         // 获取所有属性，包括继承的
         ReflectionUtils.getAllFields(cls, fields);
-        for (Field field : fields) {
+
+        // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
+        List<Field> collect = fields.stream()
+                .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID")))
+                .collect(Collectors.toList());
+
+        for (Field field : collect) {
             try {
 
                 Object obj = valMap.get(field.getName());
