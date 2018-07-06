@@ -14,6 +14,7 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.sql.SQLException;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -239,7 +241,13 @@ public final class StringUtils {
         List<Field> fields = new ArrayList<>();
         // 获取所有属性，包括继承的
         ReflectionUtils.getAllFields(cls, fields);
-        for (Field field : fields) {
+
+        // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
+        List<Field> collect = fields.stream()
+                .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID")))
+                .collect(Collectors.toList());
+
+        for (Field field : collect) {
             try {
 
                 Object obj = valMap.get(field.getName());
@@ -253,37 +261,44 @@ public final class StringUtils {
                 if (obj == null || isExcelValueEmpty(obj.toString())) {
                     // 默认excel sheet中没有对应此属性的值或属性值为""
 
+                    // 如果是参数化类型则跳过
+                    if (genericType instanceof ParameterizedType) {
+                        continue;
+                    }
+
+                    // 如果是基本类型也跳过
                     if (isBasicType((Class) genericType)) {
                         // 基本类型
                         continue;
-                    } else {
-                        // 自定义对象,且excel中未有对应字段的值或属性值为""，则采用excel多sheet进行设计
+                    }
 
-                        // 实例化自定义对象
-                        Object fieldObj = ReflectionUtils.initFromClass((Class) genericType);
+                    // 自定义对象,且excel中未有对应字段的值或属性值为""，则采用excel多sheet进行设计
+                    // 实例化自定义对象
+                    Object fieldObj = ReflectionUtils.initFromClass((Class) genericType);
 
-                        try {
-                            Object object = valMap.get(Constants.TESTMETHODMETA);
-                            MethodMeta methodMeta = (MethodMeta) object;
+                    try {
+                        Object object = valMap.get(Constants.TESTMETHODMETA);
+                        MethodMeta methodMeta = (MethodMeta) object;
 
-                            String sheetName = field.getName();
-                            ExcelUtils excel = new ExcelUtils();
-                            List<Map<String, Object>> sheetParams = excel.readDataByRow(methodMeta, sheetName);
+                        String sheetName = field.getName();
+                        ExcelUtils excel = new ExcelUtils();
+                        List<Map<String, Object>> sheetParams = excel.readDataByRow(methodMeta, sheetName);
 
-                            if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
-                                Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(valMap.get(Constants.CASE_INDEX).toString()) - 1);
+                        if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
+                            Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(valMap.get(Constants.CASE_INDEX).toString()) - 1);
 
-                                Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
-                                AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
+                            Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
+                            AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
 
-                                sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
-                                transferMap2Bean(fieldObj, sheetParam);
-                            }
-
-                        } catch (Exception e) {
-                            // 如果MethodMeta、Sheet不存在，则按照原逻辑处理,从默认sheet页中获取值来进行设置
-                            transferMap2Bean(fieldObj, valMap);
+                            sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
+                            transferMap2Bean(fieldObj, sheetParam);
+                            setFieldValue(bean, field, fieldObj);
                         }
+
+                    } catch (Exception e) {
+                        // 如果MethodMeta、Sheet不存在，则按照原逻辑处理,从默认sheet页中获取值来进行设置
+                        transferMap2Bean(fieldObj, valMap);
+                        setFieldValue(bean, field, fieldObj);
                     }
 
                 } else {
@@ -314,8 +329,7 @@ public final class StringUtils {
                     fieldSetMet.invoke(bean, object);*/
 
                     // 由于普遍使用lombok注解来生成getter、setter方法，故使用此方式给属性设值，而不采用setter方法来设值
-                    field.setAccessible(true);
-                    field.set(bean, object);
+                    setFieldValue(bean, field, object);
                 }
             } catch (Exception e) {
                 Reporter.log("excel中的值转化为入参对象值异常！", true);
@@ -342,6 +356,11 @@ public final class StringUtils {
                 }
             }
         }
+    }
+
+    private static void setFieldValue(Object bean, Field field, Object fieldObj) throws IllegalAccessException {
+        field.setAccessible(true);
+        field.set(bean, fieldObj);
     }
 
     /**
