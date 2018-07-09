@@ -305,7 +305,7 @@ public final class StringUtils {
 
                     // 如果obj为 beforeTest方法里面直接放入的对象时
                     Object object;
-                    if (Objects.equals(genericType, obj.getClass().getGenericSuperclass())) {
+                    if (Objects.equals(genericType, obj.getClass())) {
 
                         object = obj;
 
