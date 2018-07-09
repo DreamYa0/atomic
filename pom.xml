@@ -27,6 +27,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.atomic.cache</groupId>
+            <artifactId>cachecloud-client</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.coinsuper</groupId>
             <artifactId>coinsuper-utils</artifactId>
             <version>1.1.0-SNAPSHOT</version>
