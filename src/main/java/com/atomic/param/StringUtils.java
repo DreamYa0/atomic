@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -305,7 +304,7 @@ public final class StringUtils {
 
                     // 如果obj为 beforeTest方法里面直接放入的对象时
                     Object object;
-                    if (Objects.equals(genericType, obj.getClass())) {
+                    if (Boolean.FALSE.equals(isBasicType(obj.getClass()))) {
 
                         object = obj;
 
