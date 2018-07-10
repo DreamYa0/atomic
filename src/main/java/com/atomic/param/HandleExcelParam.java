@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.testng.ITestResult;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.List;
@@ -38,21 +36,18 @@ public final class HandleExcelParam {
 
     /**
      * 执行测试之前替换excel中的特殊字段为真实的值
-     * @param param
-     * @throws IOException
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws SQLException
-     * @throws InvocationTargetException
+     * @param param    入参集合
+     * @param sqlTools 数据库连接工具
      */
-    public static void getDataBeforeTest(SqlTools sqlTools, Map<String, Object> param) throws IOException, NoSuchMethodException, IllegalAccessException, SQLException, InvocationTargetException {
+    public static void getDataBeforeTest(SqlTools sqlTools, Map<String, Object> param) {
+
         // 把入参的 sql 设置为真实的值
-        param.keySet().stream().filter(key -> param.get(key) != null).forEach(key -> {
-            try {
-                param.put(key, getRealValue(sqlTools, param, key));
-            } catch (SQLException e) {
-                e.printStackTrace();
+        param.forEach((paramKey, paramValue) -> {
+
+            if (Objects.nonNull(paramValue)) {
+                param.put(paramKey, getRealValue(paramValue, sqlTools));
             }
+
         });
 
         IHandler randomParamHandler = new RandomParamHandler();
@@ -70,20 +65,31 @@ public final class HandleExcelParam {
 
     /**
      * 获取SQL语句对应的真实值
-     * @param sqlTools
-     * @param param
-     * @param field
-     * @return
-     * @throws SQLException
+     * @param sqlTools   数据库连接异常
+     * @param paramValue 入参待处理值
+     * @return 处理完毕的值
      */
-    private static Object getRealValue(SqlTools sqlTools, Map<String, Object> param, String field) throws SQLException {
-        Object value = param.get(field);
-        if (value instanceof String) {
-            value = getSqlValue(sqlTools, value.toString(), String.class);
-            // 把入参里面的 sql 语句改成真实的值
-            param.put(field, value);
+    @SuppressWarnings("unchecked")
+    private static Object getRealValue(Object paramValue, SqlTools sqlTools) {
+
+        Object newParamValue = null;
+
+        try {
+            if (paramValue instanceof String) {
+                newParamValue = getSqlValue(sqlTools, paramValue.toString(), String.class);
+            } else if (paramValue instanceof Map) {
+                Map<String, Object> nestingParam = (Map<String, Object>) paramValue;
+                nestingParam.forEach((nestingParamKey, nestingParamValue) -> {
+                    if (Objects.nonNull(nestingParamValue)) {
+                        nestingParam.put(nestingParamKey, getRealValue(nestingParamValue, sqlTools));
+                    }
+                });
+                newParamValue = nestingParam;
+            }
+        } catch (SQLException e) {
+            logger.error("数据库连接失败！", e);
         }
-        return value;
+        return newParamValue;
     }
 
     /**
