@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -26,9 +27,9 @@ public class DateParamHandler implements IHandler {
         if (Map.class.isInstance(t)) {
             Map<String, Object> param = (Map<String, Object>) t;
             param.forEach((key, value) -> {
-                if (Constants.NOW_DAY.equals(value.toString())) {
+                if (Objects.nonNull(value) && Constants.NOW_DAY.equals(value.toString())) {
                     param.put(key, dateToStr(new Date(), "yyyy-MM-dd HH:mm:ss"));
-                } else if (value.toString().startsWith("${now()-")) {
+                } else if (Objects.nonNull(value) && value.toString().startsWith("${now()-")) {
                     String numStr = value.toString().substring(8, 9);
                     Integer num = Integer.valueOf(numStr);
                     if (value.toString().endsWith("D}")) {

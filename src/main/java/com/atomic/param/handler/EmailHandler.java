@@ -3,6 +3,7 @@ package com.atomic.param.handler;
 import com.atomic.param.Constants;
 
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -23,7 +24,7 @@ public class EmailHandler implements IHandler {
         if (Map.class.isInstance(t)) {
             Map<String, Object> param = (Map<String, Object>) t;
             param.forEach((key, value) -> {
-                if (Constants.EMAIL.equals(value.toString())) {
+                if (Objects.nonNull(value) && Constants.EMAIL.equals(value.toString())) {
                     param.put(key, getEmail());
                 }
             });

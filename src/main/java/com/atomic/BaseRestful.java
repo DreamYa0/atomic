@@ -16,7 +16,6 @@ import com.atomic.param.ParamUtils;
 import com.atomic.param.ResultAssert;
 import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
-import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.SaveResultUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,17 +42,10 @@ import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ThrowException.throwNewException;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
-import static com.atomic.param.Constants.HTTP_HEADER;
-import static com.atomic.param.Constants.HTTP_HOST;
-import static com.atomic.param.Constants.HTTP_METHOD;
-import static com.atomic.param.Constants.HTTP_MODE;
-import static com.atomic.param.Constants.LOGIN_URL;
+import static com.atomic.param.Constants.*;
 import static com.atomic.param.HandleMethodName.getTestMethodName;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.isContentTypeNoNull;
-import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
-import static com.atomic.param.ParamUtils.isHttpHostNoNull;
-import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
+import static com.atomic.param.ParamUtils.*;
 import static com.atomic.param.ResultAssert.assertResultForRest;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.param.assertcheck.AssertCheck.recMode;
@@ -108,38 +100,38 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         //注入场景测试所需要的依赖方法的返回结果
         TestNGUtils.injectScenarioReturnResult(testResult, context);
 
-        // 先执行beforeTestMethod
-        beforeTest(context);
+        // 递归组合参数并转化为真实值
+        Map<String, Object> newContext = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, context);
 
-        // 把 excel 中的变量转换为真实值
-        HandleExcelParam.getDataBeforeTest(new SqlTools(), context);
+        // 先执行beforeTest
+        beforeTest(newContext);
 
         // 检查Http接口测试入参必填字段
-        ParamUtils.checkKeyWord(context);
+        ParamUtils.checkKeyWord(newContext);
 
         //记录方法调用开始时间
         SaveRunTime.startTestTime(testResult);
 
         // 执行接口调用
-        Response response = startRequest(testResult, context);
+        Response response = startRequest(testResult, newContext);
 
         //记录方法调用结束时间
         SaveRunTime.endTestTime(testResult);
 
         // 缓存入参和返回值
-        SaveResultUtils.saveTestResultInCache(response, testResult, context);
+        SaveResultUtils.saveTestResultInCache(response, testResult, newContext);
 
-        execMethod(response, testResult, callBack, context);
+        execMethod(response, testResult, callBack, newContext);
     }
 
     @SuppressWarnings("unchecked")
-    private Response startRequest(ITestResult testResult, Map<String, Object> context) {
+    private Response startRequest(ITestResult testResult, Map<String, Object> newContext) {
         Headers headers;
         String httpHost;
-        if (!isHttpHostNoNull(context)) {
+        if (!isHttpHostNoNull(newContext)) {
             httpHost = CenterConfig.newInstance().getHttpHost();
         } else {
-            httpHost = context.get(HTTP_HOST).toString();
+            httpHost = newContext.get(HTTP_HOST).toString();
         }
         RequestSpecification specification = given().baseUri(httpHost)
                 // 编码设置
@@ -148,17 +140,17 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
                 .config(config().sslConfig(sslConfig().allowAllHostnames()));
 
         //设置ContentType
-        setContentType(specification, context);
+        setContentType(specification, newContext);
 
-        if (isLoginUrlNoNull(context)) {
+        if (isLoginUrlNoNull(newContext)) {
             // 调用快捷登录
-            headers = given().get(context.get(LOGIN_URL).toString()).getHeaders();
+            headers = given().get(newContext.get(LOGIN_URL).toString()).getHeaders();
             specification = specification.headers(headers);
-        } else if (isHttpHeaderNoNull(context) && context.get(HTTP_HEADER) != null) {
+        } else if (isHttpHeaderNoNull(newContext) && newContext.get(HTTP_HEADER) != null) {
 
             Gson gson = new Gson();
             // 把Header json字符串反序列化为List<Header>
-            String headerStr = context.get(HTTP_HEADER).toString();
+            String headerStr = newContext.get(HTTP_HEADER).toString();
             List<Map<String, String>> headerMapList = gson.fromJson(headerStr, new TypeToken<List<Map<String, String>>>() {
             }.getType());
 
@@ -174,19 +166,19 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
             specification = specification.headers(new Headers(headerList));
         }
-        return getResponse(testResult, specification, context);
+        return getResponse(testResult, specification, newContext);
     }
 
-    private Response getResponse(ITestResult testResult, RequestSpecification specification, Map<String, Object> context) {
+    private Response getResponse(ITestResult testResult, RequestSpecification specification, Map<String, Object> newContext) {
         Response response;
-        String httpMode = context.get(HTTP_MODE).toString();
-        String uri = context.get(HTTP_METHOD).toString();
+        String httpMode = newContext.get(HTTP_MODE).toString();
+        String uri = newContext.get(HTTP_METHOD).toString();
 
         // 复制一份否则操作时会影响到测试上下文中的context
-        Map<String, Object> newContext = Maps.newHashMap(context);
+        Map<String, Object> copyContext = Maps.newHashMap(newContext);
 
         // 去除excel中的描述字段
-        Map<String, Object> parameters = ParamUtils.getParameters(newContext);
+        Map<String, Object> parameters = ParamUtils.getParameters(copyContext);
 
         if (Constants.HTTP_GET.equalsIgnoreCase(httpMode)) {
             if (parameters != null && parameters.size() > 0) {
@@ -194,20 +186,20 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
                 parameters.remove(Constants.CASE_INDEX);
 
                 response = specification.params(parameters).when().get(uri);
-                context.put(Constants.PARAMETER_NAME_, parameters);
+                newContext.put(Constants.PARAMETER_NAME_, parameters);
 
             } else {
                 response = specification.when().get(uri);
-                context.put(Constants.PARAMETER_NAME_, "");
+                newContext.put(Constants.PARAMETER_NAME_, "");
             }
-        } else if (Constants.HTTP_POST.equalsIgnoreCase(httpMode) && isJsonContext(context)) {
+        } else if (Constants.HTTP_POST.equalsIgnoreCase(httpMode) && isJsonContext(newContext)) {
             // POST Json请求
             if (parameters.keySet().contains("request")) {
 
                 String request = parameters.get("request").toString();
 
                 response = specification.body(request).when().post(uri);
-                context.put(Constants.PARAMETER_NAME_, parameters.get("request"));
+                newContext.put(Constants.PARAMETER_NAME_, parameters.get("request"));
 
                 Gson gson = new Gson();
                 parameters = gson.fromJson(request, new TypeToken<Map<String, Objects>>() {}.getType());
@@ -215,13 +207,12 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
             } else {
 
                 // 构造出真正的入参
-                parameters = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, parameters);
                 parameters.remove(Constants.CASE_INDEX);
 
                 response = specification.body(parameters).when().post(uri);
 
                 // 把入参和返回结果存入context中方便后续打印输出、测试报告展示等操作
-                context.put(Constants.PARAMETER_NAME_, parameters);
+                newContext.put(Constants.PARAMETER_NAME_, parameters);
 
             }
         } else {
@@ -232,18 +223,18 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
                 // POST 有参表单提交
                 response = specification.params(parameters).when().post(uri);
-                context.put(Constants.PARAMETER_NAME_, parameters);
+                newContext.put(Constants.PARAMETER_NAME_, parameters);
 
             } else {
                 // POST 无参表单提交
                 response = specification.when().post(uri);
-                context.put(Constants.PARAMETER_NAME_, "");
+                newContext.put(Constants.PARAMETER_NAME_, "");
             }
         }
 
         if (isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
-            saveTestRequestInCache(parameters, testResult, context);
+            saveTestRequestInCache(parameters, testResult, newContext);
         }
 
         return response;

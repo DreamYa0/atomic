@@ -77,14 +77,9 @@ public final class HandleExcelParam {
         try {
             if (paramValue instanceof String) {
                 newParamValue = getSqlValue(sqlTools, paramValue.toString(), String.class);
-            } else if (paramValue instanceof Map) {
-                Map<String, Object> nestingParam = (Map<String, Object>) paramValue;
-                nestingParam.forEach((nestingParamKey, nestingParamValue) -> {
-                    if (Objects.nonNull(nestingParamValue)) {
-                        nestingParam.put(nestingParamKey, getRealValue(nestingParamValue, sqlTools));
-                    }
-                });
-                newParamValue = nestingParam;
+            }else {
+                // 如果值不满足处理条件，则保留原值
+                newParamValue = paramValue;
             }
         } catch (SQLException e) {
             logger.error("数据库连接失败！", e);

@@ -3,6 +3,7 @@ package com.atomic.param.handler;
 import com.atomic.param.Constants;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author dreamyao
@@ -21,7 +22,7 @@ public class PhoneNoHandler implements IHandler {
         if (Map.class.isInstance(t)) {
             Map<String, Object> param = (Map<String, Object>) t;
             param.forEach((key, value) -> {
-                if (Constants.PHONE_NO.equals(value.toString())) {
+                if (Objects.nonNull(value) && Constants.PHONE_NO.equals(value.toString())) {
                     param.put(key, getTel());
                 }
             });
