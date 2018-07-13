@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.atomic.param.Constants.DRIVER_CLASS_NAME;
 import static com.atomic.param.Constants.JDBC_IP;
@@ -34,14 +35,14 @@ import static com.atomic.tools.sql.SqlUtils.querySql;
 @ThreadSafe
 public class NewSqlTools {
 
-    private static final NewSqlTools INSTANCE = new NewSqlTools();
+    private static volatile NewSqlTools INSTANCE = new NewSqlTools();
     private final String dbPassword;
     private final String dbUser;
-    private final List<Request> requestList = Lists.newArrayList();
-    private final List<Map<String, Object>> mapList = Lists.newArrayList();
+    private final List<Request> requestList = Lists.newCopyOnWriteArrayList();
+    private final List<Map<String, Object>> mapList = Lists.newCopyOnWriteArrayList();
     private final List<String> pkValues = Lists.newCopyOnWriteArrayList();
     private volatile String ip;
-    private volatile Connection connection;
+    private Connection connection;
 
     private NewSqlTools() {
         //加载环境配置文件
@@ -60,7 +61,13 @@ public class NewSqlTools {
     }
 
     public static NewSqlTools newInstance(String ip, String dbUser, String dbPassword) {
-        return new NewSqlTools(ip, dbUser, dbPassword);
+        if (Objects.isNull(INSTANCE)) {
+            synchronized (NewSqlTools.class) {
+                INSTANCE = new NewSqlTools(ip, dbUser, dbPassword);
+                return INSTANCE;
+            }
+        }
+        return INSTANCE;
     }
 
     public static NewSqlTools newInstance() {
@@ -79,7 +86,7 @@ public class NewSqlTools {
         return "";
     }
 
-    public NewSqlTools connect(String database) {
+    public synchronized NewSqlTools connect(String database) {
         if (database == null || "".equals(database)) {
             throw new ParameterException("数据库名不能为空！");
         }
