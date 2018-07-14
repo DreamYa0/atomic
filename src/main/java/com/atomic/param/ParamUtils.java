@@ -363,9 +363,7 @@ public final class ParamUtils {
             List<Field> fields = ReflectionUtils.getAllFieldsList(request.getClass());
 
             // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
-            List<Field> collect = fields.stream()
-                    .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID") || field.getName().equals("data")))
-                    .collect(Collectors.toList());
+            List<Field> collect = filterFields(fields);
 
             for (Field field : collect) {
 
@@ -397,7 +395,7 @@ public final class ParamUtils {
                     }
 
 
-                } else if (Boolean.FALSE.equals(StringUtils.isBasicType((Class) fieldType))){
+                } else if (Boolean.FALSE.equals(StringUtils.isBasicType((Class) fieldType))) {
                     // 采用excel多sheet进行设计,且字段为自定义对象
                     // 实例化field所表示的对象
                     Object commonObj = ReflectionUtils.initFromClass((Class) field.getGenericType());
@@ -436,6 +434,19 @@ public final class ParamUtils {
         } catch (Exception e) {
             logger.error("给请求入参对象公共属性设值失败！", e);
         }
+    }
+
+    /**
+     * 过滤实体中的公共参数
+     * @param fields 属性集合
+     * @return 过滤后的属性集合
+     */
+    public static List<Field> filterFields(List<Field> fields) {
+        return fields.stream()
+                .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID")
+                        || field.getName().equals("data")
+                        || field.getName().equals("log")))
+                .collect(Collectors.toList());
     }
 
     /**

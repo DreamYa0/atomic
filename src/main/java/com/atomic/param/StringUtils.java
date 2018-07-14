@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -242,9 +241,7 @@ public final class StringUtils {
         ReflectionUtils.getAllFields(cls, fields);
 
         // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
-        List<Field> collect = fields.stream()
-                .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID")))
-                .collect(Collectors.toList());
+        List<Field> collect = ParamUtils.filterFields(fields);
 
         for (Field field : collect) {
             try {
