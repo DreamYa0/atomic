@@ -5,7 +5,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.atomic.exception.ParameterException;
 import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
-import com.atomic.util.ExcelUtils;
+import com.atomic.param.parser.ExcelResolver;
 import com.atomic.util.ReflectionUtils;
 import com.coinsuper.common.model.BaseRequest;
 import com.google.common.collect.Lists;
@@ -404,9 +404,13 @@ public final class ParamUtils {
                         Object object = param.get(Constants.TESTMETHODMETA);
                         MethodMeta methodMeta = (MethodMeta) object;
 
+                        Class testClass = methodMeta.getTestClass();
+                        String className = testClass.getSimpleName();
+                        String resource = testClass.getResource("").getPath();
+                        String filePath = resource + className + ".xls";
                         String sheetName = field.getName();
-                        ExcelUtils excel = new ExcelUtils();
-                        List<Map<String, Object>> sheetParams = excel.readDataByRow(methodMeta, sheetName);
+                        ExcelResolver excel = new ExcelResolver(filePath,sheetName);
+                        List<Map<String, Object>> sheetParams = excel.readDataByRow();
 
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
 

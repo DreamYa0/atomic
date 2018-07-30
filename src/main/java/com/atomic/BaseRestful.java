@@ -10,7 +10,7 @@ import com.atomic.listener.SaveResultListener;
 import com.atomic.listener.SaveRunTime;
 import com.atomic.listener.ScenarioRollBackListener;
 import com.atomic.param.Constants;
-import com.atomic.param.HandleExcelParam;
+import com.atomic.param.ExcelParamConverter;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.ResultAssert;
@@ -101,7 +101,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         TestNGUtils.injectScenarioReturnResult(testResult, context);
 
         // 递归组合参数并转化为真实值
-        Map<String, Object> newContext = HandleExcelParam.assemblyParamMap2RequestMap(testResult, this, context);
+        Map<String, Object> newContext = ExcelParamConverter.assemblyParamMap2RequestMap(testResult, this, context);
 
         // 先执行beforeTest
         beforeTest(newContext);

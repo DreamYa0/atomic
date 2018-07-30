@@ -24,7 +24,9 @@ import com.atomic.tools.mock.dto.MockData;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.util.FileUtils;
 import com.atomic.util.MapUtils;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import mockit.Capturing;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
@@ -76,7 +78,6 @@ import static com.atomic.tools.mock.data.MockContext.getContext;
 import static com.atomic.util.ApplicationUtils.getBean;
 import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
 import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
-import static org.apache.commons.io.FileUtils.readFileToString;
 
 
 /**
@@ -430,7 +431,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             if (name.startsWith("data-") && name.endsWith(".sql")) {
                 String dataSource = name.replace("data-", "").replace(".sql", "");
                 try {
-                    executeSql(dataSource, readFileToString(file, "utf-8"), true);
+                    executeSql(dataSource, Files.asCharSource(file, Charsets.UTF_8).read(), true);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

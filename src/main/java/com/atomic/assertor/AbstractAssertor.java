@@ -2,7 +2,7 @@ package com.atomic.assertor;
 
 import com.atomic.param.Constants;
 import com.atomic.param.TestNGUtils;
-import com.atomic.util.ExcelUtils;
+import com.atomic.param.parser.ExcelResolver;
 import io.restassured.path.json.JsonPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +33,11 @@ public abstract class AbstractAssertor implements Assertor {
     @Override
     public void assertResult(ITestResult testResult, Object result, Object instance) {
         try {
-            ExcelUtils excelUtil = new ExcelUtils();
-            List<Map<String, Object>> list = excelUtil.readDataByRow(testResult,instance,"exceptResult");
+            String className = TestNGUtils.getTestCaseClassName(testResult);
+            String resource = instance.getClass().getResource("").getPath();
+            String filePath = resource + className + ".xls";
+            ExcelResolver excelUtil = new ExcelResolver(filePath,"exceptResult");
+            List<Map<String, Object>> list = excelUtil.readDataByRow();
 
             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(list))) {
                 Map<String, Object> param = TestNGUtils.getParamContext(testResult);

@@ -1,6 +1,5 @@
 package com.atomic.tools.http;
 
-import jodd.util.StringUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.nio.charset.Charset;
@@ -11,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 /**
  * http基类
@@ -108,7 +108,7 @@ public abstract class HttpBase<T> {
      * @since 3.1.1
      */
     public List<String> headerList(String name) {
-        if (StringUtil.isBlank(name)) {
+        if (Objects.isNull(name) || name.length() == 0) {
             return null;
         }
         return headers.get(name.trim());
@@ -263,7 +263,7 @@ public abstract class HttpBase<T> {
      * @return T 自己
      */
     public T charset(String charset) {
-        if (StringUtil.isNotBlank(charset)) {
+        if (Objects.isNull(charset) || charset.length() == 0) {
             this.charset = Charset.forName(charset);
         }
         return (T) this;

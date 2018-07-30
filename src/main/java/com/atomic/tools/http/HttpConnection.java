@@ -4,8 +4,7 @@ import com.atomic.exception.HttpException;
 import com.atomic.exception.UtilException;
 import com.atomic.tools.http.ssl.SSLSocketFactoryBuilder;
 import com.atomic.tools.http.ssl.TrustAnyHostnameVerifier;
-import jodd.util.ClassLoaderUtil;
-import jodd.util.StringUtil;
+import com.atomic.util.ClassUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -22,11 +21,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.security.AccessController;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 /**
  * http连接对象，对HttpURLConnection的包装
@@ -73,7 +75,7 @@ public class HttpConnection {
      * @param proxy            代理
      */
     public HttpConnection(String urlStr, Method method, HostnameVerifier hostnameVerifier, SSLSocketFactory ssf, int timeout, Proxy proxy) {
-        if (StringUtil.isBlank(urlStr)) {
+        if (Objects.isNull(urlStr) || urlStr.length() == 0) {
             throw new HttpException("Url is blank !");
         }
         if (!isUrl(urlStr)) {
@@ -163,7 +165,7 @@ public class HttpConnection {
         // 兼容Spring的ClassPath路径
         if (url.startsWith(CLASSPATH_URL_PREFIX)) {
             url = url.substring(CLASSPATH_URL_PREFIX.length());
-            return ClassLoaderUtil.getDefaultClassLoader().getResource(url);
+            return getDefaultClassLoader().getResource(url);
         }
 
         try {
@@ -175,6 +177,32 @@ public class HttpConnection {
             } catch (MalformedURLException ex2) {
                 throw new UtilException(e);
             }
+        }
+    }
+
+    /**
+     * Returns default class loader. By default, it is {@link #getContextClassLoader() threads context class loader}.
+     * If this one is <code>null</code>, then class loader of the <b>caller class</b> is returned.
+     */
+    public static ClassLoader getDefaultClassLoader() {
+        ClassLoader cl = getContextClassLoader();
+        if (cl == null) {
+            Class callerClass = ClassUtils.getCallerClass(2);
+            cl = callerClass.getClassLoader();
+        }
+        return cl;
+    }
+
+    /**
+     * Returns thread context class loader.
+     */
+    public static ClassLoader getContextClassLoader() {
+        if (System.getSecurityManager() == null) {
+            return Thread.currentThread().getContextClassLoader();
+        }
+        else {
+            return AccessController.doPrivileged(
+                    (PrivilegedAction<ClassLoader>) () -> Thread.currentThread().getContextClassLoader());
         }
     }
 
@@ -521,7 +549,7 @@ public class HttpConnection {
     public Charset getCharset() {
         Charset charset = null;
         final String charsetName = getCharsetName();
-        if (StringUtil.isNotBlank(charsetName)) {
+        if (Objects.isNull(charsetName) || charsetName.length() == 0) {
             try {
                 charset = Charset.forName(charsetName);
             } catch (UnsupportedCharsetException e) {
@@ -571,7 +599,7 @@ public class HttpConnection {
      */
     private void storeCookie() {
         final String setCookie = header(Header.SET_COOKIE);
-        if (!StringUtil.isBlank(setCookie)) {
+        if (Boolean.FALSE.equals(Objects.isNull(setCookie) || setCookie.length() == 0)) {
             CookiePool.put(url.getHost(), setCookie);
         }
     }

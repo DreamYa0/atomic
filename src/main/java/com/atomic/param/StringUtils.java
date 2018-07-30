@@ -5,7 +5,7 @@ import com.atomic.exception.QueryDataException;
 import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.util.DataSourceUtils;
-import com.atomic.util.ExcelUtils;
+import com.atomic.param.parser.ExcelResolver;
 import com.atomic.util.ReflectionUtils;
 import com.google.gson.Gson;
 import org.springframework.util.CollectionUtils;
@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 
@@ -276,9 +277,14 @@ public final class StringUtils {
                         Object object = valMap.get(Constants.TESTMETHODMETA);
                         MethodMeta methodMeta = (MethodMeta) object;
 
+                        Class testClass = methodMeta.getTestClass();
+                        String className = testClass.getSimpleName();
+                        String resource = testClass.getResource("").getPath();
+                        String filePath = resource + className + ".xls";
+
                         String sheetName = field.getName();
-                        ExcelUtils excel = new ExcelUtils();
-                        List<Map<String, Object>> sheetParams = excel.readDataByRow(methodMeta, sheetName);
+                        ExcelResolver excel = new ExcelResolver(filePath,sheetName);
+                        List<Map<String, Object>> sheetParams = excel.readDataByRow();
 
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
                             Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(valMap.get(Constants.CASE_INDEX).toString()) - 1);
@@ -395,7 +401,7 @@ public final class StringUtils {
      * @return
      */
     public static String lowerFirst(String str) {
-        if (org.apache.commons.lang3.StringUtils.isEmpty(str)) {
+        if (Objects.isNull(str)||str.length()==0) {
             return str;
         }
         return str.replaceFirst(str.substring(0, 1), str.substring(0, 1).toLowerCase());

@@ -8,7 +8,7 @@ import com.atomic.param.handler.PhoneNoHandler;
 import com.atomic.param.handler.RandomParamHandler;
 import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.DataSourceUtils;
-import com.atomic.util.ExcelUtils;
+import com.atomic.param.parser.ExcelResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -27,11 +27,11 @@ import java.util.Set;
  * @version 1.1.0 Created by dreamyao on 2017/5/29.
  * @title 通用excel中关键字解析工具类
  */
-public final class HandleExcelParam {
+public final class ExcelParamConverter {
 
-    private static final Logger logger = LoggerFactory.getLogger(HandleExcelParam.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelParamConverter.class);
 
-    private HandleExcelParam() {
+    private ExcelParamConverter() {
     }
 
     /**
@@ -121,13 +121,18 @@ public final class HandleExcelParam {
             for (String key : keys) {
                 Object value = context.get(key);
                 if (Objects.isNull(value) || "".equals(value)) {
-                    ExcelUtils excel = new ExcelUtils();
+
+                    String className = TestNGUtils.getTestCaseClassName(testResult);
+                    String resource = instance.getClass().getResource("").getPath();
+                    String filePath = resource + className + ".xls";
+
+                    ExcelResolver excel = new ExcelResolver(filePath,key);
                     try {
-                        List<Map<String, Object>> maps = excel.readDataByRow(testResult, instance, key);
+                        List<Map<String, Object>> maps = excel.readDataByRow();
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(maps))) {
                             Map<String, Object> map = maps.get(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()) - 1);
                             // 把excel中的值转换为真实值
-                            HandleExcelParam.getDataBeforeTest(new SqlTools(), map);
+                            ExcelParamConverter.getDataBeforeTest(new SqlTools(), map);
                             Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);
                             assemblyMap.remove(Constants.CASE_INDEX);
                             context.put(key, assemblyMap);

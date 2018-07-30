@@ -1,12 +1,12 @@
 package com.atomic.tools.http;
 
 import com.atomic.exception.UtilException;
-import jodd.util.StringUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * HTML工具类
@@ -55,7 +55,7 @@ public final class HtmlUtil {
      * @return 转换后的字符串
      */
     public static String restoreEscaped(String htmlStr) {
-        if (StringUtil.isBlank(htmlStr)) {
+        if (Objects.isNull(htmlStr) || htmlStr.length() == 0) {
             return htmlStr;
         }
         return htmlStr
@@ -126,7 +126,7 @@ public final class HtmlUtil {
         String regex1 = null;
         String regex2 = null;
         for (String tagName : tagNames) {
-            if (StringUtil.isBlank(tagName)) {
+            if (Objects.isNull(tagName) || tagName.length() == 0) {
                 continue;
             }
             tagName = tagName.trim();
@@ -150,7 +150,7 @@ public final class HtmlUtil {
         if (null == template) {
             return null;
         }
-        if (params.length == 0 || StringUtil.isBlank(template)) {
+        if (params.length == 0 || template.length() == 0) {
             return template.toString();
         }
         return format(template.toString(), params);
@@ -169,7 +169,7 @@ public final class HtmlUtil {
      * @return 结果
      */
     public static String format(final String strPattern, final Object... argArray) {
-        if (StringUtil.isBlank(strPattern) || argArray.length == 0) {
+        if (Objects.isNull(strPattern) || strPattern.length() == 0 || argArray.length == 0) {
             return strPattern;
         }
         final int strPatternLength = strPattern.length();

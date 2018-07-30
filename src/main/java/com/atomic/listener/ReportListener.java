@@ -6,7 +6,7 @@ import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.entity.AutoTestResult;
 import com.atomic.util.CIDbUtils;
-import com.atomic.util.ExcelUtils;
+import com.atomic.param.parser.ExcelResolver;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
@@ -212,9 +212,13 @@ public class ReportListener implements IReporter {
                         test.info("出参：" + gson.toJson(obj));
                     }
 
+                    String className = TestNGUtils.getTestCaseClassName(result);
+                    Class<? extends Class> clazz = result.getTestClass().getRealClass().getClass();
+                    String resource = clazz.getResource("").getPath();
+                    String filePath = resource + className + ".xls";
 
-                    ExcelUtils excel = new ExcelUtils();
-                    Map<String, Object> exceptResult = excel.readDataByRow(result, "exceptResult", Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
+                    ExcelResolver excel = new ExcelResolver(filePath,"exceptResult");
+                    Map<String, Object> exceptResult = excel.readDataByRow(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
                     test.info("断言内容：" + gson.toJson(exceptResult));
                 }
 

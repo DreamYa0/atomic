@@ -1,14 +1,10 @@
 package com.atomic;
 
 import com.atomic.param.TestNGUtils;
-import com.atomic.util.CsvUtils;
-import com.atomic.util.ExcelUtils;
-import com.google.common.collect.Sets;
+import com.atomic.param.parser.ExcelResolver;
 import org.testng.Reporter;
 import org.testng.annotations.DataProvider;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -53,21 +49,9 @@ public abstract class AbstractInterfaceTest {
         String className = this.getClass().getSimpleName();
         String resource = this.getClass().getResource("").getPath();
         String xls = resource + className + ".xls";
-        ExcelUtils excelUtil = new ExcelUtils();
-        List<Map<String, Object>> list = excelUtil.readDataByRow(xls, method.getName());
+        ExcelResolver excelUtil = new ExcelResolver(xls, method.getName());
+        List<Map<String, Object>> list = excelUtil.readDataByRow();
         Set<Object[]> set = new LinkedHashSet<>();
-        handleParams(list, set, method);
-        return set.iterator();
-    }
-
-    /**
-     * 入参数据处理
-     * @param list
-     * @param set
-     * @param method
-     * @throws Exception
-     */
-    private void handleParams(List<Map<String, Object>> list, Set<Object[]> set, Method method) throws Exception {
         // 如果有测试用例 testOnly 标志设置为1或者Y，则单独运行，其他没带此标志的测试用例跳过
         boolean hasTestOnly = list.stream().filter(map -> map.get(TEST_ONLY) != null)
                 .anyMatch(newMap -> isValueTrue(newMap.get(TEST_ONLY)));
@@ -84,29 +68,6 @@ public abstract class AbstractInterfaceTest {
             Reporter.log("[CommonTest#handleParams()]:{没有测试用例！}");
             System.err.println("------------------没有测试用例！------------------");
         }
-    }
-
-    @DataProvider(name = "csv")
-    public Iterator<Object[]> dataProviderFromCsv(Method method) {
-        Set<Object[]> set = Sets.newLinkedHashSet();
-        try {
-            // 获取测试用例Excel文件路径
-            String className = this.getClass().getSimpleName();
-            String resource = this.getClass().getResource("").getPath();
-            String path = resource + className + ".csv";
-            File file = new File(path);
-            if (!file.exists()) {
-                throw new FileNotFoundException();
-            }
-            List<Map<String, Object>> list = CsvUtils.handleFile(file);
-            // 处理入参
-            handleParams(list, set, method);
-            return set.iterator();
-        } catch (Exception e) {
-            Reporter.log("[CommonTest#dataProviderFromCsv()]:{dataProvider处理失败！}");
-            System.out.println("--------------dataProvider处理失败！----------------");
-            e.printStackTrace();
-            return set.iterator();
-        }
+        return set.iterator();
     }
 }

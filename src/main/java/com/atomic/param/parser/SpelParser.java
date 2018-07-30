@@ -1,7 +1,7 @@
 package com.atomic.param.parser;
 
 import com.atomic.param.Constants;
-import com.atomic.util.ExcelUtils;
+import com.atomic.param.TestNGUtils;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelCompilerMode;
@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.testng.ITestResult;
 
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 import java.util.Objects;
@@ -24,13 +25,14 @@ import java.util.Set;
  * @since 1.0.0
  */
 @Immutable
-public class ResultParser implements Parser {
+public class SpelParser implements Parser {
 
     private final ITestResult testResult;
     private final Object result;
+    @GuardedBy("this")
     private final Map<String, Object> context;
 
-    public ResultParser(ITestResult testResult, Object result, Map<String, Object> context) {
+    public SpelParser(ITestResult testResult, Object result, Map<String, Object> context) {
         this.testResult = testResult;
         this.result = result;
         this.context = context;
@@ -43,24 +45,29 @@ public class ResultParser implements Parser {
         EvaluationContext evaluation = new StandardEvaluationContext(result);
 
         synchronized (context) {
-            ExcelUtils excel = new ExcelUtils();
+            ExcelResolver excel = new ExcelResolver();
             parserExcel(parser, evaluation, excel, context);
         }
     }
 
     private ExpressionParser prepareExpressionParser() {
-        SpelParserConfiguration configuration = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, ResultParser.class.getClassLoader());
+        SpelParserConfiguration configuration = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, SpelParser.class.getClassLoader());
         return new SpelExpressionParser(configuration);
     }
 
-    private void parserExcel(ExpressionParser parser, EvaluationContext evaluation, ExcelUtils excel, Map<String, Object> context) {
+    private void parserExcel(ExpressionParser parser, EvaluationContext evaluation, ExcelResolver excel, Map<String, Object> context) {
+
+        String className = TestNGUtils.getTestCaseClassName(testResult);
+        Class<? extends Class> clazz = testResult.getTestClass().getRealClass().getClass();
+        String resource = clazz.getResource("").getPath();
+        String filePath = resource + className + ".xls";
 
         Set<Map.Entry<String, Object>> entries = context.entrySet();
         for (Map.Entry<String, Object> entry : entries) {
             Object value = entry.getValue();
             if (Objects.isNull(value)) {
                 String paramName = entry.getKey();
-                Map<String, Object> paramNameOfValue = excel.readDataByRow(testResult, paramName, Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
+                Map<String, Object> paramNameOfValue = excel.readDataByRow(filePath, paramName, Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
                 if (Boolean.FALSE.equals(CollectionUtils.isEmpty(paramNameOfValue))) {
 
                     parserExcel(parser, evaluation, excel, paramNameOfValue);

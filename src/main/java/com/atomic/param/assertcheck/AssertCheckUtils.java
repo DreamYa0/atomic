@@ -15,7 +15,7 @@ import com.atomic.param.handler.PhoneNoHandler;
 import com.atomic.param.handler.RandomParamHandler;
 import com.atomic.util.DataSourceUtils;
 import com.google.common.base.Charsets;
-import org.apache.commons.io.FileUtils;
+import com.google.common.io.Files;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.util.CollectionUtils;
 import org.testng.Assert;
@@ -132,7 +132,7 @@ public final class AssertCheckUtils {
             }
             return null;
         }
-        String json = FileUtils.readFileToString(file, Charsets.UTF_8);
+        String json = Files.asCharSource(file, Charsets.UTF_8).read();
         if (org.apache.commons.lang3.StringUtils.isEmpty(json)) {
             System.out.println("断言配置文件没有内容");
             return null;
