@@ -13,7 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.testng.ITestResult;
 
 import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -24,7 +24,7 @@ import java.util.Set;
  * @date 2018/7/4 下午10:16
  * @since 1.0.0
  */
-@Immutable
+@ThreadSafe
 public class SpelParser implements Parser {
 
     private final ITestResult testResult;
