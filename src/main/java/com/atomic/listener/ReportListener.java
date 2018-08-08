@@ -160,6 +160,7 @@ public class ReportListener implements IReporter {
     private void sendEmail(String reportUrl) {
         MailInfo info = new MailInfo();
         info.setSender("autotest@primeledger.cn");
+        // TODO 邮件地址暂时写死方便调试，后面从配置文件中读取
         info.setReceivers(Collections.singletonList("yaojun@primeledger.cn"));
         info.setSubject("自动化测试报告");
         info.setReportInfo(generateReportInfo(reportUrl));
