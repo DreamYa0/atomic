@@ -233,7 +233,7 @@ public class ReportListener implements IReporter {
                     }
 
                     String className = TestNGUtils.getTestCaseClassName(result);
-                    Class<? extends Class> clazz = result.getTestClass().getRealClass().getClass();
+                    Class clazz = result.getTestClass().getRealClass();
                     String resource = clazz.getResource("").getPath();
                     String filePath = resource + className + ".xls";
 

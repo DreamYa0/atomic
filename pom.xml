@@ -6,7 +6,7 @@
 
     <groupId>com.atomic</groupId>
     <artifactId>atomic</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>atomic</name>
     <url>http://www.example.com</url>
 
