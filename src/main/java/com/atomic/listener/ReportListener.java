@@ -237,7 +237,7 @@ public class ReportListener implements IReporter {
                     String resource = clazz.getResource("").getPath();
                     String filePath = resource + className + ".xls";
 
-                    ExcelResolver excel = new ExcelResolver(filePath,"exceptResult");
+                    ExcelResolver excel = new ExcelResolver(filePath, "exceptResult");
                     Map<String, Object> exceptResult = excel.readDataByRow(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
                     test.info("断言内容：" + gson.toJson(exceptResult));
                 }
@@ -385,7 +385,7 @@ public class ReportListener implements IReporter {
         int total = pass + fail + skip;
         int successRate = (int) (((float) pass / total) * 100);
 
-        return "total: " + allMethod +
+        return "totalMethod: " + allMethod +
                 "\n" +
                 "success: " + pass +
                 "\n" +
@@ -393,9 +393,9 @@ public class ReportListener implements IReporter {
                 "\n" +
                 "skip: " + skip +
                 "\n" +
-                "casenum: " + total +
+                "caseNum: " + total +
                 "\n" +
-                "successRate: " + successRate +
+                "successRate: " + successRate + "%" +
                 "\n" +
                 "status: " + (fail == 0 ? "Successful" : "Failed") +
                 "\n" +
