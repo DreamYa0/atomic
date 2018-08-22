@@ -460,7 +460,7 @@ public final class ParamUtils {
      * @return
      */
     private static String getString(Map<?, ?> map, Object key) {
-        if (map.get(key) == null) {
+        if (map.get(key) == null || "".equals(map.get(key).toString())) {
             return null;
         } else {
             return map.get(key).toString();
