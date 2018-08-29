@@ -9,10 +9,9 @@ import com.atomic.assertor.AssertorFactory;
 import com.atomic.assertor.RestfulAssertor;
 import com.atomic.assertor.UnitTestAssertor;
 import com.atomic.exception.ExceptionUtils;
-import com.atomic.util.ReflectionUtils;
-import com.coinsuper.common.model.BaseResult;
-import com.coinsuper.common.model.PagedResult;
-import com.coinsuper.common.model.Result;
+import com.atomic.util.ReflectionUtils;import com.exc.common.dto.BaseResult;
+import com.exc.common.dto.PagedResult;
+import com.exc.common.dto.Result;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.restassured.response.Response;
@@ -182,7 +181,7 @@ public final class ResultAssert {
             Assert.assertEquals(result.getCode(), context.get(Constants.ASSERT_CODE));
         }
         if (isDescriptionNoNull(context)) {
-            Assert.assertEquals(result.getMsg(), context.get(Constants.ASSERT_MSG));
+            Assert.assertEquals(result.getDescription(), context.get(Constants.ASSERT_MSG));
         }
     }
 
@@ -952,7 +951,7 @@ public final class ResultAssert {
         Result result = Result.create();
         result.setSuccess(success);
         result.setCode(code);
-        result.setMsg(message);
+        result.setDescription(message);
         return result;
     }
 }
