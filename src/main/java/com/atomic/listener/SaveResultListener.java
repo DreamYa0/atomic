@@ -89,6 +89,10 @@ public class SaveResultListener extends TestListenerAdapter {
             Gson gson = new Gson();
             Object param = context.get(Constants.PARAMETER_NAME_);
 
+            if (Objects.isNull(param) && Objects.isNull(methodsReturn)) {
+                return;
+            }
+
             if (Objects.nonNull(param) && Boolean.TRUE.equals(param instanceof HashMap)) {
 
                 if (methodsReturn instanceof Response) {
@@ -97,11 +101,14 @@ public class SaveResultListener extends TestListenerAdapter {
                 } else {
                     insertData(projectId, className, methodName, caseName, param.toString(), methodsReturn.toString(), expectedReturn, testStatus, round.get(), runAuthor);
                 }
+                return;
 
+            }
 
-            } else if (Objects.nonNull(param)) {
+            Object[] methodsParameter = (Object[]) param;
 
-                Object[] methodsParameter = (Object[]) param;
+            if (Objects.nonNull(param) && methodsParameter.length > 0) {
+
                 String jsonParam;
                 String jsonReturn;
                 try {
@@ -115,16 +122,16 @@ public class SaveResultListener extends TestListenerAdapter {
                     jsonReturn = JSON.toJSONString(methodsReturn);
                 }
                 insertData(projectId, className, methodName, caseName, jsonParam, jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
-
-            } else {
-                String jsonReturn;
-                try {
-                    jsonReturn = gson.toJson(methodsReturn);
-                } catch (Exception e) {
-                    jsonReturn = JSON.toJSONString(methodsReturn);
-                }
-                insertData(projectId, className, methodName, caseName, "{}", jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
+                return;
             }
+
+            String jsonReturn;
+            try {
+                jsonReturn = gson.toJson(methodsReturn);
+            } catch (Exception e) {
+                jsonReturn = JSON.toJSONString(methodsReturn);
+            }
+            insertData(projectId, className, methodName, caseName, "{}", jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
 
         } catch (Exception e) {
             System.out.println("---------------------" + className + "#" + methodName + "--------------------");
