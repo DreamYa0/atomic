@@ -19,7 +19,7 @@ import com.atomic.param.values.AutoTestStringValues;
 import com.atomic.param.values.IAutoTestValues;
 import com.atomic.util.ListUtils;
 import com.atomic.util.ReflectionUtils;
-import com.exc.common.dto.BaseRequest;
+import com.coinsuper.common.dto.BaseRequest;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.ITestResult;

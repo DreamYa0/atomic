@@ -27,8 +27,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.exc.api</groupId>
-            <artifactId>exc-api-dep</artifactId>
+            <groupId>com.coinsuper.framework</groupId>
+            <artifactId>api-dep</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>

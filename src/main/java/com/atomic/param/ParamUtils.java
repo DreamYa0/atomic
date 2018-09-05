@@ -7,7 +7,7 @@ import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.util.ExcelUtils;
 import com.atomic.util.ReflectionUtils;
-import com.exc.common.dto.BaseRequest;
+import com.coinsuper.common.dto.BaseRequest;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
