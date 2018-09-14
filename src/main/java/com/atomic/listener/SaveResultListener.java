@@ -2,7 +2,6 @@ package com.atomic.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.atomic.config.GlobalConfig;
-import com.atomic.exception.ListenerException;
 import com.atomic.param.Constants;
 import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
@@ -11,6 +10,7 @@ import com.atomic.param.entity.AutoTestResult;
 import com.atomic.util.CIDbUtils;
 import com.google.gson.Gson;
 import io.restassured.response.Response;
+import org.springframework.util.StringUtils;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
@@ -145,10 +145,12 @@ public class SaveResultListener extends TestListenerAdapter {
         // 项目名称
         String projectName = GlobalConfig.projectName;
         this.runAuthor = GlobalConfig.runner;
-        if ("".equals(projectName) || "".equals(runAuthor)) {
-            throw new ListenerException("接口测试请在test.properties中填写：projectName、runner值，单测请在@EnableAtomic注解中填写projectName、runner值");
+        if (StringUtils.isEmpty(projectName)) {
+            projectName = "default";
         }
-        //TODO 2.0版本SQL会换成调用SOA服务接口
+        if (StringUtils.isEmpty(runAuthor)) {
+            runAuthor = "default";
+        }
         String queryProject = "select * from autotest_project where project_name= ?";
         Object[] queryProjectParam = {projectName};
         AutoTestProject autoTestProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
