@@ -140,7 +140,7 @@ public class ReportListener implements IReporter {
         // 暂时做输出展示
         Mongodb tools = new Mongodb.Builder().build().connectMongodb();
         String Id = tools.getIdByExample("name", projectName + "#" + ExtentManager.newInstance().countBuild(projectName));
-        String reportURL = "http://10.200.173.92:1337/#/report-summary?id=" + Id;
+        String reportURL = "http://10.199.5.131:1337/#/report-summary?id=" + Id;
         System.out.println();
         System.out.println("======================================================================================");
         System.out.println();
