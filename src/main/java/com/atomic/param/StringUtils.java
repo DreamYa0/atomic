@@ -269,6 +269,11 @@ public final class StringUtils {
                         continue;
                     }
 
+                    // 如是枚举类型也跳过
+                    if (((Class) genericType).isEnum()) {
+                        continue;
+                    }
+
                     // 自定义对象,且excel中未有对应字段的值或属性值为""，则采用excel多sheet进行设计
                     // 实例化自定义对象
                     Object fieldObj = ReflectionUtils.initFromClass((Class) genericType);

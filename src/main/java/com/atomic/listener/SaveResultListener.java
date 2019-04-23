@@ -2,7 +2,6 @@ package com.atomic.listener;
 
 import com.alibaba.fastjson.JSON;
 import com.atomic.config.GlobalConfig;
-import com.atomic.exception.ListenerException;
 import com.atomic.param.Constants;
 import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
@@ -11,6 +10,7 @@ import com.atomic.param.entity.AutoTestResult;
 import com.atomic.util.CIDbUtils;
 import com.google.gson.Gson;
 import io.restassured.response.Response;
+import org.springframework.util.StringUtils;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
@@ -89,6 +89,10 @@ public class SaveResultListener extends TestListenerAdapter {
             Gson gson = new Gson();
             Object param = context.get(Constants.PARAMETER_NAME_);
 
+            if (Objects.isNull(param) && Objects.isNull(methodsReturn)) {
+                return;
+            }
+
             if (Objects.nonNull(param) && Boolean.TRUE.equals(param instanceof HashMap)) {
 
                 if (methodsReturn instanceof Response) {
@@ -97,11 +101,14 @@ public class SaveResultListener extends TestListenerAdapter {
                 } else {
                     insertData(projectId, className, methodName, caseName, param.toString(), methodsReturn.toString(), expectedReturn, testStatus, round.get(), runAuthor);
                 }
+                return;
 
+            }
 
-            } else if (Objects.nonNull(param)) {
+            Object[] methodsParameter = (Object[]) param;
 
-                Object[] methodsParameter = (Object[]) param;
+            if (Objects.nonNull(param) && methodsParameter.length > 0) {
+
                 String jsonParam;
                 String jsonReturn;
                 try {
@@ -115,16 +122,16 @@ public class SaveResultListener extends TestListenerAdapter {
                     jsonReturn = JSON.toJSONString(methodsReturn);
                 }
                 insertData(projectId, className, methodName, caseName, jsonParam, jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
-
-            } else {
-                String jsonReturn;
-                try {
-                    jsonReturn = gson.toJson(methodsReturn);
-                } catch (Exception e) {
-                    jsonReturn = JSON.toJSONString(methodsReturn);
-                }
-                insertData(projectId, className, methodName, caseName, "{}", jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
+                return;
             }
+
+            String jsonReturn;
+            try {
+                jsonReturn = gson.toJson(methodsReturn);
+            } catch (Exception e) {
+                jsonReturn = JSON.toJSONString(methodsReturn);
+            }
+            insertData(projectId, className, methodName, caseName, "{}", jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
 
         } catch (Exception e) {
             System.out.println("---------------------" + className + "#" + methodName + "--------------------");
@@ -138,10 +145,12 @@ public class SaveResultListener extends TestListenerAdapter {
         // 项目名称
         String projectName = GlobalConfig.projectName;
         this.runAuthor = GlobalConfig.runner;
-        if ("".equals(projectName) || "".equals(runAuthor)) {
-            throw new ListenerException("接口测试请在test.properties中填写：projectName、runner值，单测请在@EnableAtomic注解中填写projectName、runner值");
+        if (StringUtils.isEmpty(projectName)) {
+            projectName = "default";
         }
-        //TODO 2.0版本SQL会换成调用SOA服务接口
+        if (StringUtils.isEmpty(runAuthor)) {
+            runAuthor = "default";
+        }
         String queryProject = "select * from autotest_project where project_name= ?";
         Object[] queryProjectParam = {projectName};
         AutoTestProject autoTestProject = CIDbUtils.queryQaProjectValue(queryProject, queryProjectParam);
