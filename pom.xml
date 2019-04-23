@@ -27,7 +27,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.coinsuper.framework</groupId>
+            <groupId>com.g7.framework</groupId>
             <artifactId>api-dep</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
@@ -301,52 +301,31 @@
 
     <repositories>
         <repository>
-            <id>nexus-public</id>
-            <name>nexus-public</name>
-            <url>http://maven.primeledger.cn:8081/repository/maven-public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>nexus-releases</id>
-            <name>nexus-releases</name>
-            <url>http://maven.primeledger.cn:8081/repository/maven-releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>nexus-snapshots</id>
-            <name>nexus-snapshots</name>
-            <url>http://maven.primeledger.cn:8081/repository/maven-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
+            <id>central</id>
+            <name>artifactory</name>
+            <url>http://repo.chinawayltd.com/artifactory/libs-alls</url>
         </repository>
     </repositories>
+
     <distributionManagement>
         <repository>
-            <id>nexus-releases</id>
-            <name>nexus-releases</name>
-            <url>http://maven.primeledger.cn:8081/repository/maven-releases/</url>
+            <id>repo.chinawayltd-r</id>
+            <name>dsp Release Repository</name>
+            <url>http://repo.chinawayltd.com/artifactory/ext-release-local/</url>
         </repository>
         <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>nexus-snapshots</name>
-            <url>http://maven.primeledger.cn:8081/repository/maven-snapshots/</url>
+            <id>repo.chinawayltd-s</id>
+            <name>dsp Snapshot Repository</name>
+            <url>http://repo.chinawayltd.com/artifactory/ext-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <url>http://repo.chinawayltd.com/artifactory/libs-alls</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <plugins>
