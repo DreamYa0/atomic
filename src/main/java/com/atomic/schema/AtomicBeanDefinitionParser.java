@@ -44,7 +44,7 @@ public class AtomicBeanDefinitionParser implements BeanDefinitionParser {
             Map<String, String> parameters = parseParameters(element);
 
             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(parameters))) {
-                GlobalConfig.projectName = parameters.get("projectName");
+                GlobalConfig.projectName = parameters.get("project.name");
                 GlobalConfig.runner = parameters.get("runner");
             }
 

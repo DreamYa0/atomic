@@ -1,4 +1,4 @@
-package com.atomic.tools.mock.spring;
+package com.atomic.tools.mock.dubbo;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
@@ -13,19 +13,14 @@ import com.atomic.tools.mock.data.MockContext;
 import com.atomic.tools.mock.data.MockDataService;
 import com.atomic.tools.mock.dto.MockData4Rpc;
 import com.atomic.tools.mock.util.JacksonUtils;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 import org.testng.Reporter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @Activate(group = Constants.CONSUMER)
-public class UnitTestFilter4Spring implements Filter,HandlerInterceptor {
+public class UnitTestFilter4Dubbo implements Filter {
 
     private MockDataService mockDataService;
 
-    public UnitTestFilter4Spring() {
+    public UnitTestFilter4Dubbo() {
         mockDataService = DubboMockData2FileServiceImpl.getInstance();
     }
 
@@ -67,20 +62,5 @@ public class UnitTestFilter4Spring implements Filter,HandlerInterceptor {
 
         MockContext.getContext().removeContext();
         return invoker.invoke(invocation);
-    }
-
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        return false;
-    }
-
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-
-    }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-
     }
 }

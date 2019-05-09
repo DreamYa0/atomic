@@ -3,13 +3,11 @@ package com.atomic.enums;
 public enum TestMode {
 
     // 测试环境1
-    TEST_ONE("testOne"),
+    DEV("dev"),
     // 测试环境2
-    TEST_TWO("testTwo"),
+    TEST("test"),
     // 测试环境3
-    TEST_THREE("testThree"),
-    //
-    TESTING("testing")
+    DEMO("demo"),
 
     ;
 

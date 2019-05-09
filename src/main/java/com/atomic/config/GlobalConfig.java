@@ -38,31 +38,31 @@ public class GlobalConfig {
             if (properties.containsKey("profile")) {
                 String env = properties.getProperty("profile");
                 if (env == null || "".equals(env)) {
-                    profile = TestMode.TEST_ONE.getName();
+                    profile = TestMode.DEV.getName();
                 } else {
                     profile = env;
                 }
             }
-            if (properties.containsKey("mailAddrList")) {
-                mailAddrList = getListFromString(properties.getProperty("mailAddrList"), ",", true);
+            if (properties.containsKey("mail.addr.list")) {
+                mailAddrList = getListFromString(properties.getProperty("mail.addr.list"), ",", true);
             }
-            if (properties.containsKey("hostDomain")) {
-                hostDomain = properties.getProperty("hostDomain");
+            if (properties.containsKey("host.domain")) {
+                hostDomain = properties.getProperty("host.domain");
             }
-            if (properties.containsKey("projectName") && Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("projectName")))) {
-                projectName = properties.getProperty("projectName");
+            if (properties.containsKey("project.name") && Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("project.name")))) {
+                projectName = properties.getProperty("project.name");
             }
             if (properties.containsKey("runner") && Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("runner")))) {
                 runner = properties.getProperty("runner");
             }
-            if (properties.containsKey("runMode")) {
-                runMode = properties.getProperty("runMode");
+            if (properties.containsKey("run.mode")) {
+                runMode = properties.getProperty("run.mode");
             }
-            if (properties.containsKey("serviceVersion")) {
-                serviceVersion = properties.getProperty("serviceVersion");
+            if (properties.containsKey("service.version")) {
+                serviceVersion = properties.getProperty("service.version");
             }
-            if (properties.containsKey("httpHost")) {
-                httpHost = properties.getProperty("httpHost");
+            if (properties.containsKey("http.host")) {
+                httpHost = properties.getProperty("http.host");
             }
 
         } catch (IllegalArgumentException e) {

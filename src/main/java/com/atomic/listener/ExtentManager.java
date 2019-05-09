@@ -67,14 +67,17 @@ final class ExtentManager {
         htmlReporter.config().setLevel(Status.INFO);
         htmlReporter.config().setProtocol(Protocol.HTTP);
         htmlReporter.config().setResourceCDN(ResourceCDN.EXTENTREPORTS);
+        // TODO
         htmlReporter.config().setExtentXUrl("http://10.199.5.131:1337/#/");
         return htmlReporter;
     }
 
     private ExtentXReporter createExtentXReporter(String projectName) {
+        // TODO
         ExtentXReporter extentx = new ExtentXReporter("10.199.5.130", 27017);
         extentx.config().setProjectName(projectName);
         extentx.config().setReportName(projectName + "#" + countBuild(projectName));
+        // TODO
         extentx.config().setServerUrl("http://10.199.5.131:1337/#/");
         return extentx;
     }
