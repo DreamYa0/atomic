@@ -1,7 +1,6 @@
 package com.atomic.annotations;
 
 import com.atomic.enums.AutoTestMode;
-import com.atomic.enums.CheckMessage;
 import com.atomic.enums.CheckMode;
 import com.atomic.exception.AnnotationException;
 import com.atomic.param.Constants;
@@ -215,78 +214,6 @@ public abstract class AnnotationUtils {
             }
         }
         return true;
-    }
-
-    /**
-     * 获取调用接口的Class对象
-     * @param method
-     * @return
-     */
-    public static Class<?> getInterfaceClass(Method method) {
-        Scenario scenario = method.getAnnotation(Scenario.class);
-        return scenario.Interface();
-    }
-
-    /**
-     * 获取被测方法名称
-     * @param method
-     * @return
-     */
-    public static String getInterfaceMethodName(Method method) {
-        Scenario scenario = method.getAnnotation(Scenario.class);
-        return scenario.methodName();
-    }
-
-    /**
-     * 获取调用dubbo服务版本号
-     * @param method
-     * @return
-     */
-    public static String getDubboServiceVersion(Method method) {
-        Scenario scenario = method.getAnnotation(Scenario.class);
-        return scenario.version();
-    }
-
-    /**
-     * 获取测试依赖方法的名称
-     * @param method
-     * @return
-     */
-    public static String[] getDependOnMethodName(Method method) {
-        Test test = method.getAnnotation(Test.class);
-        if (test == null) {
-            return null;
-        }
-        return test.dependsOnMethods();
-    }
-
-    /**
-     * 判断是否有@MessageType注解
-     * @param method
-     * @return
-     */
-    public static boolean isMessageType(Method method) {
-        Annotation[] annotations = method.getAnnotations();
-        if (annotations != null) {
-            MessageType messageType = method.getAnnotation(MessageType.class);
-            if (messageType == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 获取Http接口响应结果返回类型值
-     * @param method
-     * @return
-     */
-    public static CheckMessage getMessageType(Method method) {
-        MessageType messageType = method.getAnnotation(MessageType.class);
-        if (messageType != null) {
-            return messageType.checkMessage();
-        }
-        return CheckMessage.NORM;
     }
 
     public static boolean isIgnoreMethod(Method testMethod) {

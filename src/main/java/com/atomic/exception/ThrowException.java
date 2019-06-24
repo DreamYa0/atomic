@@ -1,7 +1,7 @@
 package com.atomic.exception;
 
-import com.alibaba.dubbo.rpc.RpcException;
-import com.alibaba.dubbo.rpc.service.GenericException;
+import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.service.GenericException;
 import com.alibaba.fastjson.JSONException;
 
 /**

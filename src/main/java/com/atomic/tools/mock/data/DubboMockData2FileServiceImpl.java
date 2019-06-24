@@ -1,14 +1,14 @@
 package com.atomic.tools.mock.data;
 
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcResult;
 import com.atomic.param.StringUtils;
 import com.atomic.tools.mock.dto.MockData;
 import com.atomic.tools.mock.dto.MockData4Rpc;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.tools.mock.util.JacksonUtils;
 import com.atomic.util.FileUtils;
+import org.apache.dubbo.rpc.Invocation;
+import org.apache.dubbo.rpc.Result;
+import org.apache.dubbo.rpc.RpcResult;
 
 import java.lang.reflect.Method;
 

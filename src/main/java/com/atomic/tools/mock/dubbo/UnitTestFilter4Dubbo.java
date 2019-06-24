@@ -1,12 +1,12 @@
 package com.atomic.tools.mock.dubbo;
 
-import com.alibaba.dubbo.common.Constants;
-import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.Filter;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
+import org.apache.dubbo.common.Constants;
+import org.apache.dubbo.common.extension.Activate;
+import org.apache.dubbo.rpc.Filter;
+import org.apache.dubbo.rpc.Invocation;
+import org.apache.dubbo.rpc.Invoker;
+import org.apache.dubbo.rpc.Result;
+import org.apache.dubbo.rpc.RpcException;
 import com.atomic.config.TestMethodMode;
 import com.atomic.tools.mock.data.DubboMockData2FileServiceImpl;
 import com.atomic.tools.mock.data.MockContext;
@@ -26,7 +26,7 @@ public class UnitTestFilter4Dubbo implements Filter {
 
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
 
-        if ("com.alibaba.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
+        if ("org.apache.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
             return invoker.invoke(invocation);
         }
 

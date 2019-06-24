@@ -3,7 +3,6 @@ package com.atomic.util;
 import com.atomic.param.entity.AutoTestAssert;
 import com.atomic.param.entity.AutoTestProject;
 import com.atomic.param.entity.AutoTestResult;
-import com.atomic.param.entity.QaScenarioData;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
@@ -117,26 +116,6 @@ public final class CIDbUtils {
             obj = qr.query(conn, sqlString, new BeanHandler<>(AutoTestAssert.class), params);
         } catch (SQLException e) {
             Reporter.log("[CIDbUtils#queryQaAutoAssetValue]异常信息：{}", true);
-        } finally {
-            DbUtils.closeQuietly(conn);
-        }
-        return obj;
-    }
-
-    /**
-     * 查询场景测试时保存的测试方法的数据
-     * @param sql
-     * @param params
-     * @return
-     */
-    public static QaScenarioData queryQaScenarioTestValue(String sql, Object[] params) {
-        conn = getConnection();
-        QueryRunner qr = new QueryRunner();//创建SQL执行类对象
-        QaScenarioData obj = null;
-        try {
-            obj = qr.query(conn, sql, new BeanHandler<>(QaScenarioData.class), params);
-        } catch (SQLException e) {
-            Reporter.log("[CIDbUtils#queryQaScenarioTestValue]异常信息：{}", true);
         } finally {
             DbUtils.closeQuietly(conn);
         }

@@ -6,14 +6,11 @@ import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.entity.AutoTestResult;
 import com.atomic.param.parser.ExcelResolver;
-import com.atomic.tools.mail.MailInfo;
-import com.atomic.tools.mail.SmtpMailServer;
 import com.atomic.util.CIDbUtils;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.model.TestAttribute;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import io.restassured.response.Response;
@@ -28,7 +25,6 @@ import org.testng.Reporter;
 import org.testng.xml.XmlSuite;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +44,6 @@ public class ReportListener implements IReporter {
     private ExtentReports extent;
     private String projectName;
     private String[] runAuthor;
-    private List<Integer> failedTests = Lists.newArrayList();
-    private List<Integer> skippedTests = Lists.newArrayList();
-    private List<Integer> passedTests = Lists.newArrayList();
-    private List<Integer> allTestMethod = Lists.newArrayList();
 
     @Override
     public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
@@ -91,8 +83,6 @@ public class ReportListener implements IReporter {
                 for (ISuiteResult r : iSuiteResultMap.values()) {
                     ExtentTest resultNode;
                     ITestContext context = r.getTestContext();
-                    // 统计测试结果数据
-                    getResultInfo(context);
                     if (createSuiteResultNode) {
                         // 没有创建suite的情况下，将在SuiteResult的创建为一级节点，否则创建为suite的一个子节点。
                         if (null == suiteTest) {
@@ -146,8 +136,6 @@ public class ReportListener implements IReporter {
         String Id = tools.getIdByExample("name", projectName + "#" + ExtentManager.newInstance().countBuild(projectName));
         String reportURL = "http://10.200.173.92:1337/#/report-summary?id=" + Id;
 
-        sendEmail(reportURL);
-
         System.out.println();
         System.out.println("======================================================================================");
         System.out.println();
@@ -156,19 +144,6 @@ public class ReportListener implements IReporter {
         System.out.println("======================================================================================");
         System.out.println();
     }
-
-    private void sendEmail(String reportUrl) {
-        MailInfo info = new MailInfo();
-        info.setSender("autotest@primeledger.cn");
-        // TODO 邮件地址暂时写死方便调试，后面从配置文件中读取
-        info.setReceivers(Collections.singletonList("yaojun@primeledger.cn"));
-        info.setSubject("自动化测试报告");
-        info.setReportInfo(generateReportInfo(reportUrl));
-        SmtpMailServer smtpMailServer = new SmtpMailServer();
-        smtpMailServer.createEmail(info);
-        smtpMailServer.sendEmail();
-    }
-
 
     private void buildTestNodes(ExtentTest extentTest, IResultMap resultMap, Status status) {
         // 存在父节点时，获取父节点的标签
@@ -368,37 +343,5 @@ public class ReportListener implements IReporter {
             name = result.getMethod().getMethodName();
         }
         return name;
-    }
-
-    private void getResultInfo(ITestContext context) {
-        passedTests.add(context.getPassedTests().size());
-        failedTests.add(context.getFailedTests().size());
-        skippedTests.add(context.getSkippedTests().size());
-        allTestMethod.add(context.getAllTestMethods().length);
-    }
-
-    private String generateReportInfo(String reportURL) {
-        int pass = passedTests.stream().mapToInt(value -> value).sum();
-        int fail = failedTests.stream().mapToInt(value -> value).sum();
-        int skip = skippedTests.stream().mapToInt(value -> value).sum();
-        int allMethod = allTestMethod.stream().mapToInt(value -> value).sum();
-        int total = pass + fail + skip;
-        int successRate = (int) (((float) pass / total) * 100);
-
-        return "totalMethod: " + allMethod +
-                "\n" +
-                "success: " + pass +
-                "\n" +
-                "fail: " + fail +
-                "\n" +
-                "skip: " + skip +
-                "\n" +
-                "caseNum: " + total +
-                "\n" +
-                "successRate: " + successRate + "%" +
-                "\n" +
-                "status: " + (fail == 0 ? "Successful" : "Failed") +
-                "\n" +
-                "reportUrl: " + reportURL;
     }
 }
