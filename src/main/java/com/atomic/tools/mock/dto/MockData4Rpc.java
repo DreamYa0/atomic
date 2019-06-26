@@ -1,7 +1,6 @@
 package com.atomic.tools.mock.dto;
 
-
-import org.apache.dubbo.rpc.Result;
+import com.alibaba.dubbo.rpc.Result;
 
 public class MockData4Rpc {
 

@@ -1,6 +1,6 @@
 package com.atomic.schema;
 
-import org.apache.dubbo.common.utils.ClassHelper;
+import com.alibaba.dubbo.common.utils.ClassHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

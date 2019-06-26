@@ -1,7 +1,7 @@
 package com.atomic.tools.mock.dto;
 
+import com.alibaba.dubbo.rpc.Result;
 import com.beust.jcommander.internal.Lists;
-import org.apache.dubbo.rpc.Result;
 
 import java.util.List;
 
