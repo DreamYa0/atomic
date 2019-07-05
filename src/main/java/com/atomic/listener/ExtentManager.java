@@ -44,7 +44,8 @@ final class ExtentManager {
 
     private void createInstance(String projectName) {
         extent = new ExtentReports();
-        extent.attachReporter(createHtmlReporter(projectName), createExtentXReporter(projectName));
+        // extent.attachReporter(createHtmlReporter(projectName), createExtentXReporter(projectName));
+        extent.attachReporter(createHtmlReporter(projectName));
         // extent.attachReporter(createHtmlReporter(projectName));
         extent.setReportUsesManualConfiguration(true);
     }

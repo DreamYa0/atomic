@@ -1,19 +1,15 @@
 package com.atomic;
 
-import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.CenterConfig;
-import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.listener.ReportListener;
 import com.atomic.listener.RollBackListener;
-import com.atomic.listener.SaveResultListener;
 import com.atomic.listener.SaveRunTime;
 import com.atomic.listener.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.ExcelParamConverter;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
-import com.atomic.param.ResultAssert;
 import com.atomic.param.TestNGUtils;
 import com.atomic.tools.sql.NewSqlTools;
 import com.atomic.util.SaveResultUtils;
@@ -42,14 +38,19 @@ import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ThrowException.throwNewException;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
-import static com.atomic.param.Constants.*;
+import static com.atomic.param.Constants.HTTP_HEADER;
+import static com.atomic.param.Constants.HTTP_HOST;
+import static com.atomic.param.Constants.HTTP_METHOD;
+import static com.atomic.param.Constants.HTTP_MODE;
+import static com.atomic.param.Constants.LOGIN_URL;
 import static com.atomic.param.HandleMethodName.getTestMethodName;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.*;
+import static com.atomic.param.ParamUtils.isContentTypeNoNull;
+import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
+import static com.atomic.param.ParamUtils.isHttpHostNoNull;
+import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
 import static com.atomic.param.ResultAssert.assertResultForRest;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.param.assertcheck.AssertCheck.recMode;
-import static com.atomic.param.assertcheck.AssertCheck.replayMode;
 import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
 import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
@@ -64,7 +65,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @title REST风格接口测试基类
  * @Data 2018/05/30 10:48
  */
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
+@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
 public abstract class BaseRestful extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
@@ -257,7 +258,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
         //返回result为String，则检测是否需要录制回放和自动断言
-        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+        /*if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
 
             if (AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
 
@@ -278,7 +279,9 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         } else {
             // 自动断言
             assertResultForRest(response, testResult, this, context, callback);
-        }
+        }*/
+        // 自动断言
+        assertResultForRest(response, testResult, this, context, callback);
         testCallBack(callBack, testResult);
     }
 

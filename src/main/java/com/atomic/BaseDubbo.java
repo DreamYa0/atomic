@@ -3,13 +3,11 @@ package com.atomic;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.GlobalConfig;
 import com.atomic.enums.AutoTestMode;
-import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.InvokeException;
 import com.atomic.exception.ParameterException;
 import com.atomic.listener.ReportListener;
 import com.atomic.listener.RollBackListener;
-import com.atomic.listener.SaveResultListener;
 import com.atomic.listener.ScenarioRollBackListener;
 import com.atomic.param.AutoTest;
 import com.atomic.param.HandleMethodName;
@@ -38,7 +36,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
-import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.getServiceVersion;
 import static com.atomic.annotations.AnnotationUtils.isAutoTest;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
@@ -54,13 +51,10 @@ import static com.atomic.param.Constants.CASE_NAME;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
 import static com.atomic.param.ExcelParamConverter.getDataBeforeTest;
 import static com.atomic.param.ResultAssert.assertResult;
-import static com.atomic.param.ResultAssert.resultCallBack;
 import static com.atomic.param.TestNGUtils.getParamContext;
 import static com.atomic.param.TestNGUtils.getTestMethod;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.param.TestNGUtils.injectScenarioReturnResult;
-import static com.atomic.param.assertcheck.AssertCheck.recMode;
-import static com.atomic.param.assertcheck.AssertCheck.replayMode;
 import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
 import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
 
@@ -90,7 +84,7 @@ import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
  * @version 2.0.0 Created by dreamyao on 2017/5/9.
  * @title dubbo接口测试基类
  */
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class, SaveResultListener.class, ReportListener.class})
+@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
 public abstract class BaseDubbo<T> extends AbstractUnitTest implements IHookable, ITestBase {
 
     protected final SqlTools sqlTools = new SqlTools();
@@ -326,7 +320,7 @@ public abstract class BaseDubbo<T> extends AbstractUnitTest implements IHookable
         } else {
             ParamPrint.resultPrint(methodMeta.getMethodName(), result, context, parameters);
         }
-        if (AnnotationUtils.isAutoAssert(getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+        /*if (AnnotationUtils.isAutoAssert(getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
             if (getCheckMode(getTestMethod(testResult)) == CheckMode.REC) {
                 resultCallBack(result, context, callback);
                 recMode(parameters[0], result, methodMeta);
@@ -340,7 +334,9 @@ public abstract class BaseDubbo<T> extends AbstractUnitTest implements IHookable
             }
         } else {
             assertResult(result, testResult, this, context, callback, parameters);
-        }
+        }*/
+
+        assertResult(result, testResult, this, context, callback, parameters);
     }
 
     /**

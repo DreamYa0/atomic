@@ -4,18 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.TestMethodMode;
 import com.atomic.enums.AutoTestMode;
-import com.atomic.enums.CheckMode;
 import com.atomic.exception.MethodMetaException;
 import com.atomic.exception.ParameterException;
 import com.atomic.exception.ThrowException;
 import com.atomic.listener.IntegrationTestRollBackListener;
 import com.atomic.listener.ReportListener;
-import com.atomic.listener.SaveResultListener;
 import com.atomic.param.AutoTest;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
 import com.atomic.param.ITestResultCallback;
-import com.atomic.param.ParamUtils;
 import com.atomic.param.StringUtils;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.assertcheck.AssertCheckUtils;
@@ -59,21 +56,25 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.atomic.annotations.AnnotationUtils.*;
+import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
+import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ExceptionUtils.isExceptionThrowsBySpecialMethod;
 import static com.atomic.listener.SaveRunTime.endTestTime;
 import static com.atomic.listener.SaveRunTime.startTestTime;
 import static com.atomic.param.AutoTest.generateAutoTestCases;
-import static com.atomic.param.Constants.*;
+import static com.atomic.param.Constants.EXCEL_DESC;
+import static com.atomic.param.Constants.PARAMETER_NAME_;
+import static com.atomic.param.Constants.RESULT_NAME;
+import static com.atomic.param.Constants.THREAD_COUNT;
 import static com.atomic.param.MethodMetaUtils.getMethodMeta;
 import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.*;
+import static com.atomic.param.ParamUtils.generateParametersNew;
 import static com.atomic.param.ParamUtils.isAutoTest;
-import static com.atomic.param.ResultAssert.*;
+import static com.atomic.param.ParamUtils.isExpectSuccess;
+import static com.atomic.param.ResultAssert.assertResult;
+import static com.atomic.param.ResultAssert.exceptionDeal;
 import static com.atomic.param.StringUtils.isExcelValueEmpty;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.param.assertcheck.AssertCheck.recMode;
-import static com.atomic.param.assertcheck.AssertCheck.replayMode;
 import static com.atomic.tools.mock.data.MockContext.getContext;
 import static com.atomic.util.ApplicationUtils.getBean;
 import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
@@ -86,7 +87,7 @@ import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
  * @version 1.0
  */
 @SqlConfig
-@Listeners({SaveResultListener.class, ReportListener.class, IntegrationTestRollBackListener.class})
+@Listeners({ReportListener.class, IntegrationTestRollBackListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
 public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBase {
 
@@ -343,7 +344,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             resultPrint(method.getName(), result, context, parameters);
         }
 
-        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+        /*if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
 
             if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
 
@@ -366,7 +367,9 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             }
         } else {
             assertResult(result, testResult, this, context, callback, parameters);
-        }
+        }*/
+
+        assertResult(result, testResult, this, context, callback, parameters);
     }
 
     /**

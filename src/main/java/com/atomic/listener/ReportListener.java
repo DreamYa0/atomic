@@ -132,7 +132,7 @@ public class ReportListener implements IReporter {
             suites.clear();
         }
         // 暂时做输出展示
-        Mongodb tools = new Mongodb.Builder().build().connectMongodb();
+        /*Mongodb tools = new Mongodb.Builder().build().connectMongodb();
         String Id = tools.getIdByExample("name", projectName + "#" + ExtentManager.newInstance().countBuild(projectName));
         String reportURL = "http://10.200.173.92:1337/#/report-summary?id=" + Id;
 
@@ -142,7 +142,7 @@ public class ReportListener implements IReporter {
         System.out.println("报告地址：" + reportURL + "：报告地址");
         System.out.println();
         System.out.println("======================================================================================");
-        System.out.println();
+        System.out.println();*/
     }
 
     private void buildTestNodes(ExtentTest extentTest, IResultMap resultMap, Status status) {

@@ -2,15 +2,12 @@ package com.atomic;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.CenterConfig;
 import com.atomic.config.GlobalConfig;
-import com.atomic.enums.CheckMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.ParameterException;
 import com.atomic.listener.ReportListener;
 import com.atomic.listener.RollBackListener;
-import com.atomic.listener.SaveResultListener;
 import com.atomic.listener.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
@@ -34,7 +31,6 @@ import java.net.Proxy;
 import java.util.List;
 import java.util.Map;
 
-import static com.atomic.annotations.AnnotationUtils.getCheckMode;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.exception.ThrowException.throwNewException;
 import static com.atomic.listener.SaveRunTime.endTestTime;
@@ -49,10 +45,7 @@ import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
 import static com.atomic.param.ResultAssert.assertResult;
-import static com.atomic.param.ResultAssert.resultCallBack;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.param.assertcheck.AssertCheck.recMode;
-import static com.atomic.param.assertcheck.AssertCheck.replayMode;
 import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
 
 
@@ -62,7 +55,7 @@ import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
  * @description 新的 HTTP 请求基类
  * @Data 2018/05/30 10:48
  */
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class, SaveResultListener.class})
+@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
 public abstract class BaseHttp extends AbstractInterfaceTest implements IHookable, ITestBase {
 
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
@@ -176,7 +169,7 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
         ITestResultCallback callback = paramAndResultCallBack();
 
         //返回result为String，则检测是否需要录制回放和自动断言
-        if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
+        /*if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
 
             if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
 
@@ -195,7 +188,9 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
         } else {
             // 自动断言
             assertResult(result, context, callback);
-        }
+        }*/
+        // 自动断言
+        assertResult(result, context, callback);
         testCallBack(callBack, testResult);
 
     }
