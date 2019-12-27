@@ -1,4 +1,4 @@
-package com.atomic;
+package com.atomic.prototype;
 
 import java.io.Serializable;
 

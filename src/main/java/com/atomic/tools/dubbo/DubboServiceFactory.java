@@ -10,6 +10,7 @@ import com.atomic.exception.DubboServiceException;
 import com.atomic.param.Constants;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.xiaoleilu.hutool.util.StrUtil;
 import org.testng.Reporter;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -41,10 +42,13 @@ public class DubboServiceFactory {
         registry = new RegistryConfig();
         registry.setAddress("zookeeper://" + host);
         registry.setUsername("atomic");
+        registry.setProtocol("dubbo");
+        registry.setRegister(false);
     }
 
     public DubboServiceFactory() {
-        GlobalConfig.load();//加载环境配置文件
+        //加载环境配置文件
+        GlobalConfig.load();
         profile = GlobalConfig.getProfile();
         Map<String, String> maps = CenterConfig.newInstance().readPropertyConfig(profile);
         host = maps.get(Constants.ZOOKEEPER);
@@ -54,6 +58,8 @@ public class DubboServiceFactory {
         registry = new RegistryConfig();
         registry.setAddress("zookeeper://" + host);
         registry.setUsername("atomic");
+        registry.setProtocol("dubbo");
+        registry.setRegister(false);
     }
 
     /**
@@ -76,7 +82,7 @@ public class DubboServiceFactory {
         } catch (Exception e) {
             throw new DubboServiceException("获取dubbo服务异常！", e);
         }
-        return getService(clazz, profile, version);
+        return getService(clazz, profile, version[0]);
     }
 
     /**
@@ -88,11 +94,8 @@ public class DubboServiceFactory {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <T> T getService(Class<? extends T> clazz, String profile, String... version) {
-        String key = clazz.getName() + "_" + profile;
-        if (version != null && version.length > 0) {
-            key = key + "_" + version[0];
-        }
+    private <T> T getService(Class<? extends T> clazz, String profile, String version) {
+        String key = clazz.getName() + "_" + profile + "_" + version;
         Object object;
         try {
             object = serviceCache.get(key, () -> getRemoteService(clazz, version));
@@ -110,16 +113,18 @@ public class DubboServiceFactory {
      * @param <T>
      * @return
      */
-    private <T> T getRemoteService(Class<? extends T> clazz, String... version) {
+    private <T> T getRemoteService(Class<? extends T> clazz, String version) {
         // 引用远程服务
         ReferenceConfig<T> reference = new ReferenceConfig<>();
         reference.setApplication(application);
         reference.setRegistry(registry);
-        if (version != null && version.length != 0) {
-            reference.setVersion(version[0]);
+        if (StrUtil.isNotBlank(version)) {
+            reference.setVersion(version);
         }
         reference.setTimeout(10000);
         reference.setInterface(clazz);
+        reference.setProtocol("dubbo");
+        reference.setLoadbalance("roundrobin");
         return reference.get();
     }
 
@@ -136,7 +141,8 @@ public class DubboServiceFactory {
                 // 引用远程服务
                 ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
                 reference.setApplication(application);
-                reference.setRegistry(registry); // 多个注册中心可以用setRegistries()
+                // 多个注册中心可以用setRegistries()
+                reference.setRegistry(registry);
                 reference.setInterface(clazz);
                 reference.setGeneric(true);
                 reference.setTimeout(60000 * 2);

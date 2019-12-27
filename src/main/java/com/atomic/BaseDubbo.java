@@ -85,7 +85,7 @@ import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
  * @title dubbo接口测试基类
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
-public abstract class BaseDubbo<T> extends AbstractUnitTest implements IHookable, ITestBase {
+public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookable, ITestBase {
 
     protected final SqlTools sqlTools = new SqlTools();
     protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();

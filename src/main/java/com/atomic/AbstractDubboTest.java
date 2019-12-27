@@ -1,19 +1,18 @@
 package com.atomic;
 
-import com.atomic.listener.SoaMockListener;
 import com.atomic.util.DataProviderUtils;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.DataProvider;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
-
-// @ContextConfiguration(locations = {"/test-service.xml"})
-@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, SoaMockListener.class})
-public abstract class AbstractUnitTest extends AbstractTestNGSpringContextTests {
+/**
+ * @author dreamyao
+ * @title
+ * @date 2019-12-27 13:03
+ * @since 1.0.0
+ */
+public abstract class AbstractDubboTest {
 
     @DataProvider(name = "excel")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {
@@ -29,4 +28,3 @@ public abstract class AbstractUnitTest extends AbstractTestNGSpringContextTests 
         return DataProviderUtils.readExcel(this, method);
     }
 }
-
