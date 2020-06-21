@@ -19,15 +19,14 @@ import java.lang.reflect.Method;
  */
 public class DubboMockData2FileServiceImpl implements MockDataService<MockData4Rpc, Invocation> {
 
-    private static final MockDataService instance = new DubboMockData2FileServiceImpl();
+    private static final MockDataService<MockData4Rpc, Invocation> INSTANCE = new DubboMockData2FileServiceImpl();
 
-    //*********单例模式****************
     private DubboMockData2FileServiceImpl() {
 
     }
 
     public static MockDataService<MockData4Rpc, Invocation> getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     @Override

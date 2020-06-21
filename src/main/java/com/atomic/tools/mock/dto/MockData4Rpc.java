@@ -5,11 +5,8 @@ import com.alibaba.dubbo.rpc.Result;
 public class MockData4Rpc {
 
     private String rpcMethod;
-
     private String rpcRequest;
-
     private Result rpcResult;
-
     private Object apiResult;
 
     public String getRpcMethod() {

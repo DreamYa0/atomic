@@ -6,9 +6,9 @@ import com.atomic.enums.AutoTestMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.InvokeException;
 import com.atomic.exception.ParameterException;
-import com.atomic.listener.ReportListener;
-import com.atomic.listener.RollBackListener;
-import com.atomic.listener.ScenarioRollBackListener;
+import com.atomic.report.ReportListener;
+import com.atomic.rollback.RollBackListener;
+import com.atomic.rollback.ScenarioRollBackListener;
 import com.atomic.param.AutoTest;
 import com.atomic.param.HandleMethodName;
 import com.atomic.param.ITestMethodMultiTimes;
@@ -19,8 +19,6 @@ import com.atomic.param.ParamUtils;
 import com.atomic.param.StringUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.tools.dubbo.DubboServiceFactory;
-import com.atomic.tools.sql.NewSqlTools;
-import com.atomic.tools.sql.SqlTools;
 import com.atomic.util.MapUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -42,8 +40,8 @@ import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.annotations.AnnotationUtils.isServiceVersion;
 import static com.atomic.exception.ExceptionUtils.handleException;
-import static com.atomic.listener.SaveRunTime.endTestTime;
-import static com.atomic.listener.SaveRunTime.startTestTime;
+import static com.atomic.report.SaveRunTime.endTestTime;
+import static com.atomic.report.SaveRunTime.startTestTime;
 import static com.atomic.param.AutoTest.generateAutoTestCases;
 import static com.atomic.param.AutoTest.printExceptions;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
@@ -55,8 +53,8 @@ import static com.atomic.param.TestNGUtils.getParamContext;
 import static com.atomic.param.TestNGUtils.getTestMethod;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.param.TestNGUtils.injectScenarioReturnResult;
-import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
-import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
+import static com.atomic.report.SaveResultCache.saveTestRequestInCache;
+import static com.atomic.report.SaveResultCache.saveTestResultInCache;
 
 
 /**
@@ -87,8 +85,6 @@ import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
 public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookable, ITestBase {
 
-    protected final SqlTools sqlTools = new SqlTools();
-    protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
     protected final DubboServiceFactory dubboServiceFactory = new DubboServiceFactory();
 
     /**
@@ -101,8 +97,6 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
 
     @AfterClass(alwaysRun = true)
     public void closeSqlTools() {
-        sqlTools.disconnect();
-        newSqlTools.disconnect();
     }
 
     @Override
@@ -118,7 +112,6 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         CompletableFuture<Object> future = new CompletableFuture<>();
         try {
             String dubboServiceVersion = null;
-            GlobalConfig.load();
             if (GlobalConfig.getServiceVersion() != null) {
                 dubboServiceVersion = GlobalConfig.getServiceVersion();
             } else if (isServiceVersion(getTestMethod(testResult))) {
@@ -244,7 +237,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         // 先执行beforeTest
         beforeTest(context);
         // 如果excel中字段的值为SQL则把SQL语句变为对应的真实值
-        getDataBeforeTest(sqlTools, context);
+        getDataBeforeTest(context);
         // 获取测试所需要的属性
         MethodMeta methodMeta = MethodMetaUtils.getMethodMeta(testResult, clazz, testMethodName, context, future);
         // execMethod(parameters,methodMeta, context);

@@ -68,7 +68,10 @@ public final class ReflectionUtils {
      * @return Field
      * @throws IllegalAccessException .{@link IllegalAccessException}
      */
-    public static Field getField(Object bean, Class targetClass, String fieldName) throws IllegalAccessException {
+    public static Field getField(Object bean,
+                                 Class<?> targetClass,
+                                 String fieldName) throws IllegalAccessException {
+
         List<Field> fields = Lists.newArrayList();
         getAllFields(bean.getClass(), fields);
         // 第一次类型和属性名都满足才返回
@@ -87,7 +90,7 @@ public final class ReflectionUtils {
      * @param clazz  Class对象
      * @param fields Field对象
      */
-    public static void getAllFields(Class clazz, List<Field> fields) {
+    public static void getAllFields(Class<?> clazz, List<Field> fields) {
         if (clazz == null || fields == null || clazz == Object.class)
             return;
         fields.addAll(getAllFieldsList(clazz));
@@ -113,7 +116,7 @@ public final class ReflectionUtils {
      * @param clazz
      * @param fields
      */
-    public static void getFields(Class clazz, List<Field> fields) {
+    public static void getFields(Class<?> clazz, List<Field> fields) {
         if (clazz == null || fields == null || clazz == Object.class) {
             return;
         }
@@ -129,10 +132,14 @@ public final class ReflectionUtils {
      * @return
      * @throws IllegalAccessException .{@link IllegalAccessException}
      */
-    public static Object getFieldInstance(Object bean, Class<?> targetClass, String fieldClassName) throws IllegalAccessException {
+    public static Object getFieldInstance(Object bean,
+                                          Class<?> targetClass,
+                                          String fieldClassName) throws IllegalAccessException {
+
         Field[] fields = targetClass.getDeclaredFields();
         Optional<Field> filterField = Arrays.stream(fields)
-                .filter(field -> field.getName().equals(fieldClassName) || field.getType().toString().toLowerCase().endsWith("." + fieldClassName.toLowerCase()))
+                .filter(field -> field.getName().equals(fieldClassName) ||
+                        field.getType().toString().toLowerCase().endsWith("." + fieldClassName.toLowerCase()))
                 .findFirst();
         if (filterField.isPresent()) {
             filterField.get().setAccessible(true);
@@ -190,7 +197,7 @@ public final class ReflectionUtils {
      * @return 方法名称数组
      * @throws NotFoundException .{@link NotFoundException}
      */
-    public static String[] getParamNames(Class clazz, String method) throws NotFoundException {
+    public static String[] getParamNames(Class<?> clazz, String method) throws NotFoundException {
         ClassPool pool = ClassPool.getDefault();
         CtClass cc = pool.get(clazz.getName());
         CtMethod cm = cc.getDeclaredMethod(method);
@@ -221,7 +228,12 @@ public final class ReflectionUtils {
         ClassReader cr = new ClassReader(n);
         cr.accept(new ClassVisitor(Opcodes.ASM4, cw) {
             @Override
-            public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+            public MethodVisitor visitMethod(final int access,
+                                             final String name,
+                                             final String desc,
+                                             final String signature,
+                                             final String[] exceptions) {
+
                 final Type[] args = Type.getArgumentTypes(desc);
                 // 方法名相同并且参数个数相同
                 if (!name.equals(m.getName())
@@ -233,7 +245,12 @@ public final class ReflectionUtils {
                         exceptions);
                 return new MethodVisitor(Opcodes.ASM4, v) {
                     @Override
-                    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+                    public void visitLocalVariable(String name,
+                                                   String desc,
+                                                   String signature,
+                                                   Label start,
+                                                   Label end,
+                                                   int index) {
                         int i = index - 1;
                         // 如果是静态方法，则第一就是参数
                         // 如果不是静态方法，则第一个是"this"，然后才是方法的参数

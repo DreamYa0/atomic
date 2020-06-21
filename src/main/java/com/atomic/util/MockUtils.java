@@ -55,7 +55,7 @@ public final class MockUtils {
         Assert.notNull(mockInstance, "Mock类实列不能为空");
         Assert.notNull(mockMethod, "Mock方法名称不能为空");
 
-        Class mockClass = mockInstance.getClass();
+        Class<?> mockClass = mockInstance.getClass();
         // 为Class时
         try {
 
@@ -109,7 +109,7 @@ public final class MockUtils {
         Assert.notNull(mockMethod, "Mock方法名称不能为空");
 
         // 如果mock的对象为接口时，如mybatis的mapper
-        Class mockClass = mockInstance.getClass();
+        Class<?> mockClass = mockInstance.getClass();
 
         try {
             Method method = ReflectionUtils.getMethod(mockClass, mockMethod);

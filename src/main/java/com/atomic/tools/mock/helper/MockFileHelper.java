@@ -10,7 +10,8 @@ public class MockFileHelper {
     //获取mock数据路径
     public static String getMockFile(int caseIndex) {
         String testPath = getTestResourcesPath(MockContext.getContext().getTestClass());
-        return testPath + MockContext.getContext().getTestClass().replace(".", File.separator) + "_" + caseIndex + ".mock";
+        return testPath + MockContext.getContext().getTestClass().replace(".", File.separator) +
+                "_" + caseIndex + ".mock";
     }
 
     private static String getTestResourcesPath(String className) {
@@ -38,7 +39,7 @@ public class MockFileHelper {
             return "";
         }
         try {
-            Class clazz = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             String path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();
             int index = path.indexOf("target");
             path = path.substring(0, index);

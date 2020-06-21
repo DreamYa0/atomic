@@ -7,8 +7,8 @@ import com.atomic.enums.AutoTestMode;
 import com.atomic.exception.MethodMetaException;
 import com.atomic.exception.ParameterException;
 import com.atomic.exception.ThrowException;
-import com.atomic.listener.IntegrationTestRollBackListener;
-import com.atomic.listener.ReportListener;
+import com.atomic.rollback.IntegrationTestRollBackListener;
+import com.atomic.report.ReportListener;
 import com.atomic.param.AutoTest;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
@@ -59,8 +59,8 @@ import java.util.concurrent.Executors;
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ExceptionUtils.isExceptionThrowsBySpecialMethod;
-import static com.atomic.listener.SaveRunTime.endTestTime;
-import static com.atomic.listener.SaveRunTime.startTestTime;
+import static com.atomic.report.SaveRunTime.endTestTime;
+import static com.atomic.report.SaveRunTime.startTestTime;
 import static com.atomic.param.AutoTest.generateAutoTestCases;
 import static com.atomic.param.Constants.EXCEL_DESC;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
@@ -77,8 +77,8 @@ import static com.atomic.param.StringUtils.isExcelValueEmpty;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
 import static com.atomic.tools.mock.data.MockContext.getContext;
 import static com.atomic.util.ApplicationUtils.getBean;
-import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
-import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
+import static com.atomic.report.SaveResultCache.saveTestRequestInCache;
+import static com.atomic.report.SaveResultCache.saveTestResultInCache;
 
 
 /**

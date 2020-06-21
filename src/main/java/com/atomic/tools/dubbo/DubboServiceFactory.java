@@ -1,5 +1,6 @@
 package com.atomic.tools.dubbo;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
@@ -10,7 +11,6 @@ import com.atomic.exception.DubboServiceException;
 import com.atomic.param.Constants;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.xiaoleilu.hutool.util.StrUtil;
 import org.testng.Reporter;
 
 import javax.annotation.concurrent.ThreadSafe;
@@ -30,7 +30,7 @@ public class DubboServiceFactory {
     private final RegistryConfig registry;
     private final Cache<String, GenericService> genericServiceCache = CacheBuilder.newBuilder().build();
     private final Cache<String, Object> serviceCache = CacheBuilder.newBuilder().build();
-    private volatile String host = "172.16.1.150:2181";
+    private volatile String host = "172.16.2.124:2181";
     private volatile String profile;
 
     public DubboServiceFactory(String env) {
@@ -48,7 +48,6 @@ public class DubboServiceFactory {
 
     public DubboServiceFactory() {
         //加载环境配置文件
-        GlobalConfig.load();
         profile = GlobalConfig.getProfile();
         Map<String, String> maps = CenterConfig.newInstance().readPropertyConfig(profile);
         host = maps.get(Constants.ZOOKEEPER);

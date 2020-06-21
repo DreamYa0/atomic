@@ -6,8 +6,8 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 public class MockDataEncode {
-    private List<Object> dbData = Lists.newArrayList();
 
+    private List<Object> dbData = Lists.newArrayList();
     private List<Result> rpcData = Lists.newArrayList();
 
     public List<Object> getDbData() {

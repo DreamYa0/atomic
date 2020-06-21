@@ -15,7 +15,7 @@ import java.util.Properties;
 @Intercepts({@Signature(method = "handleResultSets", type = ResultSetHandler.class, args = {Statement.class})})
 public class UnitTestFilter4Mybatis implements Interceptor {
 
-    private MockDataService mockDataService;
+    private MockDataService<MockData4Db, Invocation> mockDataService;
 
     public UnitTestFilter4Mybatis() {
         mockDataService = MybatisMockData2FileServiceImpl.getInstance();

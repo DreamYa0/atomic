@@ -51,7 +51,8 @@ public class CenterConfig {
                 Map<String, String> config = Maps.newHashMap();
                 try {
 
-                    InputStream stream = CenterConfig.class.getClassLoader().getResourceAsStream("properties/" + profile + ".properties");
+                    InputStream stream = CenterConfig.class.getClassLoader().getResourceAsStream(
+                            "zookeeper/" + profile + ".properties");
                     Properties properties = new Properties();
                     properties.load(stream);
                     Iterator<Object> iterator = properties.keySet().iterator();
@@ -78,7 +79,6 @@ public class CenterConfig {
      * @return 域名或IP+Port
      */
     public String getHttpHost() {
-        GlobalConfig.load();
         String httpHost = GlobalConfig.getHttpHost();
         if (httpHost == null || "".equals(httpHost)) {
             throw new CenterConfigException("从配置中获取Http请求的域名或IP地址失败！");

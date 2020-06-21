@@ -6,9 +6,8 @@ import com.atomic.param.handler.IHandler;
 import com.atomic.param.handler.IdCardHandler;
 import com.atomic.param.handler.PhoneNoHandler;
 import com.atomic.param.handler.RandomParamHandler;
-import com.atomic.tools.sql.SqlTools;
-import com.atomic.util.DataSourceUtils;
 import com.atomic.param.parser.ExcelResolver;
+import com.atomic.util.DataSourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -37,15 +36,14 @@ public final class ExcelParamConverter {
     /**
      * 执行测试之前替换excel中的特殊字段为真实的值
      * @param param    入参集合
-     * @param sqlTools 数据库连接工具
      */
-    public static void getDataBeforeTest(SqlTools sqlTools, Map<String, Object> param) {
+    public static void getDataBeforeTest(Map<String, Object> param) {
 
         // 把入参的 sql 设置为真实的值
         param.forEach((paramKey, paramValue) -> {
 
             if (Objects.nonNull(paramValue)) {
-                param.put(paramKey, getRealValue(paramValue, sqlTools));
+                param.put(paramKey, getRealValue(paramValue));
             }
 
         });
@@ -65,18 +63,17 @@ public final class ExcelParamConverter {
 
     /**
      * 获取SQL语句对应的真实值
-     * @param sqlTools   数据库连接异常
      * @param paramValue 入参待处理值
      * @return 处理完毕的值
      */
     @SuppressWarnings("unchecked")
-    private static Object getRealValue(Object paramValue, SqlTools sqlTools) {
+    private static Object getRealValue(Object paramValue) {
 
         Object newParamValue = null;
 
         try {
             if (paramValue instanceof String) {
-                newParamValue = getSqlValue(sqlTools, paramValue.toString(), String.class);
+                newParamValue = getSqlValue(paramValue.toString(), String.class);
             }else {
                 // 如果值不满足处理条件，则保留原值
                 newParamValue = paramValue;
@@ -94,7 +91,7 @@ public final class ExcelParamConverter {
      * @return
      * @throws SQLException
      */
-    private static String getSqlValue(SqlTools sqlTools, String value, Type type) throws SQLException {
+    private static String getSqlValue(String value, Type type) throws SQLException {
         // 格式：sql:dataBaseName:select XXX
         if (value.startsWith("sql:")) {
             value = value.substring(4);
@@ -102,7 +99,7 @@ public final class ExcelParamConverter {
             if (index > -1) {
                 String dataSourceName = value.substring(0, index);
                 String sql = value.substring(index + 1);
-                List<Map<Integer, Object>> datalist = DataSourceUtils.queryData(sqlTools, dataSourceName, sql);
+                List<Map<Integer, Object>> datalist = DataSourceUtils.queryData(dataSourceName, sql);
                 value = StringUtils.handleDataList(datalist, value, type, sql);
             }
         }
@@ -130,9 +127,9 @@ public final class ExcelParamConverter {
                     try {
                         List<Map<String, Object>> maps = excel.readDataByRow();
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(maps))) {
-                            Map<String, Object> map = maps.get(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()) - 1);
+                            Map<String, Object> map = maps.get(Integer.parseInt(context.get(Constants.CASE_INDEX).toString()) - 1);
                             // 把excel中的值转换为真实值
-                            ExcelParamConverter.getDataBeforeTest(new SqlTools(), map);
+                            ExcelParamConverter.getDataBeforeTest(map);
                             Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);
                             assemblyMap.remove(Constants.CASE_INDEX);
                             context.put(key, assemblyMap);

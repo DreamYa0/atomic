@@ -14,7 +14,7 @@ import java.util.Properties;
  * @author dreamyao
  * @version 1.0.0
  * @title
- * @Data 2017/9/11 22:41
+ * @date 2017/9/11 22:41
  */
 public class MethodSelectorConfig {
 

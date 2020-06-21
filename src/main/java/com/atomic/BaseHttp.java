@@ -1,24 +1,23 @@
 package com.atomic;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.atomic.config.CenterConfig;
 import com.atomic.config.GlobalConfig;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.ParameterException;
-import com.atomic.listener.ReportListener;
-import com.atomic.listener.RollBackListener;
-import com.atomic.listener.ScenarioRollBackListener;
+import com.atomic.report.ReportListener;
+import com.atomic.rollback.RollBackListener;
+import com.atomic.rollback.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
 import com.atomic.tools.http.GetHandler;
-import com.atomic.tools.http.HttpRequest;
-import com.atomic.tools.http.HttpResponse;
 import com.atomic.tools.http.IHandler;
 import com.atomic.tools.http.PostHandler;
-import com.atomic.tools.sql.NewSqlTools;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
@@ -33,8 +32,8 @@ import java.util.Map;
 
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.exception.ThrowException.throwNewException;
-import static com.atomic.listener.SaveRunTime.endTestTime;
-import static com.atomic.listener.SaveRunTime.startTestTime;
+import static com.atomic.report.SaveRunTime.endTestTime;
+import static com.atomic.report.SaveRunTime.startTestTime;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.HTTP_HEADER;
 import static com.atomic.param.Constants.HTTP_HOST;
@@ -46,7 +45,7 @@ import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
 import static com.atomic.param.ResultAssert.assertResult;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
+import static com.atomic.report.SaveResultCache.saveTestResultInCache;
 
 
 /**
@@ -56,9 +55,7 @@ import static com.atomic.util.SaveResultUtils.saveTestResultInCache;
  * @Data 2018/05/30 10:48
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
-public abstract class BaseHttp extends AbstractInterfaceTest implements IHookable, ITestBase {
-
-    protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
+public abstract class BaseHttp extends AbstractRestTest implements IHookable, ITestBase {
 
     /**
      * Http接口入参字段检查
@@ -113,7 +110,6 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
             httpHost = context.get(HTTP_HOST).toString();
         }
         HttpRequest request = new HttpRequest(httpHost);
-        GlobalConfig.load();
         if (Constants.PROFILE_TESTING.equals(GlobalConfig.getProfile())) {
             // 预发布环境设置代理
             String httpProxy = CenterConfig.newInstance().readPropertyConfig(GlobalConfig.getProfile()).get(HTTP_PROXY);
@@ -127,7 +123,7 @@ public abstract class BaseHttp extends AbstractInterfaceTest implements IHookabl
             String loginUrl = context.get(Constants.LOGIN_URL).toString();
             HttpRequest httpRequest = new HttpRequest(loginUrl);
             HttpResponse httpResponse = httpRequest.execute();
-            List<HttpCookie> cookies = httpResponse.getCookie();
+            List<HttpCookie> cookies = httpResponse.getCookies();
             request.cookie((HttpCookie[]) cookies.toArray());
         }
         if (isHttpHeaderNoNull(context)) {

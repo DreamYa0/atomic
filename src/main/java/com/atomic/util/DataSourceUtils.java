@@ -1,16 +1,20 @@
 package com.atomic.util;
 
-import com.atomic.exception.GetBeanException;
-import com.atomic.tools.sql.SqlTools;
+import cn.hutool.db.ds.DSFactory;
+import cn.hutool.setting.Setting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -20,48 +24,40 @@ import java.util.Map;
 public final class DataSourceUtils {
 
     private static ThreadLocal<DataSource> dataSourceThreadLocal = new ThreadLocal<>();
+    private static final ConcurrentMap<String, DataSource> DATA_SOURCE_CONCURRENT_MAP =
+            new ConcurrentHashMap<>(16);
 
     private DataSourceUtils() {
-    }
 
-    /**
-     * 根据dataSource名称查询数据
-     * @param dataSourceName 数据源名称
-     * @param sql            SQL语句
-     * @return 结果集
-     * @throws SQLException
-     */
-    public static List<Map<Integer, Object>> queryData(String dataSourceName, String sql) throws SQLException {
-        Connection conn = getConnection(dataSourceName);
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ResultSet resultSet = ps.executeQuery();
-        // select value1,value2
-        List<Map<Integer, Object>> list = Lists.newArrayList();
-        handleResultSet(resultSet, list);
-        resultSet.close();
-        ps.close();
-        conn.close();
-        return list;
     }
 
     /**
      * 根据数据库名称查询数据
-     * @param sqlTools     数据库操作工具
-     * @param dataBaseName 数据库名称
-     * @param sql          SQL语句
+     *
+     * @param sql SQL语句
      * @return 结果集
      * @throws SQLException
      */
-    public static List<Map<Integer, Object>> queryData(SqlTools sqlTools, String dataBaseName, String sql) throws SQLException {
-        sqlTools.connect(dataBaseName);
-        ResultSet resultSet = sqlTools.getResult(sql);
+    public static List<Map<Integer, Object>> queryData(String dbName, String sql) throws SQLException {
+        ResultSet resultSet = getResult(dbName, sql);
         // select value1,value2
         List<Map<Integer, Object>> list = Lists.newArrayList();
         handleResultSet(resultSet, list);
         resultSet.close();
-        // 关闭后会导致给测试用例的sqlTools失效
-        // sqlTools.disconnect();
         return list;
+    }
+
+    private static ResultSet getResult(String dbName, String sqlString) {
+        Statement stmt;
+        ResultSet rs = null;
+        try (Connection connection = DataSourceUtils.getDataSource(dbName).getConnection()) {
+            stmt = connection.createStatement();
+            stmt.execute(sqlString);
+            rs = stmt.getResultSet();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rs;
     }
 
     /**
@@ -82,31 +78,31 @@ public final class DataSourceUtils {
         }
     }
 
-    private static Connection getConnection(String dataSourceName) throws SQLException {
-        DataSource dataSource = getDataSource();
-        return dataSource.getConnection();
-    }
-
     /**
      * 获取数据源
+     *
      * @return 获取dataSource
      */
-    public static DataSource getDataSource() {
-        DataSource dataSource = null;
+    public static DataSource getDataSource(String dbName) {
         try {
-            if (dataSourceThreadLocal.get() == null) {
-                dataSource = (DataSource) ApplicationUtils.getBean(DataSource.class);
-                dataSourceThreadLocal.set(dataSource);
-            } else {
-                dataSource = dataSourceThreadLocal.get();
+            DataSource source = DATA_SOURCE_CONCURRENT_MAP.get(dbName);
+            if (Objects.nonNull(source)) {
+                return source;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (dataSource == null) {
-            throw new GetBeanException("获取dataSource失败！");
-        }
-        return dataSource;
-    }
 
+            DataSource dataSource = (DataSource) ApplicationUtils.getBean(DataSource.class);
+            DATA_SOURCE_CONCURRENT_MAP.put(dbName, dataSource);
+            return dataSource;
+
+        } catch (Exception e) {
+            // 如果从 spring 容器中获取DataSource 失败，则从加载数据库连接配置文件初始化
+            //自定义数据库Setting
+            Setting setting = new Setting("db.setting");
+            //获取指定配置，第二个参数为分组，用于多数据源，无分组情况下传null
+            DSFactory factory = DSFactory.create(setting);
+            DataSource dataSource = factory.getDataSource(dbName);
+            DATA_SOURCE_CONCURRENT_MAP.put(dbName, dataSource);
+            return dataSource;
+        }
+    }
 }

@@ -1,5 +1,8 @@
 package com.atomic.tools.http;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.Method;
 import com.atomic.param.Constants;
 import com.atomic.param.ParamUtils;
 import com.google.common.collect.Maps;

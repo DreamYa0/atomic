@@ -1,5 +1,8 @@
 package com.atomic.tools.http;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+
 /**
  * @author dreamyao
  * @version 1.0.0

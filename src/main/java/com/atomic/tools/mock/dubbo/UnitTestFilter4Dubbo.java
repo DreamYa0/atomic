@@ -18,7 +18,7 @@ import org.testng.Reporter;
 @Activate(group = Constants.CONSUMER)
 public class UnitTestFilter4Dubbo implements Filter {
 
-    private MockDataService mockDataService;
+    private MockDataService<MockData4Rpc,Invocation> mockDataService;
 
     public UnitTestFilter4Dubbo() {
         mockDataService = DubboMockData2FileServiceImpl.getInstance();
@@ -54,7 +54,8 @@ public class UnitTestFilter4Dubbo implements Filter {
         if (MockContext.getContext().getMode() == TestMethodMode.REPLAY) {
             Result result = (Result) mockDataService.getMockData(invocation);
             if (result == null) {
-                Reporter.log("{} 调用的方法:{}mock数据不存在" + MockContext.getContext().getTestMethod() + invocation.getInvoker().getInterface() + ":" + invocation.getMethodName());
+                Reporter.log(String.format("调用的方法: %s mock数据不存在",
+                        invocation.getInvoker().getInterface() + "." + invocation.getMethodName()));
                 throw new RuntimeException("mock数据不存在");
             }
             return result;

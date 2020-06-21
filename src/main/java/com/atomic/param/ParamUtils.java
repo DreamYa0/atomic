@@ -53,7 +53,8 @@ public final class ParamUtils {
      * @return
      */
     public static boolean isValueTrue(Object value) {
-        return value != null && ("1".equalsIgnoreCase(value.toString()) || Constants.EXCEL_YES.equalsIgnoreCase(value.toString()));
+        return value != null && ("1".equalsIgnoreCase(value.toString()) ||
+                Constants.EXCEL_YES.equalsIgnoreCase(value.toString()));
     }
 
     /**
@@ -186,7 +187,8 @@ public final class ParamUtils {
     @SuppressWarnings("unchecked")
     private static <T> T getParameter(MethodMeta methodMeta, Map<String, Object> param, int index) {
         if (index < 0 || index >= methodMeta.getParamTypes().length) {
-            throw new RuntimeException(String.format("size is %s, index is %s", methodMeta.getParamTypes().length, index));
+            throw new RuntimeException(String.format("size is %s, index is %s",
+                    methodMeta.getParamTypes().length, index));
         }
         return (T) param.get(Constants.PARAMETER_NAME_ + index);
     }
@@ -236,7 +238,8 @@ public final class ParamUtils {
      * @return 入参对象
      * @throws Exception 异常
      */
-    public static Object[] generateParametersNew(final MethodMeta methodMeta, Map<String, Object> newParam) throws Exception {
+    public static Object[] generateParametersNew(final MethodMeta methodMeta,
+                                                 Map<String, Object> newParam) throws Exception {
         final Object[] parameters = new Object[methodMeta.getParamTypes().length];
         for (int i = 0; i < methodMeta.getParamTypes().length; i++) {
             Type type = methodMeta.getParamTypes()[i];
@@ -245,7 +248,9 @@ public final class ParamUtils {
         return parameters;
     }
 
-    private static Object generateParametersNew(Type type, Map<String, Object> param, String paramName) throws Exception {
+    private static Object generateParametersNew(Type type,
+                                                Map<String, Object> param,
+                                                String paramName) throws Exception {
         // 类，如：方法xxxx(Request)
         if (type instanceof Class) {
             return generateParametersNew(param, (Class) type, paramName);
@@ -265,7 +270,9 @@ public final class ParamUtils {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    private static Object generateParametersNew(Map<String, Object> param, Class clazz, String paramName) throws Exception {
+    private static Object generateParametersNew(Map<String, Object> param,
+                                                Class<?> clazz,
+                                                String paramName) throws Exception {
 
         if (clazz.equals(HttpSession.class)) {
 
@@ -312,8 +319,12 @@ public final class ParamUtils {
      * @throws IllegalAccessException
      */
     @SuppressWarnings("unchecked")
-    private static Object generateParametersNew(Type paramType, Type parameterizedType, Map<String, Object> param, String paramName) throws Exception {
-        Class requestClass = ((ParameterizedTypeImpl) paramType).getRawType();
+    private static Object generateParametersNew(Type paramType,
+                                                Type parameterizedType,
+                                                Map<String, Object> param,
+                                                String paramName) throws Exception {
+
+        Class<?> requestClass = ((ParameterizedTypeImpl) paramType).getRawType();
         Object request;
         Object data;
         if (requestClass.isInterface()) {
@@ -327,7 +338,7 @@ public final class ParamUtils {
             if (parameterizedType instanceof ParameterizedType) {
                 data = JSON.parseObject(getString(param, paramName), parameterizedType);
             } else {
-                Class paramClass = (Class) parameterizedType;
+                Class<?> paramClass = (Class<?>) parameterizedType;
                 if (StringUtils.isBasicType(paramClass)) {
                     data = StringUtils.json2Bean(paramClass.getSimpleName(), getString(param, paramName), parameterizedType);
                     setRequestData(request, data);
@@ -390,7 +401,8 @@ public final class ParamUtils {
                             field.setAccessible(true);
                             field.set(request, actualValue);
                         } catch (Exception e) {
-                            logger.error("给请求入参对象公共自定义对象属性设值失败，属性名称为：{}，对应设置的值为：{}", fieldName, fieldValue, e);
+                            logger.error("给请求入参对象公共自定义对象属性设值失败，属性名称为：{}，对应设置的值为：{}",
+                                    fieldName, fieldValue, e);
                         }
                     }
 
@@ -414,7 +426,8 @@ public final class ParamUtils {
 
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
 
-                            Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1);
+                            Map<String, Object> sheetParam = sheetParams.get(
+                                    Integer.parseInt(param.get(Constants.CASE_INDEX).toString()) - 1);
 
                             Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
                             AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);

@@ -6,8 +6,8 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 public class MockData {
-    private List<Object> dbData = Lists.newArrayList();
 
+    private List<Object> dbData = Lists.newArrayList();
     private List<RpcResult> rpcData = Lists.newArrayList();
 
     public List<Object> getDbData() {

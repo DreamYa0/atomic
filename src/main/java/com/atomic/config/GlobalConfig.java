@@ -30,7 +30,11 @@ public class GlobalConfig {
     private static String profile = "";
     private static String httpHost = "";
 
-    public static void load() {
+    static {
+        load();
+    }
+
+    private static void load() {
         try {
             InputStream in = FileUtils.getTestFileInputStream(testConfFilePath);
             Properties properties = new Properties();
@@ -44,15 +48,18 @@ public class GlobalConfig {
                 }
             }
             if (properties.containsKey("mail.addr.list")) {
-                mailAddrList = getListFromString(properties.getProperty("mail.addr.list"), ",", true);
+                mailAddrList = getListFromString(properties.getProperty("mail.addr.list"), ",",
+                        true);
             }
             if (properties.containsKey("host.domain")) {
                 hostDomain = properties.getProperty("host.domain");
             }
-            if (properties.containsKey("project.name") && Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("project.name")))) {
+            if (properties.containsKey("project.name") &&
+                    Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("project.name")))) {
                 projectName = properties.getProperty("project.name");
             }
-            if (properties.containsKey("runner") && Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("runner")))) {
+            if (properties.containsKey("runner") &&
+                    Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("runner")))) {
                 runner = properties.getProperty("runner");
             }
             if (properties.containsKey("run.mode")) {

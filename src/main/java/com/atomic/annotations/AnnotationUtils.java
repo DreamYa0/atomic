@@ -230,10 +230,13 @@ public abstract class AnnotationUtils {
      * @param interfaceClass 接口的Class对象
      * @return 接口名称
      */
-    public static String getBeanName(Class<?> interfaceClass) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static String getBeanName(Class<?> interfaceClass) throws NoSuchMethodException,
+            InvocationTargetException, IllegalAccessException {
+
         Annotation[] annotations = interfaceClass.getAnnotations();
         if (!ArrayUtils.isEmpty(annotations)) {
-            List<Class<? extends Annotation>> serviceList = Arrays.asList(Service.class, Component.class, Controller.class, Repository.class);
+            List<Class<? extends Annotation>> serviceList = Arrays.asList(Service.class,
+                    Component.class, Controller.class, Repository.class);
             for (Annotation annotation : annotations) {
                 if (serviceList.contains(annotation.annotationType())) {
                     Method m = annotation.getClass().getDeclaredMethod("value", null);

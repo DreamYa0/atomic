@@ -2,17 +2,16 @@ package com.atomic;
 
 import com.atomic.config.CenterConfig;
 import com.atomic.exception.InjectResultException;
-import com.atomic.listener.ReportListener;
-import com.atomic.listener.RollBackListener;
-import com.atomic.listener.SaveRunTime;
-import com.atomic.listener.ScenarioRollBackListener;
+import com.atomic.report.ReportListener;
+import com.atomic.rollback.RollBackListener;
+import com.atomic.report.SaveRunTime;
+import com.atomic.rollback.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.ExcelParamConverter;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
-import com.atomic.tools.sql.NewSqlTools;
-import com.atomic.util.SaveResultUtils;
+import com.atomic.report.SaveResultCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
@@ -51,7 +50,7 @@ import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
 import static com.atomic.param.ResultAssert.assertResultForRest;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.util.SaveResultUtils.saveTestRequestInCache;
+import static com.atomic.report.SaveResultCache.saveTestRequestInCache;
 import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
@@ -66,9 +65,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @Data 2018/05/30 10:48
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
-public abstract class BaseRestful extends AbstractInterfaceTest implements IHookable, ITestBase {
-
-    protected final NewSqlTools newSqlTools = NewSqlTools.newInstance();
+public abstract class BaseRestful extends AbstractRestTest implements IHookable, ITestBase {
 
     @Override
     public void initDb() {
@@ -77,7 +74,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
 
     @AfterClass(alwaysRun = true)
     public void closeSqlTools() {
-        newSqlTools.disconnect();
+
     }
 
     @Override
@@ -120,7 +117,7 @@ public abstract class BaseRestful extends AbstractInterfaceTest implements IHook
         SaveRunTime.endTestTime(testResult);
 
         // 缓存入参和返回值
-        SaveResultUtils.saveTestResultInCache(response, testResult, newContext);
+        SaveResultCache.saveTestResultInCache(response, testResult, newContext);
 
         execMethod(response, testResult, callBack, newContext);
     }

@@ -3,7 +3,6 @@ package com.atomic.tools.mock.data;
 import com.alibaba.fastjson.JSON;
 import com.atomic.param.StringUtils;
 import com.atomic.tools.mock.dto.MockData4Db;
-import com.atomic.tools.mock.dto.MockData4Rpc;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.util.FileUtils;
 import org.apache.ibatis.plugin.Invocation;
@@ -18,15 +17,14 @@ import java.util.List;
  */
 public class MybatisMockData2FileServiceImpl implements MockDataService<MockData4Db, Invocation> {
 
-    private static final MockDataService instance = new MybatisMockData2FileServiceImpl();
+    private static final MockDataService<MockData4Db, Invocation> INSTANCE = new MybatisMockData2FileServiceImpl();
 
-    //*********单例模式****************
     private MybatisMockData2FileServiceImpl() {
 
     }
 
-    public static MockDataService<MockData4Rpc, Invocation> getInstance() {
-        return instance;
+    public static MockDataService<MockData4Db, Invocation> getInstance() {
+        return INSTANCE;
     }
 
     @Override

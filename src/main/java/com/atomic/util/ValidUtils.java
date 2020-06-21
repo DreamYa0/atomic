@@ -269,8 +269,9 @@ public class ValidUtils {
     }
 
     public static boolean matches(String regex, String input) {
-        if (StringUtils.isBlank(input)) return false;
-        if (input.matches(regex)) return true;
-        return false;
+        if (StringUtils.isBlank(input)) {
+            return false;
+        }
+        return input.matches(regex);
     }
 }

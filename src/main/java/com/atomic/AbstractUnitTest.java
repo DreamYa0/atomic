@@ -1,6 +1,6 @@
 package com.atomic;
 
-import com.atomic.listener.SoaMockListener;
+import com.atomic.tools.mock.listener.SoaMockListener;
 import com.atomic.util.DataProviderUtils;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
