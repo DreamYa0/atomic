@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class DataSourceUtils {
 
-    private static ThreadLocal<DataSource> dataSourceThreadLocal = new ThreadLocal<>();
     private static final ConcurrentMap<String, DataSource> DATA_SOURCE_CONCURRENT_MAP =
             new ConcurrentHashMap<>(16);
 
