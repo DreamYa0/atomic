@@ -62,16 +62,19 @@ public class IntegrationTestRollBackListener extends TestListenerAdapter {
 
     @Override
     public void onTestStart(ITestResult testResult) {
-        if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
+        if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) &&
+                !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
             String dbName = AnnotationUtils.getDbName(TestNGUtils.getTestMethod(testResult));
             String[] tableNames = AnnotationUtils.getTableName(TestNGUtils.getTestMethod(testResult));
             // 开启监听，当为@RollBack注解时执行单库,多表数据回滚
             RollBack.newInstance().setStartPoint(dbName, new Changes(), tableNames);
-        } else if (AnnotationUtils.isRollBackAllMethod(TestNGUtils.getTestMethod(testResult)) && !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
+        } else if (AnnotationUtils.isRollBackAllMethod(TestNGUtils.getTestMethod(testResult)) &&
+                !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 当为@RollBackAll注解时执行多库,多表数据回滚
             try {
                 try {
-                    Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(TestNGUtils.getTestMethod(testResult));
+                    Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(
+                            TestNGUtils.getTestMethod(testResult));
                     Set<String> set = multimap.keySet();
                     List<String> stringList = Lists.newArrayList(set);
                     for (String dbName : stringList) {
