@@ -17,10 +17,12 @@ public class AutoTestDateValues implements IAutoTestValues<String> {
     @Override
     public List<String> getAutoTestValues(int autoTestValuesLevel) {
         if (autoTestValuesLevel == AutoTestEnum.SMALL.getLevel()) {
-            return Lists.newArrayList(getDateString(new Date(0)), getDateString(new Date()), getDateString(new Date(Integer.MAX_VALUE)));
+            return Lists.newArrayList(getDateString(new Date(0)), getDateString(new Date()),
+                    getDateString(new Date(Integer.MAX_VALUE)));
         } else if (autoTestValuesLevel == AutoTestEnum.VERY_SMALL.getLevel()) {
             return Lists.newArrayList(getDateString(new Date(Integer.MAX_VALUE)));
         }
-        return Lists.newArrayList(null, getDateString(new Date(0)), getDateString(new Date()), getDateString(new Date(Integer.MAX_VALUE)));
+        return Lists.newArrayList(null, getDateString(new Date(0)), getDateString(new Date()),
+                getDateString(new Date(Integer.MAX_VALUE)));
     }
 }

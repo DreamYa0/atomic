@@ -44,7 +44,7 @@ public final class HandleMethodName {
      */
     public static String getTestClassName(ITestResult testResult) {
         IClass iClass = testResult.getTestClass();
-        Class superClass = iClass.getRealClass();
+        Class<?> superClass = iClass.getRealClass();
         Type superType = superClass.getGenericSuperclass();
         if (superType instanceof ParameterizedType) {
             String name = ((ParameterizedType) superType).getActualTypeArguments()[0].toString();

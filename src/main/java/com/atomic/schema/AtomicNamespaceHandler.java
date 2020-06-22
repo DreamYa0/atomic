@@ -16,6 +16,7 @@ public class AtomicNamespaceHandler  extends NamespaceHandlerSupport {
     }
 
     public void init() {
-        registerBeanDefinitionParser("atomic", new AtomicBeanDefinitionParser(GlobalConfig.class));
+        registerBeanDefinitionParser("atomic",
+                new AtomicBeanDefinitionParser(GlobalConfig.class));
     }
 }

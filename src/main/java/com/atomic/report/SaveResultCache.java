@@ -49,7 +49,10 @@ public final class SaveResultCache {
         return testDataCache.getIfPresent(cacheKey);
     }
 
-    public static void saveTestRequestInCache(Object parameters, ITestResult testResult, Map<String, Object> context) {
+    public static void saveTestRequestInCache(Object parameters,
+                                              ITestResult testResult,
+                                              Map<String, Object> context) {
+
         if (Objects.nonNull(parameters)) {
             String name = TestNGUtils.getTestCaseClassName(testResult) + "_" + context.get(CASE_INDEX);
             testRequestCache.put(name, parameters);

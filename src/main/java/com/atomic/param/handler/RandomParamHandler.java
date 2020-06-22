@@ -17,19 +17,19 @@ public class RandomParamHandler implements IHandler {
     private IHandler handler;
 
     private static int randomInt(String startInclusive, String endInclusive) {
-        return RandomUtils.nextInt(Integer.valueOf(startInclusive), Integer.valueOf(endInclusive));
+        return RandomUtils.nextInt(Integer.parseInt(startInclusive), Integer.parseInt(endInclusive));
     }
 
     private static double randomDouble(String startInclusive, String endInclusive) {
-        return RandomUtils.nextDouble(Double.valueOf(startInclusive), Double.valueOf(endInclusive));
+        return RandomUtils.nextDouble(Double.parseDouble(startInclusive), Double.parseDouble(endInclusive));
     }
 
     private static long randomLong(String startInclusive, String endInclusive) {
-        return RandomUtils.nextLong(Long.valueOf(startInclusive), Long.valueOf(endInclusive));
+        return RandomUtils.nextLong(Long.parseLong(startInclusive), Long.parseLong(endInclusive));
     }
 
     private static float randomFloat(String startInclusive, String endInclusive) {
-        return RandomUtils.nextFloat(Float.valueOf(startInclusive), Float.valueOf(endInclusive));
+        return RandomUtils.nextFloat(Float.parseFloat(startInclusive), Float.parseFloat(endInclusive));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class RandomParamHandler implements IHandler {
                 if (values.length > 0) {
                     if (Constants.EXCEL_RANDOM.equals(values[0])) {
                         if ("String".equals(values[1])) {
-                            param.put(key, RandomStringUtils.randomAlphabetic(Integer.valueOf(values[2])));
+                            param.put(key, RandomStringUtils.randomAlphabetic(Integer.parseInt(values[2])));
                         } else if ("int".equals(values[1])) {
                             param.put(key, randomInt(values[2], values[3]));
                         } else if ("double".equals(values[1])) {

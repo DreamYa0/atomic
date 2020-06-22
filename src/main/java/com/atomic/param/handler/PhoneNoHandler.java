@@ -14,7 +14,8 @@ import java.util.Objects;
 public class PhoneNoHandler implements IHandler {
 
     private IHandler handler;
-    private String[] telFirst = "134,135,136,137,138,139,150,151,152,157,158,159,130,131,132,155,156,133,153".split(",");
+    private String[] telFirst = ("134,135,136,137,138,139,150,151,152,157,158,159,130,131,132,155,156," +
+            "133,153").split(",");
 
     @Override
     @SuppressWarnings("unchecked")

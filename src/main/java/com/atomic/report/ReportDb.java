@@ -20,7 +20,8 @@ import java.sql.SQLException;
  */
 public final class ReportDb {
 
-    private static final String URL = "jdbc:mysql://10.199.5.130:3306/atomic_autotest?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=round&useSSL=false";
+    private static final String URL = "jdbc:mysql://10.199.5.130:3306/atomic_autotest?" +
+            "useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=round&useSSL=false";
     private static final String USER = "autotest";
     private static final String PASSWORD = "123456";
     private static final String DRIVER = "com.mysql.jdbc.Driver";

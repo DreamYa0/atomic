@@ -54,8 +54,8 @@ public final class StringUtils {
 
     public static boolean isBasicType(String type) {
         // char 没判断
-        return Arrays.asList("String", "Date", "Integer", "int", "Long", "long", "Double", "double", "Boolean", "boolean", "Byte"
-                , "byte", "BigDecimal", "Short", "short", "Float", "float").contains(type);
+        return Arrays.asList("String", "Date", "Integer", "int", "Long", "long", "Double", "double", "Boolean",
+                "boolean", "Byte", "byte", "BigDecimal", "Short", "short", "Float", "float").contains(type);
     }
 
     /**
@@ -64,7 +64,8 @@ public final class StringUtils {
      * @return
      */
     public static boolean isExcelValueEmpty(Object value) {
-        return value == null || org.apache.commons.lang3.StringUtils.isEmpty(value.toString()) || Constants.EXCEL_NULL.equalsIgnoreCase(value.toString());
+        return value == null || org.apache.commons.lang3.StringUtils.isEmpty(value.toString()) ||
+                Constants.EXCEL_NULL.equalsIgnoreCase(value.toString());
     }
 
     /**
@@ -293,7 +294,8 @@ public final class StringUtils {
                         List<Map<String, Object>> sheetParams = excel.readDataByRow();
 
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
-                            Map<String, Object> sheetParam = sheetParams.get(Integer.valueOf(valMap.get(Constants.CASE_INDEX).toString()) - 1);
+                            Map<String, Object> sheetParam = sheetParams.get(
+                                    Integer.parseInt(valMap.get(Constants.CASE_INDEX).toString()) - 1);
 
                             Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
                             AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
@@ -341,24 +343,29 @@ public final class StringUtils {
                 }
             } catch (Exception e) {
                 Reporter.log("excel中的值转化为入参对象值异常！", true);
-                Reporter.log(String.format("StringUtil#transferMap2Bean error, field is %s, value is %s ", field.getName(), valMap.get(field.getName())) + e);
+                Reporter.log(String.format("StringUtil#transferMap2Bean error, field is %s, value is %s ",
+                        field.getName(), valMap.get(field.getName())) + e);
                 e.printStackTrace();
                 //continue;
                 // 把异常放入参里面去，打印出来，提醒用户数据有问题
                 if (valMap.get(Constants.CASE_NAME) == null) {
                     String msg = getValue(valMap.get(Constants.EXCEL_DESC));
                     if (msg == null) {
-                        msg = String.format(" 【属性转化异常】, field is %s, value is %s ", field.getName(), valMap.get(field.getName()));
+                        msg = String.format(" 【属性转化异常】, field is %s, value is %s ",
+                                field.getName(), valMap.get(field.getName()));
                     } else {
-                        msg += String.format(" 【属性转化异常】, field is %s, value is %s ", field.getName(), valMap.get(field.getName()));
+                        msg += String.format(" 【属性转化异常】, field is %s, value is %s ",
+                                field.getName(), valMap.get(field.getName()));
                     }
                     valMap.put(Constants.EXCEL_DESC, msg);
                 } else {
                     String msg = getValue(valMap.get(Constants.CASE_NAME));
                     if (msg == null) {
-                        msg = String.format(" 【属性转化异常】, field is %s, value is %s ", field.getName(), valMap.get(field.getName()));
+                        msg = String.format(" 【属性转化异常】, field is %s, value is %s ",
+                                field.getName(), valMap.get(field.getName()));
                     } else {
-                        msg += String.format(" 【属性转化异常】, field is %s, value is %s ", field.getName(), valMap.get(field.getName()));
+                        msg += String.format(" 【属性转化异常】, field is %s, value is %s ",
+                                field.getName(), valMap.get(field.getName()));
                     }
                     valMap.put(Constants.CASE_NAME, msg);
                 }
@@ -379,7 +386,10 @@ public final class StringUtils {
      * @return Method对象
      * @throws Exception .{@link Exception}
      */
-    private static Method getMethod(Class<?> clazz, String methodName, final Class<?>... parameterTypes) throws Exception {
+    private static Method getMethod(Class<?> clazz,
+                                    String methodName,
+                                    final Class<?>... parameterTypes) throws Exception {
+
         Method method;
         try {
             method = clazz.getDeclaredMethod(methodName, parameterTypes);

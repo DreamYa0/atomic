@@ -117,7 +117,11 @@ public class SqlInterceptor4Mybatis implements Interceptor {
      * @param col 参数集合
      * @return
      */
-    private String handleListParameter(String sql, Collection<?> col, List<ParameterMapping> parameterMappingList, Object parameterObject) {
+    private String handleListParameter(String sql,
+                                       Collection<?> col,
+                                       List<ParameterMapping> parameterMappingList,
+                                       Object parameterObject) {
+
         if (col != null && col.size() != 0) {
             for (Object obj : col) {
                 String value = null;
@@ -152,7 +156,11 @@ public class SqlInterceptor4Mybatis implements Interceptor {
      * @param parameterMappingList
      * @return
      */
-    private String handleMapParameter(String sql, Map<?, ?> paramMap, List<ParameterMapping> parameterMappingList, Object parameterObject) {
+    private String handleMapParameter(String sql,
+                                      Map<?, ?> paramMap,
+                                      List<ParameterMapping> parameterMappingList,
+                                      Object parameterObject) {
+
         for (ParameterMapping parameterMapping : parameterMappingList) {
             Object propertyName = parameterMapping.getProperty();
             Object propertyValue = paramMap.get(propertyName);
@@ -184,8 +192,11 @@ public class SqlInterceptor4Mybatis implements Interceptor {
      * @return
      * @throws Exception
      */
-    private String handleCommonParameter(String sql, List<ParameterMapping> parameterMappingList, Class<?> parameterObjectClass,
+    private String handleCommonParameter(String sql,
+                                         List<ParameterMapping> parameterMappingList,
+                                         Class<?> parameterObjectClass,
                                          Object parameterObject) throws Exception {
+
         for (ParameterMapping parameterMapping : parameterMappingList) {
             String propertyValue;
             // 基本数据类型或者基本数据类型的包装类，直接toString即可获取其真正的参数值，其余直接取parameterMapping中的property属性即可
@@ -252,10 +263,14 @@ public class SqlInterceptor4Mybatis implements Interceptor {
      */
     private boolean isPrimitiveOrPrimitiveWrapper(Class<?> parameterObjectClass) {
         return parameterObjectClass.isPrimitive() ||
-                (parameterObjectClass.isAssignableFrom(Byte.class) || parameterObjectClass.isAssignableFrom(Short.class) ||
-                        parameterObjectClass.isAssignableFrom(Integer.class) || parameterObjectClass.isAssignableFrom(Long.class) ||
-                        parameterObjectClass.isAssignableFrom(Double.class) || parameterObjectClass.isAssignableFrom(Float.class) ||
-                        parameterObjectClass.isAssignableFrom(Character.class) || parameterObjectClass.isAssignableFrom(Boolean.class));
+                (parameterObjectClass.isAssignableFrom(Byte.class) ||
+                        parameterObjectClass.isAssignableFrom(Short.class) ||
+                        parameterObjectClass.isAssignableFrom(Integer.class) ||
+                        parameterObjectClass.isAssignableFrom(Long.class) ||
+                        parameterObjectClass.isAssignableFrom(Double.class) ||
+                        parameterObjectClass.isAssignableFrom(Float.class) ||
+                        parameterObjectClass.isAssignableFrom(Character.class) ||
+                        parameterObjectClass.isAssignableFrom(Boolean.class));
     }
 
     /**

@@ -58,7 +58,12 @@ public final class MethodMetaUtils {
      * @return 方法属性对象
      * @throws Exception
      */
-    public static MethodMeta getMethodMeta(ITestResult testResult, Class interfaceType, String testMethodName, Map<String, Object> context, CompletableFuture<Object> future) throws Exception {
+    public static MethodMeta getMethodMeta(ITestResult testResult,
+                                           Class<?> interfaceType,
+                                           String testMethodName,
+                                           Map<String, Object> context,
+                                           CompletableFuture<Object> future) throws Exception {
+
         MethodMeta methodMeta = new MethodMeta();
         Type[] types = generateMethodMeta(interfaceType, testMethodName);
         String multiTimeField = getMultiTimeField(context);
@@ -97,7 +102,10 @@ public final class MethodMetaUtils {
      * @return 方法属性集合
      * @throws Exception
      */
-    public static MethodMeta getMethodMeta(Map<String, Object> context, ITestResult testResult, Object testInstance) throws Exception {
+    public static MethodMeta getMethodMeta(Map<String, Object> context,
+                                           ITestResult testResult,
+                                           Object testInstance) throws Exception {
+
         Object object = context.get(Constants.TESTMETHODMETA);
         if (object != null) {
             return (MethodMeta) object;
@@ -129,7 +137,8 @@ public final class MethodMetaUtils {
      */
     private static TestContext getTestContext(Object testInstance) throws Exception {
         TestContextManager testContextManager = getTestContextManager(testInstance);
-        TestContext testContext = (TestContext) getFieldValue(testContextManager, TestContextManager.class, "testContext");
+        TestContext testContext = (TestContext) getFieldValue(testContextManager, TestContextManager.class,
+                "testContext");
         Assert.assertNotNull(testContext, "cannot get testContext");
         return testContext;
     }
@@ -141,7 +150,8 @@ public final class MethodMetaUtils {
      * @throws Exception
      */
     private static TestContextManager getTestContextManager(Object testInstance) throws Exception {
-        TestContextManager testContextManager = (TestContextManager) getFieldValue(testInstance, AbstractTestNGSpringContextTests.class, "testContextManager");
+        TestContextManager testContextManager = (TestContextManager) getFieldValue(testInstance,
+                AbstractTestNGSpringContextTests.class, "testContextManager");
         Assert.assertNotNull(testContextManager, "cannot get testContextManager");
         return testContextManager;
     }
@@ -154,7 +164,10 @@ public final class MethodMetaUtils {
      * @return Object
      * @throws IllegalAccessException .{@link IllegalAccessException}
      */
-    private static Object getFieldValue(Object bean, Class targetClass, String fieldName) throws IllegalAccessException {
+    private static Object getFieldValue(Object bean,
+                                        Class<?> targetClass,
+                                        String fieldName) throws IllegalAccessException {
+
         Optional<Field> fieldOptional = Arrays.stream(targetClass.getDeclaredFields())
                 .filter(field -> field.getName().equals(fieldName))
                 .findFirst();
@@ -172,7 +185,11 @@ public final class MethodMetaUtils {
         return generateMethodMeta(param, testResult.getInstance(), testClass.getRealClass(), testInstance);
     }
 
-    private static MethodMeta generateMethodMeta(Map<String, Object> param, Object instances, Class testClass, Object testInstance) throws Exception {
+    private static MethodMeta generateMethodMeta(Map<String, Object> param,
+                                                 Object instances,
+                                                 Class<?> testClass,
+                                                 Object testInstance) throws Exception {
+
         String methodName = testClass.getSimpleName().substring(4);
         // 得到测试接口方法名称
         methodName = StringUtils.lowerFirst(methodName);
@@ -224,7 +241,10 @@ public final class MethodMetaUtils {
         if (param.containsKey(Constants.DEFAULT_SINGLE_PARAM_NAME)) {
             return Constants.DEFAULT_SINGLE_PARAM_NAME;
         }
-        ImmutableList<String> expectList = ImmutableList.of(Constants.ASSERT_RESULT, Constants.EXCEL_DESC, Constants.AUTO_TEST, Constants.CASE_NAME, Constants.ASSERT_CODE, Constants.ASSERT_MSG, Constants.EXPECTED_RESULT, Constants.AUTO_ASSERT, "");
+        ImmutableList<String> expectList = ImmutableList.of(Constants.ASSERT_RESULT,
+                Constants.EXCEL_DESC, Constants.AUTO_TEST, Constants.CASE_NAME, Constants.ASSERT_CODE,
+                Constants.ASSERT_MSG, Constants.EXPECTED_RESULT, Constants.AUTO_ASSERT, "");
+
         List<String> allParamList = new ArrayList<>(param.keySet());
         allParamList.removeAll(expectList);
         if (allParamList.size() == 0) {

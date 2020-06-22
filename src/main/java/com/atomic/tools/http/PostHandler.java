@@ -32,13 +32,17 @@ public class PostHandler implements IHandler {
             if (isPost) {
                 request.method(Method.POST);
                 if (newContext.get(Constants.CONTENT_TYPE) == null ||
-                        Constants.CONTENT_TYPE_FROM.equalsIgnoreCase(newContext.get(Constants.CONTENT_TYPE).toString())) {
+                        Constants.CONTENT_TYPE_FROM.equalsIgnoreCase(
+                                newContext.get(Constants.CONTENT_TYPE).toString())) {
+
                     request.contentType(Constants.CONTENT_TYPE_FROM);
                     Map<String, Object> newParam = ParamUtils.getParameters(newContext);
                     // TODO: 2018/6/9 递归处理map
                     request.form(newParam);
                     return request.execute();
-                } else if (Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(newContext.get(Constants.CONTENT_TYPE).toString())) {
+                } else if (Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(newContext.get(
+                        Constants.CONTENT_TYPE).toString())) {
+
                     Map<String, Object> newParam = ParamUtils.getParameters(newContext);
                     // TODO: 2018/6/9 递归处理map
                     request.contentType(Constants.CONTENT_TYPE_JSON).body(JSON.toJSONString(newParam));

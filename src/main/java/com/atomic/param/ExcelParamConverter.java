@@ -112,7 +112,10 @@ public final class ExcelParamConverter {
      * @param context  接口入参map集合
      * @return paramter map集合
      */
-    public static Map<String, Object> assemblyParamMap2RequestMap(ITestResult testResult, Object instance, Map<String, Object> context) {
+    public static Map<String, Object> assemblyParamMap2RequestMap(ITestResult testResult,
+                                                                  Object instance,
+                                                                  Map<String, Object> context) {
+
         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(context))) {
             Set<String> keys = context.keySet();
             for (String key : keys) {
@@ -127,7 +130,8 @@ public final class ExcelParamConverter {
                     try {
                         List<Map<String, Object>> maps = excel.readDataByRow();
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(maps))) {
-                            Map<String, Object> map = maps.get(Integer.parseInt(context.get(Constants.CASE_INDEX).toString()) - 1);
+                            Map<String, Object> map = maps.get(Integer.parseInt(
+                                    context.get(Constants.CASE_INDEX).toString()) - 1);
                             // 把excel中的值转换为真实值
                             ExcelParamConverter.getDataBeforeTest(map);
                             Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);

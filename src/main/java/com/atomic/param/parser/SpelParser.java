@@ -51,11 +51,15 @@ public class SpelParser implements Parser {
     }
 
     private ExpressionParser prepareExpressionParser() {
-        SpelParserConfiguration configuration = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, SpelParser.class.getClassLoader());
+        SpelParserConfiguration configuration = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE,
+                SpelParser.class.getClassLoader());
         return new SpelExpressionParser(configuration);
     }
 
-    private void parserExcel(ExpressionParser parser, EvaluationContext evaluation, ExcelResolver excel, Map<String, Object> context) {
+    private void parserExcel(ExpressionParser parser,
+                             EvaluationContext evaluation,
+                             ExcelResolver excel,
+                             Map<String, Object> context) {
 
         String className = TestNGUtils.getTestCaseClassName(testResult);
         Class<? extends Class> clazz = testResult.getTestClass().getRealClass().getClass();
@@ -67,7 +71,8 @@ public class SpelParser implements Parser {
             Object value = entry.getValue();
             if (Objects.isNull(value)) {
                 String paramName = entry.getKey();
-                Map<String, Object> paramNameOfValue = excel.readDataByRow(filePath, paramName, Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
+                Map<String, Object> paramNameOfValue = excel.readDataByRow(filePath, paramName,
+                        Integer.parseInt(context.get(Constants.CASE_INDEX).toString()));
                 if (Boolean.FALSE.equals(CollectionUtils.isEmpty(paramNameOfValue))) {
 
                     parserExcel(parser, evaluation, excel, paramNameOfValue);

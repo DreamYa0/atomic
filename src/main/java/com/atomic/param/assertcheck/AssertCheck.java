@@ -70,7 +70,8 @@ public final class AssertCheck {
      * @param result
      */
     private static void insertAssertValue(String methodName, Object parameter, String result) {
-        String insertSql = "insert into autotest_assert (method_name,method_param,method_return,create_time) values(?,?,?,?)";
+        String insertSql = "insert into autotest_assert (method_name,method_param,method_return,create_time) " +
+                "values(?,?,?,?)";
         Object[] insertParam = {methodName, parameter.toString(), result, new Date()};
         ReportDb.updateValue(insertSql, insertParam);
     }
@@ -101,7 +102,10 @@ public final class AssertCheck {
      * @param context    beforeTest传递参数
      * @param callback   回调函数，为testCase方法传入，入参和返回结果
      */
-    public static void replayMode(String result, String methodName, final Map<String, Object> context, ITestResultCallback callback) throws Exception {
+    public static void replayMode(String result, String methodName,
+                                  final Map<String, Object> context,
+                                  ITestResultCallback callback) throws Exception {
+
         try {
             JSONObject.parse(result);
         } catch (Exception e) {
@@ -119,7 +123,8 @@ public final class AssertCheck {
     }
 
     private static void insertAssertValue(String methodName, Object parameter, Object result) {
-        String insertSql = "insert into autotest_assert (method_name,method_param,method_return,create_time) values(?,?,?,?)";
+        String insertSql = "insert into autotest_assert (method_name,method_param,method_return,create_time) " +
+                "values(?,?,?,?)";
         Object[] insertParam = {methodName, JSON.toJSONString(parameter), JSON.toJSONString(result), new Date()};
         ReportDb.updateValue(insertSql, insertParam);
     }

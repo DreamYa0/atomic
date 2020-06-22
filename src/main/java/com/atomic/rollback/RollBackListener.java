@@ -94,7 +94,8 @@ public class RollBackListener extends TestListenerAdapter {
     private void startRollBackAll(ITestResult testResult) throws RollBackException {
         //实现多数据库数据回滚
         try {
-            Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(TestNGUtils.getTestMethod(testResult));
+            Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(
+                    TestNGUtils.getTestMethod(testResult));
             Set<String> set = multimap.keySet();
             List<String> stringList = Lists.newArrayList();
             stringList.addAll(set);

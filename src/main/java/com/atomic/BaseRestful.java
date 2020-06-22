@@ -99,7 +99,8 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         TestNGUtils.injectScenarioReturnResult(testResult, context);
 
         // 递归组合参数并转化为真实值
-        Map<String, Object> newContext = ExcelParamConverter.assemblyParamMap2RequestMap(testResult, this, context);
+        Map<String, Object> newContext = ExcelParamConverter.assemblyParamMap2RequestMap(testResult,
+                this, context);
 
         // 先执行beforeTest
         beforeTest(newContext);
@@ -148,7 +149,8 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
 
             // 把Header json字符串反序列化为List<Header>
             String headerStr = newContext.get(HTTP_HEADER).toString();
-            List<Map<String, String>> headerMapList = GsonUtils.getGson().fromJson(headerStr, new TypeToken<List<Map<String, String>>>() {
+            List<Map<String, String>> headerMapList = GsonUtils.getGson().fromJson(headerStr,
+                    new TypeToken<List<Map<String, String>>>() {
             }.getType());
 
             List<Header> headerList = Lists.newArrayList();
@@ -166,7 +168,10 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         return getResponse(testResult, specification, newContext);
     }
 
-    private Response getResponse(ITestResult testResult, RequestSpecification specification, Map<String, Object> newContext) {
+    private Response getResponse(ITestResult testResult,
+                                 RequestSpecification specification,
+                                 Map<String, Object> newContext) {
+
         Response response;
         String httpMode = newContext.get(HTTP_MODE).toString();
         String uri = newContext.get(HTTP_METHOD).toString();
@@ -178,7 +183,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         Map<String, Object> parameters = ParamUtils.getParameters(copyContext);
 
         if (Constants.HTTP_GET.equalsIgnoreCase(httpMode)) {
-            if (parameters != null && parameters.size() > 0) {
+            if (parameters.size() > 0) {
 
                 parameters.remove(Constants.CASE_INDEX);
 
@@ -242,10 +247,14 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
      * @return boolean
      */
     private boolean isJsonContext(Map<String, Object> context) {
-        return Objects.nonNull(context.get(Constants.CONTENT_TYPE)) && Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(context.get(Constants.CONTENT_TYPE).toString());
+        return Objects.nonNull(context.get(Constants.CONTENT_TYPE)) &&
+                Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(context.get(Constants.CONTENT_TYPE).toString());
     }
 
-    private void execMethod(Response response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {
+    private void execMethod(Response response,
+                            ITestResult testResult,
+                            IHookCallBack callBack,
+                            Map<String, Object> context) throws Exception {
 
         String result = response.body().asString();
         // 打印测试结果

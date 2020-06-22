@@ -35,7 +35,8 @@ public class IntegrationTestRollBackListener extends TestListenerAdapter {
     @Override
     public void onStart(ITestContext testContext) {
         ITestNGMethod[] testNGMethods = testContext.getAllTestMethods();
-        Map<String, String[]> tableNameList = RollBack.newInstance().getTableNames4Scenario(testNGMethods, dbNameAndChanges);
+        Map<String, String[]> tableNameList = RollBack.newInstance().getTableNames4Scenario(testNGMethods,
+                dbNameAndChanges);
         if (dbNameAndChanges.size() > 20) {
             Reporter.log("[ScenarioRollBackListener#startRollBack()]:{} ---> 场景测试回滚数据库不能超过20个！");
             throw new RollBackException("场景测试回滚数据库不能超过20个！");

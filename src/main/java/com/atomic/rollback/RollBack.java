@@ -125,7 +125,10 @@ public final class RollBack {
                 }
             }
             sql = new StringBuilder(sql.substring(0, sql.length() - 1));
-            sql.append(" where ").append(valuesList.get(0).getColumnName()).append(" = ").append(valuesList.get(0).getValue());
+            sql.append(" where ")
+                    .append(valuesList.get(0).getColumnName())
+                    .append(" = ")
+                    .append(valuesList.get(0).getValue());
             return sql.toString();
         }
         return "";
@@ -150,7 +153,8 @@ public final class RollBack {
             } else if (AnnotationUtils.isRollBackAllMethod(method) && AnnotationUtils.isScenario(method)) {
                 // 实现多数据库数据回滚
                 try {
-                    Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(testNGMethod.getConstructorOrMethod().getMethod());
+                    Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(
+                            testNGMethod.getConstructorOrMethod().getMethod());
                     Set<String> set = multimap.keySet();
                     for (String dbName : set) {
                         changesMap.put(dbName, new Changes());

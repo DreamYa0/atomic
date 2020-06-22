@@ -30,7 +30,8 @@ public class ProgressTrackerListener extends TestListenerAdapter implements IInv
             long elapsedTime = (Calendar.getInstance().getTimeInMillis() - startTime) / 1000;
             int remainingTestCount = totalRun - totalExecuted;
             long remainingTime = (elapsedTime / totalExecuted) * remainingTestCount;
-            System.out.println("[Progress：]" + formPercentageStr(totalExecuted, totalRun) + " (" + totalExecuted + "/" + totalRun + ") " + ", 测试运行时间:"
+            System.out.println("[Progress：]" + formPercentageStr(totalExecuted, totalRun) + " (" +
+                    totalExecuted + "/" + totalRun + ") " + ", 测试运行时间:"
                     + formTimeStr(elapsedTime) + ", 测试预计剩余时间:" + formTimeStr(remainingTime));
         }
     }

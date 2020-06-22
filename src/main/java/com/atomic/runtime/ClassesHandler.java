@@ -22,7 +22,7 @@ public class ClassesHandler implements IHandler {
         if (classList.size() > 0) {
             final boolean[] isInclude = {false};
             classList.forEach(className -> {
-                Class clazz = testNGMethod.getRealClass();
+                Class<?> clazz = testNGMethod.getRealClass();
                 if (className.equals(clazz.getSimpleName())) {
                     isInclude[0] = true;
                     return;

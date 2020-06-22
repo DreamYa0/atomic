@@ -42,12 +42,13 @@ public abstract class AbstractAssertor implements Assertor {
             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(list))) {
                 Map<String, Object> param = TestNGUtils.getParamContext(testResult);
                 if (Boolean.FALSE.equals(CollectionUtils.isEmpty(param))) {
-                    doAssert(result, list.get(Integer.valueOf(param.get(Constants.CASE_INDEX).toString()) - 1));
+                    doAssert(result, list.get(Integer.parseInt(param.get(Constants.CASE_INDEX).toString()) - 1));
                 }
             }
 
         } catch (Exception e) {
-            logger.info("---------------- excel中名称为exceptResult的sheet页不存在或值为空，请进行手动断言！ ----------------");
+            logger.info("---------------- excel中名称为exceptResult的sheet页不存在或值为空，请进行手动断言！ " +
+                    "----------------");
         }
     }
 
@@ -59,7 +60,8 @@ public abstract class AbstractAssertor implements Assertor {
 
                 String actualResult = resultPath.getString(jsonPath);
                 if (StringUtils.isEmpty(actualResult)) {
-                    Assert.assertNotNull(actualResult, String.format("当前 JsonPath 路径不存在或 Result 返回值错误，JsonPath 路径为：%s", jsonPath));
+                    Assert.assertNotNull(actualResult, String.format("当前 JsonPath 路径不存在或 Result 返回值错误，" +
+                            "JsonPath 路径为：%s", jsonPath));
                 } else {
                     Assert.assertEquals(actualResult, expecValue);
                 }

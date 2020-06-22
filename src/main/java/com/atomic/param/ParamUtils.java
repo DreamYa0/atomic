@@ -204,7 +204,7 @@ public final class ParamUtils {
     public static boolean isParamTypeExtendsBaseRequest(Method method, int paramIndex) throws Exception {
         if (method.getGenericParameterTypes()[paramIndex] instanceof ParameterizedType) {
             Type rawType = ((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getRawType();
-            if (BaseRequest.class.isAssignableFrom((Class) rawType)) {
+            if (BaseRequest.class.isAssignableFrom((Class<?>) rawType)) {
                 return true;
             }
         }
@@ -254,7 +254,7 @@ public final class ParamUtils {
                                                 String paramName) throws Exception {
         // 类，如：方法xxxx(Request)
         if (type instanceof Class) {
-            return generateParametersNew(param, (Class) type, paramName);
+            return generateParametersNew(param, (Class<?>) type, paramName);
         } else {
             // 泛型，取出泛型对象中的参数，如：方法xxxx(Request<T>)中的T
             Type parameterizedType = ((ParameterizedType) type).getActualTypeArguments()[0];
@@ -408,16 +408,16 @@ public final class ParamUtils {
                     }
 
 
-                } else if (Boolean.FALSE.equals(StringUtils.isBasicType((Class) fieldType))) {
+                } else if (Boolean.FALSE.equals(StringUtils.isBasicType((Class<?>) fieldType))) {
                     // 采用excel多sheet进行设计,且字段为自定义对象
                     // 实例化field所表示的对象
-                    Object commonObj = ReflectionUtils.initFromClass((Class) field.getGenericType());
+                    Object commonObj = ReflectionUtils.initFromClass((Class<?>) field.getGenericType());
 
                     try {
                         Object object = param.get(Constants.TESTMETHODMETA);
                         MethodMeta methodMeta = (MethodMeta) object;
 
-                        Class testClass = methodMeta.getTestClass();
+                        Class<?> testClass = methodMeta.getTestClass();
                         String className = testClass.getSimpleName();
                         String resource = testClass.getResource("").getPath();
                         String filePath = resource + className + ".xls";

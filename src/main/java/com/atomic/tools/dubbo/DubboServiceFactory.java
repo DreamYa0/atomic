@@ -167,7 +167,8 @@ public class DubboServiceFactory {
                 ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
                 reference.setGeneric(true);
                 reference.setApplication(application);
-                reference.setRegistry(registry); // 多个注册中心可以用setRegistries()
+                // 多个注册中心可以用setRegistries()
+                reference.setRegistry(registry);
                 reference.setInterface(interfaceName);
                 reference.setTimeout(60000 * 2);
                 return reference.get();
@@ -204,7 +205,7 @@ public class DubboServiceFactory {
      */
     private <T> void checkService(T t, Class<? extends T> clazz) throws Exception {
         Method method = clazz.getMethods()[0];
-        Class[] parameterTypes = method.getParameterTypes();
+        Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] params = new Object[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
             Object o1 = parameterTypes[i].newInstance();

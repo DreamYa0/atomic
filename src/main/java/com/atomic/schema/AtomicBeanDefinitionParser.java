@@ -52,7 +52,8 @@ public class AtomicBeanDefinitionParser implements BeanDefinitionParser {
             beanDefinition.setBeanClass(ApplicationUtils.class);
             beanDefinition.setLazyInit(false);
 
-            parserContext.registerBeanComponent(new BeanComponentDefinition(beanDefinition, "applicationUtils"));
+            parserContext.registerBeanComponent(new BeanComponentDefinition(beanDefinition,
+                    "applicationUtils"));
         }
         return null;
     }

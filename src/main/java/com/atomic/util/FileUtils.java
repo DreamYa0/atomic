@@ -191,7 +191,8 @@ public final class FileUtils {
                 File[] lists = oldFile.listFiles();
                 if (lists != null && lists.length > 0) {
                     for (File file : lists) {
-                        copyFile(file.getAbsolutePath(), newPath.endsWith(File.separator) ? newPath + file.getName() : newPath + File.separator + file.getName());
+                        copyFile(file.getAbsolutePath(), newPath.endsWith(File.separator) ?
+                                newPath + file.getName() : newPath + File.separator + file.getName());
                     }
                 }
             } else {

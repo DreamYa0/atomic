@@ -39,7 +39,9 @@ public class ApplicationUtils implements ApplicationContextAware {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    public static Object getBean(Class<?> interfaceType) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public static Object getBean(Class<?> interfaceType) throws NoSuchMethodException,
+            IllegalAccessException, InvocationTargetException {
+
         try {
             return applicationContext.getBean(interfaceType);
         } catch (Exception e) {

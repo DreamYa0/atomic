@@ -79,7 +79,13 @@ public final class ResultAssert {
      * @param parameters 入参对象
      * @throws Exception 异常
      */
-    public static void assertResult(Object result, ITestResult testResult, Object instance, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
+    public static void assertResult(Object result,
+                                    ITestResult testResult,
+                                    Object instance,
+                                    Map<String, Object> context,
+                                    ITestResultCallback callback,
+                                    Object... parameters) throws Exception {
+
         // 把入参和执行结果写入param中
         callback.afterTestMethod(context, result, parameters);
         // 如果是Result型，检测执行结果，assertResult不填的就不管，比如自动化测试
@@ -240,19 +246,21 @@ public final class ResultAssert {
                 if (jsonActualData.contains(jsonExpecData)) {
                     return true;
                 }
-                System.out.println("------------------------返回值Result中的data值为List数据，请自行实现手动断言！----------------------");
+                System.out.println("------------------------返回值Result中的data值为List数据，" +
+                        "请自行实现手动断言！----------------------");
                 return true;
             } else if (returnDataType instanceof Class) {
-                if (StringUtils.isBasicType((Class) returnDataType)) {
+                if (StringUtils.isBasicType((Class<?>) returnDataType)) {
                     //当data为基本类型时
                     if (!expectedData.equals(result.getData().toString())) {
                         return false;
                     }
                 } else {
                     //当data为对象时
-                    Map<String, String> expecDataMap = JSON.parseObject(expectedData, new TypeReference<Map<String, String>>() {
+                    Map<String, String> expecDataMap = JSON.parseObject(expectedData,
+                            new TypeReference<Map<String, String>>() {
                     });
-                    Field[] fields = ((Class) returnDataType).getDeclaredFields();
+                    Field[] fields = ((Class<?>) returnDataType).getDeclaredFields();
                     for (Field field : fields) {
                         try {
                             Type type = field.getGenericType();
@@ -261,8 +269,11 @@ public final class ResultAssert {
                             Method fieldGetMethod;
                             if (ReflectionUtils.getMethod(result.getData().getClass(), fieldGetName) != null) {
                                 fieldGetMethod = ReflectionUtils.getMethod(result.getData().getClass(), fieldGetName);
-                            } else if (ReflectionUtils.getMethod(result.getData().getClass(), fieldIsGetName) != null) {
-                                fieldGetMethod = ReflectionUtils.getMethod(result.getData().getClass(), fieldIsGetName);
+                            } else if (ReflectionUtils.getMethod(result.getData().getClass(),
+                                    fieldIsGetName) != null) {
+
+                                fieldGetMethod = ReflectionUtils.getMethod(result.getData().getClass(),
+                                        fieldIsGetName);
                             } else {
                                 continue;
                             }
@@ -278,18 +289,23 @@ public final class ResultAssert {
                             } else if (type instanceof Class) {
                                 String fieldName = field.getName();
                                 String value = expecDataMap.get(fieldName);
-                                Map<String, String> expecMap = JSON.parseObject(value, new TypeReference<Map<String, String>>() {
+                                Map<String, String> expecMap = JSON.parseObject(value,
+                                        new TypeReference<Map<String, String>>() {
                                 });
-                                Field[] fields1 = ((Class) type).getDeclaredFields();
+                                Field[] fields1 = ((Class<?>) type).getDeclaredFields();
                                 for (Field field1 : fields1) {
                                     Type type1 = field1.getGenericType();
-                                    String fieldGetName1 = parGetName(field1.getName(), field.getType().getSimpleName());
+                                    String fieldGetName1 = parGetName(field1.getName(),
+                                            field.getType().getSimpleName());
                                     String fieldIsGetName1 = parIsGetName(field1.getName());
                                     Method fieldGetMethod1;
                                     if (ReflectionUtils.getMethod(actualValue.getClass(), fieldGetName1) != null) {
-                                        fieldGetMethod1 = ReflectionUtils.getMethod(actualValue.getClass(), fieldGetName1);
-                                    } else if (ReflectionUtils.getMethod(actualValue.getClass(), fieldIsGetName1) != null) {
-                                        fieldGetMethod1 = ReflectionUtils.getMethod(actualValue.getClass(), fieldIsGetName1);
+                                        fieldGetMethod1 = ReflectionUtils.getMethod(actualValue.getClass(),
+                                                fieldGetName1);
+                                    } else if (ReflectionUtils.getMethod(actualValue.getClass(),
+                                            fieldIsGetName1) != null) {
+                                        fieldGetMethod1 = ReflectionUtils.getMethod(actualValue.getClass(),
+                                                fieldIsGetName1);
                                     } else {
                                         continue;
                                     }
@@ -305,17 +321,23 @@ public final class ResultAssert {
                                     } else if (type1 instanceof Class) {
                                         String fieldName1 = field1.getName();
                                         String value1 = expecMap.get(fieldName1);
-                                        Map<String, String> expecMap1 = JSON.parseObject(value1, new TypeReference<Map<String, String>>() {
+                                        Map<String, String> expecMap1 = JSON.parseObject(value1,
+                                                new TypeReference<Map<String, String>>() {
                                         });
-                                        Field[] fields2 = ((Class) type1).getDeclaredFields();
+                                        Field[] fields2 = ((Class<?>) type1).getDeclaredFields();
                                         for (Field field2 : fields2) {
-                                            String fieldGetName2 = parGetName(field2.getName(), field.getType().getSimpleName());
+                                            String fieldGetName2 = parGetName(field2.getName(),
+                                                    field.getType().getSimpleName());
                                             String fieldIsGetName2 = parIsGetName(field2.getName());
                                             Method fieldGetMethod2;
-                                            if (ReflectionUtils.getMethod(actualValue1.getClass(), fieldGetName2) != null) {
-                                                fieldGetMethod2 = ReflectionUtils.getMethod(actualValue1.getClass(), fieldGetName2);
-                                            } else if (ReflectionUtils.getMethod(actualValue1.getClass(), fieldIsGetName2) != null) {
-                                                fieldGetMethod2 = ReflectionUtils.getMethod(actualValue1.getClass(), fieldIsGetName2);
+                                            if (ReflectionUtils.getMethod(actualValue1.getClass(),
+                                                    fieldGetName2) != null) {
+                                                fieldGetMethod2 = ReflectionUtils.getMethod(actualValue1.getClass(),
+                                                        fieldGetName2);
+                                            } else if (ReflectionUtils.getMethod(actualValue1.getClass(),
+                                                    fieldIsGetName2) != null) {
+                                                fieldGetMethod2 = ReflectionUtils.getMethod(actualValue1.getClass(),
+                                                        fieldIsGetName2);
                                             } else {
                                                 continue;
                                             }
@@ -334,7 +356,8 @@ public final class ResultAssert {
                                 }
                             }
                         } catch (Exception e) {
-                            Reporter.log("[ResultAssert#assertExpectedResult()]:{获取返回实际值异常！！}", true);
+                            Reporter.log("[ResultAssert#assertExpectedResult()]:{获取返回实际值异常！！}",
+                                    true);
                         }
                     }
                 }
@@ -384,13 +407,15 @@ public final class ResultAssert {
         if (isExpectedResultNoNull(param)) {
             String expectedData = (String) param.get(Constants.EXPECTED_RESULT);
             Object actualData = result.getData();
-            Type returnDataType = ((ParameterizedType) returnType).getActualTypeArguments()[0];//获取Result<T> 中的类型 T的Type类型
+            //获取Result<T> 中的类型 T的Type类型
+            Type returnDataType = ((ParameterizedType) returnType).getActualTypeArguments()[0];
             if (StringUtils.isBasicType(actualData.getClass())) {
-                Assert.assertTrue(Objects.equals(actualData.toString(), expectedData));
+                Assert.assertEquals(expectedData, actualData.toString());
             } else if (returnDataType instanceof Class) {
                 Object expecData = JSON.parseObject(expectedData, returnDataType);
                 List<Field> expecFields = ReflectionUtils.getAllFieldsList(expecData.getClass());
-                List<Field> basicExpecFields = expecFields.stream().filter(field -> StringUtils.isBasicType(field.getType())).collect(toList());
+                List<Field> basicExpecFields = expecFields.stream().filter(
+                        field -> StringUtils.isBasicType(field.getType())).collect(toList());
                 basicExpecFields.forEach(field -> assertBasicTypeParam(field, actualData, expecData));
             }
         }
@@ -398,7 +423,8 @@ public final class ResultAssert {
 
     private static void assertBasicTypeParam(Field field, Object actualData, Object expecData) {
         try {
-            boolean result = Objects.deepEquals(readField(field, actualData, true), readField(field, expecData, true));
+            boolean result = Objects.deepEquals(readField(field, actualData, true), readField(field,
+                    expecData, true));
             Assert.assertTrue(result);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -415,28 +441,34 @@ public final class ResultAssert {
             String expectedData = (String) param.get(Constants.EXPECTED_RESULT);
             // 判断 actualData 是否为基本类型
             if (StringUtils.isBasicType(actualData.getClass())) {
-                Assert.assertTrue(Objects.equals(actualData.toString(), expectedData));
+                Assert.assertEquals(expectedData, actualData.toString());
                 return;
             }
-            Map<String, Object> expecDataMap = JSON.parseObject(expectedData, new TypeReference<Map<String, Object>>() {
+            Map<String, Object> expecDataMap = JSON.parseObject(expectedData,
+                    new TypeReference<Map<String, Object>>() {
             });
             List<Field> fields = ReflectionUtils.getAllFieldsList(actualData.getClass());
-            List<Field> basicFields = fields.stream().filter(field -> StringUtils.isBasicType(field.getType())).collect(toList());
+            List<Field> basicFields = fields.stream().filter(
+                    field -> StringUtils.isBasicType(field.getType())).collect(toList());
             //基本类型属性断言
             basicFields.forEach(field -> {
-                if (expecDataMap.keySet().contains(field.getName())) {
+                if (expecDataMap.containsKey(field.getName())) {
                     assertBasicTypeParam(field, actualData, expecDataMap);
                 }
             });
             fields.removeAll(basicFields);
             // List集合断言
-            List<Field> parameterTypeFields = fields.stream().filter(f -> f.getGenericType() instanceof ParameterizedType).collect(toList());
+            List<Field> parameterTypeFields = fields.stream()
+                    .filter(f -> f.getGenericType() instanceof ParameterizedType)
+                    .collect(toList());
             handleParameterTypeFields(parameterTypeFields, actualData, expecDataMap);
             fields.removeAll(parameterTypeFields);
             // 数组类型断言
-            List<Field> arrayTypeFields = fields.stream().filter(f -> f.getGenericType() instanceof GenericArrayType).collect(toList());
+            List<Field> arrayTypeFields = fields.stream()
+                    .filter(f -> f.getGenericType() instanceof GenericArrayType)
+                    .collect(toList());
             arrayTypeFields.forEach(field -> {
-                if (expecDataMap.keySet().contains(field.getName())) {
+                if (expecDataMap.containsKey(field.getName())) {
                     assertArrayTypeParam(field, actualData, expecDataMap);
                 }
             });
@@ -444,7 +476,7 @@ public final class ResultAssert {
             // 自定义对象断言
             for (Field field : fields) {
                 try {
-                    if (expecDataMap.keySet().contains(field.getName())) {
+                    if (expecDataMap.containsKey(field.getName())) {
                         assertClassTypeParam(field, actualData, expecDataMap);
                     }
                 } catch (IllegalAccessException e) {
@@ -509,10 +541,13 @@ public final class ResultAssert {
      * @param expecDataMap 预期结果的 map 集合
      * @throws IllegalAccessException 非法访问异常
      */
-    private static void assertClassTypeParam(Field field, Object actualData, Map<String, Object> expecDataMap) throws IllegalAccessException {
+    private static void assertClassTypeParam(Field field,
+                                             Object actualData,
+                                             Map<String, Object> expecDataMap) throws IllegalAccessException {
         // 对象类型属性的实际值
         Object result = readField(field, actualData, true);
-        Map<String, Object> mapData = JSON.parseObject(expecDataMap.get(field.getName()).toString(), new TypeReference<Map<String, Object>>() {
+        Map<String, Object> mapData = JSON.parseObject(expecDataMap.get(field.getName()).toString(),
+                new TypeReference<Map<String, Object>>() {
         });
         if (mapData == null) {
             return;
@@ -521,27 +556,31 @@ public final class ResultAssert {
         // 基本类型属性断言
         List<Field> basicFields = fields.stream().filter(f -> StringUtils.isBasicType(f.getType())).collect(toList());
         basicFields.forEach(f -> {
-            if (mapData.keySet().contains(f.getName())) {
+            if (mapData.containsKey(f.getName())) {
                 assertBasicTypeParam(f, result, mapData);
             }
         });
         fields.removeAll(basicFields);
         // List集合断言
-        List<Field> paramterTypeFields = fields.stream().filter(f -> f.getGenericType() instanceof ParameterizedType).collect(toList());
+        List<Field> paramterTypeFields = fields.stream()
+                .filter(f -> f.getGenericType() instanceof ParameterizedType)
+                .collect(toList());
         handleParameterTypeFields(paramterTypeFields, result, mapData);
         // 自定义对象断言
         fields.removeAll(paramterTypeFields);
         // 数组类型断言
-        List<Field> arrayTypeFields = fields.stream().filter(f -> f.getGenericType() instanceof GenericArrayType).collect(toList());
+        List<Field> arrayTypeFields = fields.stream()
+                .filter(f -> f.getGenericType() instanceof GenericArrayType)
+                .collect(toList());
         arrayTypeFields.forEach(f -> {
-            if (mapData.keySet().contains(f.getName())) {
+            if (mapData.containsKey(f.getName())) {
                 assertArrayTypeParam(f, result, mapData);
             }
         });
         fields.removeAll(arrayTypeFields);
         fields.forEach(classField -> {
             try {
-                if (mapData.keySet().contains(classField.getName())) {
+                if (mapData.containsKey(classField.getName())) {
                     assertClassTypeParam(classField, result, mapData);
                 }
             } catch (IllegalAccessException e) {
@@ -556,10 +595,13 @@ public final class ResultAssert {
      * @param o                   Result<T> T 或 T 中嵌套的自定义对象
      * @param map                 预期结果的 map 集合
      */
-    private static void handleParameterTypeFields(List<Field> parameterTypeFields, Object o, Map<String, Object> map) {
+    private static void handleParameterTypeFields(List<Field> parameterTypeFields,
+                                                  Object o,
+                                                  Map<String, Object> map) {
+
         parameterTypeFields.forEach(f -> {
             try {
-                if (map.keySet().contains(f.getName())) {
+                if (map.containsKey(f.getName())) {
                     assertListTypeParam(f, o, map);
                 }
             } catch (IllegalAccessException e) {
@@ -575,14 +617,19 @@ public final class ResultAssert {
      * @param expecDataMap 预期结果的 map 集合
      */
     @SuppressWarnings("unchecked")
-    private static void assertListTypeParam(Field field, Object actualData, Map<String, Object> expecDataMap) throws IllegalAccessException {
+    private static void assertListTypeParam(Field field,
+                                            Object actualData,
+                                            Map<String, Object> expecDataMap) throws IllegalAccessException {
+
         List<Object> actualResult = (List<Object>) readField(field, actualData, true);
-        List<Object> expecResult = JSON.parseObject(expecDataMap.get(field.getName()).toString(), new TypeReference<List<Object>>() {
+        List<Object> expecResult = JSON.parseObject(expecDataMap.get(field.getName()).toString(),
+                new TypeReference<List<Object>>() {
         });
         if (expecResult == null) {
             return;
         }
-        Assert.assertTrue(expecResult.size() <= actualResult.size(), "某个字段实际返回的List集合的长度小于预期结果中的长度");
+        Assert.assertTrue(expecResult.size() <= actualResult.size(),
+                "某个字段实际返回的List集合的长度小于预期结果中的长度");
         // 判断List中是否存放的是基本类型，是则执行基本类型数据断言
         for (int i = 0; i < expecResult.size(); i++) {
             Object o = expecResult.get(i);
@@ -599,22 +646,28 @@ public final class ResultAssert {
                 Map<String, Object> maps = JSON.parseObject(o.toString(), new TypeReference<Map<String, Object>>() {
                 });
                 List<Field> fields = ReflectionUtils.getAllFieldsList(actObject.getClass());
-                List<Field> basicFields = fields.stream().filter(f -> StringUtils.isBasicType(f.getType())).collect(toList());
+                List<Field> basicFields = fields.stream()
+                        .filter(f -> StringUtils.isBasicType(f.getType()))
+                        .collect(toList());
                 basicFields.forEach(f -> {
-                    if (maps.keySet().contains(f.getName())) {
+                    if (maps.containsKey(f.getName())) {
                         assertBasicTypeParam(f, actObject, maps);
                     }
                 });
                 fields.removeAll(basicFields);
                 // List集合断言
-                List<Field> parameterTypeFields = fields.stream().filter(f -> f.getGenericType() instanceof ParameterizedType).collect(toList());
+                List<Field> parameterTypeFields = fields.stream()
+                        .filter(f -> f.getGenericType() instanceof ParameterizedType)
+                        .collect(toList());
                 handleParameterTypeFields(parameterTypeFields, actObject, maps);
                 // 自定义对象断言
                 fields.removeAll(parameterTypeFields);
                 // 数组类型断言
-                List<Field> arrayTypeFields = fields.stream().filter(f -> f.getGenericType() instanceof GenericArrayType).collect(toList());
+                List<Field> arrayTypeFields = fields.stream()
+                        .filter(f -> f.getGenericType() instanceof GenericArrayType)
+                        .collect(toList());
                 arrayTypeFields.forEach(f -> {
-                    if (maps.keySet().contains(f.getName())) {
+                    if (maps.containsKey(f.getName())) {
                         assertArrayTypeParam(f, o, maps);
                     }
                 });
@@ -637,7 +690,10 @@ public final class ResultAssert {
      * @param callback 回调函数
      * @throws Exception 异常
      */
-    public static void assertResult(final Object result, final Map<String, Object> context, ITestResultCallback callback) throws Exception {
+    public static void assertResult(final Object result,
+                                    final Map<String, Object> context,
+                                    ITestResultCallback callback) throws Exception {
+
         // 把入参和执行结果写入param中
         callback.afterTestMethod(context, result, context.get(Constants.PARAMETER_NAME_));
         // result为HttpEntity实现类，则跳过自动断言
@@ -649,9 +705,11 @@ public final class ResultAssert {
                 String expectJsonResult = context.get(Constants.EXPECTED_RESULT).toString();
                 String actualResult = result.toString();
 
-                Map<String, Object> expectMap = JSON.parseObject(expectJsonResult, new TypeReference<Map<String, Object>>() {
+                Map<String, Object> expectMap = JSON.parseObject(expectJsonResult,
+                        new TypeReference<Map<String, Object>>() {
                 });
-                Map<String, Object> actualMap = JSON.parseObject(actualResult, new TypeReference<Map<String, Object>>() {
+                Map<String, Object> actualMap = JSON.parseObject(actualResult,
+                        new TypeReference<Map<String, Object>>() {
                 });
 
                 Assert.assertTrue(expectMap.size() <= actualMap.size());
@@ -701,14 +759,20 @@ public final class ResultAssert {
      * @param callback   回调
      * @throws Exception 异常
      */
-    public static void assertResultForRest(Response response, ITestResult testResult, Object instance, Map<String, Object> context, ITestResultCallback callback) throws Exception {
+    public static void assertResultForRest(Response response,
+                                           ITestResult testResult,
+                                           Object instance,
+                                           Map<String, Object> context,
+                                           ITestResultCallback callback) throws Exception {
+
         // 把入参和执行结果写入param中
         callback.afterTestMethod(context, response, context.get(Constants.PARAMETER_NAME_));
         // Assert.assertEquals(response.getStatusCode(), 200);
         if (isExpectedResultNoNull(context)) {
             String expectJsonResult = context.get(Constants.EXPECTED_RESULT).toString();
             String actualResult = response.asString();
-            Map<String, Object> expectMap = JSON.parseObject(expectJsonResult, new TypeReference<Map<String, Object>>() {
+            Map<String, Object> expectMap = JSON.parseObject(expectJsonResult,
+                    new TypeReference<Map<String, Object>>() {
             });
             Map<String, Object> actualMap = JSON.parseObject(actualResult, new TypeReference<Map<String, Object>>() {
             });
@@ -728,9 +792,11 @@ public final class ResultAssert {
 
     private static void handleMap(Map<String, Object> expectMap, Map<String, Object> actualMap) {
         if (expectMap.get("data") != null || actualMap.get("data") != null) {
-            Map<String, Object> expectDataMap = JSON.parseObject(expectMap.get("data").toString(), new TypeReference<Map<String, Object>>() {
+            Map<String, Object> expectDataMap = JSON.parseObject(expectMap.get("data").toString(),
+                    new TypeReference<Map<String, Object>>() {
             });
-            Map<String, Object> actualDataMap = JSON.parseObject(actualMap.get("data").toString(), new TypeReference<Map<String, Object>>() {
+            Map<String, Object> actualDataMap = JSON.parseObject(actualMap.get("data").toString(),
+                    new TypeReference<Map<String, Object>>() {
             });
             assertMapForRest(expectDataMap, actualDataMap);
             actualMap.remove("data");
@@ -745,9 +811,11 @@ public final class ResultAssert {
                     return;
                 }
                 // 转换为Map的方式处理
-                Map<String, Object> expectMap = JSON.parseObject(value.toString(), new TypeReference<Map<String, Object>>() {
+                Map<String, Object> expectMap = JSON.parseObject(value.toString(),
+                        new TypeReference<Map<String, Object>>() {
                 });
-                Map<String, Object> actualMap = JSON.parseObject(newActualMap.get(key).toString(), new TypeReference<Map<String, Object>>() {
+                Map<String, Object> actualMap = JSON.parseObject(newActualMap.get(key).toString(),
+                        new TypeReference<Map<String, Object>>() {
                 });
                 List<String> expectKeys = Lists.newArrayList(expectMap.keySet());
                 List<String> actualKeys = Lists.newArrayList(actualMap.keySet());
@@ -767,7 +835,8 @@ public final class ResultAssert {
                     // 转换为List的方式处理
                     List<Object> expectList = JSON.parseObject(value.toString(), new TypeReference<List<Object>>() {
                     });
-                    List<Object> actualList = JSON.parseObject(newActualMap.get(key).toString(), new TypeReference<List<Object>>() {
+                    List<Object> actualList = JSON.parseObject(newActualMap.get(key).toString(),
+                            new TypeReference<List<Object>>() {
                     });
                     Assert.assertTrue(expectList.size() <= actualList.size());
                     for (int i = 0; i < expectList.size(); i++) {
@@ -795,7 +864,8 @@ public final class ResultAssert {
                         // 转换为数组的方式处理
                         Object[] expectArray = JSON.parseObject(value.toString(), new TypeReference<Object[]>() {
                         });
-                        Object[] actualArray = JSON.parseObject(newActualMap.get(key).toString(), new TypeReference<Object[]>() {
+                        Object[] actualArray = JSON.parseObject(newActualMap.get(key).toString(),
+                                new TypeReference<Object[]>() {
                         });
                         List<Object> expList = Lists.newArrayList(Arrays.asList(expectArray));
                         List<Object> actList = Lists.newArrayList(Arrays.asList(actualArray));
@@ -849,8 +919,10 @@ public final class ResultAssert {
     private static boolean compareAtom(String j1, String j2) {
         if (!j1.equals("?:\"?\"")) {
             //取出最深层原子
-            String a1 = j1.split("\\{", -1)[j1.split("\\{", -1).length - 1].split("}", -1)[0];
-            String a2 = j2.split("\\{", -1)[j2.split("\\{", -1).length - 1].split("}", -1)[0];
+            String a1 = j1.split("\\{", -1)[j1.split("\\{", -1).length - 1]
+                    .split("}", -1)[0];
+            String a2 = j2.split("\\{", -1)[j2.split("\\{", -1).length - 1]
+                    .split("}", -1)[0];
             String j2_ = j2;
             String a2_ = a2;
             //转换成原子项
@@ -866,15 +938,18 @@ public final class ResultAssert {
                     //相等则从j1、j2中消除，消除不能简单的替换，因为其他位置可能有相同的结构，必须从当前位置上消除
                     int index = 0;
                     index = j1.lastIndexOf("{" + a1 + "}");
-                    j1 = j1.substring(0, index) + j1.substring(index).replace("{" + a1 + "}", "?:\"?\"");
+                    j1 = j1.substring(0, index) + j1.substring(index).replace("{" + a1 +
+                            "}", "?:\"?\"");
                     index = j2.lastIndexOf("{" + a2 + "}");
-                    j2 = j2.substring(0, index) + j2.substring(index).replace("{" + a2 + "}", "?:\"?\"");
+                    j2 = j2.substring(0, index) + j2.substring(index).replace("{" + a2 +
+                            "}", "?:\"?\"");
                     //递归
                     return compareAtom(j1, j2);
                 } else {
                     //寻找下一个同级原子
                     j2_ = j2_.replace("{" + a2 + "}", "");
-                    a2 = j2_.split("\\{", -1)[j2_.split("\\{", -1).length - 1].split("}", -1)[0];
+                    a2 = j2_.split("\\{", -1)[j2_.split("\\{", -1).length - 1]
+                            .split("}", -1)[0];
                     a2_ = a2;
                 }
             }
@@ -928,7 +1003,10 @@ public final class ResultAssert {
      * @param callback 回调函数
      * @throws Exception 异常
      */
-    public static void resultCallBack(Object result, Map<String, Object> context, ITestResultCallback callback) throws Exception {
+    public static void resultCallBack(Object result,
+                                      Map<String, Object> context,
+                                      ITestResultCallback callback) throws Exception {
+
         // 把入参和执行结果写入param中
         callback.afterTestMethod(context, result, context.get(Constants.PARAMETER_NAME_));
     }

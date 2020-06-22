@@ -151,7 +151,8 @@ public final class AssertCheckUtils {
         // 断言前就从数据库获取值
         if (item.getAssertType() == AssertType.OLD_VALUE_BEFORE_TEST.getCode()) {
             oldValue = param.get(Constants.ASSERT_ITEM_ + index);
-            oldSql = param.get(Constants.OLD_SQL_ + index) == null ? null : String.valueOf(param.get(Constants.OLD_SQL_ + index));
+            oldSql = param.get(Constants.OLD_SQL_ + index) == null ? null :
+                    String.valueOf(param.get(Constants.OLD_SQL_ + index));
         } else {
             oldValue = item.getOldValue();
             if (org.apache.commons.lang3.StringUtils.isEmpty(item.getOldValue())) {
@@ -206,7 +207,13 @@ public final class AssertCheckUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static void compare(int compareType, Object oldValue, Object newValue, int fixedValue, String oldSql, String newSql) throws ParseException {
+    private static void compare(int compareType,
+                                Object oldValue,
+                                Object newValue,
+                                int fixedValue,
+                                String oldSql,
+                                String newSql) throws ParseException {
+
         boolean isOldList = oldValue instanceof List;
         boolean isNewList = newValue instanceof List;
         List<Map<Integer, Object>> oldList = null;
@@ -227,7 +234,8 @@ public final class AssertCheckUtils {
                 Map<Integer, Object> oldMap = oldList.get(i);
                 // map里面每个key的值进行断言
                 for (int key : oldMap.keySet()) {
-                    assertCheck(compareType, String.valueOf(oldMap.get(key)), getNewValue(isNewList, newList, newValue, i, key), fixedValue, oldSql, newSql);
+                    assertCheck(compareType, String.valueOf(oldMap.get(key)),
+                            getNewValue(isNewList, newList, newValue, i, key), fixedValue, oldSql, newSql);
                 }
             }
         } else {
@@ -252,7 +260,12 @@ public final class AssertCheckUtils {
         return oldValue;
     }
 
-    private static String getNewValue(boolean isNewList, List<Map<Integer, Object>> newList, Object newValue, int index, int key) {
+    private static String getNewValue(boolean isNewList,
+                                      List<Map<Integer, Object>> newList,
+                                      Object newValue,
+                                      int index,
+                                      int key) {
+
         if (isNewList) {
             return String.valueOf(newList.get(index).get(key));
         } else {
@@ -260,7 +273,13 @@ public final class AssertCheckUtils {
         }
     }
 
-    private static void assertCheck(int compareType, String oldValue, String newValue, int fixedValue, String oldSql, String newSql) throws ParseException {
+    private static void assertCheck(int compareType,
+                                    String oldValue,
+                                    String newValue,
+                                    int fixedValue,
+                                    String oldSql,
+                                    String newSql) throws ParseException {
+
         CompareType compare = CompareType.getCompareType(compareType);
         if (compare != null) {
             switch (compare) {
@@ -290,11 +309,13 @@ public final class AssertCheckUtils {
                     break;
                 case GREATER_THAN_VALUE:// 值2比值1大多少
                     print(String.format("值2（%s）- 值1（%s）= %s", newValue, oldValue, fixedValue), oldSql, newSql);
-                    Assert.assertEquals(Integer.valueOf(newValue).intValue(), Integer.valueOf(oldValue) + fixedValue);
+                    Assert.assertEquals(Integer.valueOf(newValue).intValue(),
+                            Integer.parseInt(oldValue) + fixedValue);
                     break;
                 case LESS_THAN_VALUE:// 值2比值1小多少
                     print(String.format("值1（%s）- 值2（%s）= %s", newValue, oldValue, fixedValue), oldSql, newSql);
-                    Assert.assertEquals(Integer.valueOf(newValue).intValue(), Integer.valueOf(oldValue) - fixedValue);
+                    Assert.assertEquals(Integer.valueOf(newValue).intValue(),
+                            Integer.parseInt(oldValue) - fixedValue);
                     break;
                 case SAME_DAY:// 同一天
                     print(String.format("值2（%s）和 值1（%s）是同一天", newValue, oldValue, fixedValue), oldSql, newSql);
@@ -308,11 +329,11 @@ public final class AssertCheckUtils {
                     break;
                 case SAME_DAY_UNIX_TIME:// 时间戳是同一天
                     print(String.format("值2（%s）和 值1（%s）是同一天", newValue, oldValue, fixedValue), oldSql, newSql);
-                    Assert.assertTrue(isSameDay(Integer.valueOf(newValue), Integer.valueOf(oldValue)));
+                    Assert.assertTrue(isSameDay(Integer.parseInt(newValue), Integer.parseInt(oldValue)));
                     break;
                 case TODAY_UNIX_TIME:// 时间戳是今天
                     print(String.format("值1（%s）是今天", oldValue, fixedValue), oldSql, newSql);
-                    Assert.assertTrue(isSameDay(Integer.valueOf(oldValue), new Date()));
+                    Assert.assertTrue(isSameDay(Integer.parseInt(oldValue), new Date()));
                     break;
                 default:
                     break;
@@ -322,7 +343,7 @@ public final class AssertCheckUtils {
 
     private static Date strToDate(String str) throws ParseException {
         if (NumberUtils.isNumber(str)) {
-            return new Date(Integer.valueOf(str) * 1000L);
+            return new Date(Integer.parseInt(str) * 1000L);
         } else {
             return strToDate(str, "yyyy-MM-dd");
         }
@@ -370,13 +391,16 @@ public final class AssertCheckUtils {
         }
     }
 
-    private static List<Map<Integer, Object>> getSqlValue(SqlEntity sqlEntity, Map<String, Object> context) throws Exception {
+    private static List<Map<Integer, Object>> getSqlValue(SqlEntity sqlEntity,
+                                                          Map<String, Object> context) throws Exception {
+
         String sql = sqlEntity.getSql();
         if (org.apache.commons.lang3.StringUtils.isEmpty(sql)) {
             if (org.apache.commons.lang3.StringUtils.isEmpty(sqlEntity.getCondition())) {
                 sql = String.format("select %s from %s where 1=1", sqlEntity.getFields(), sqlEntity.getTable());
             } else {
-                sql = String.format("select %s from %s where 1=1 and %s", sqlEntity.getFields(), sqlEntity.getTable(), sqlEntity.getCondition());
+                sql = String.format("select %s from %s where 1=1 and %s", sqlEntity.getFields(),
+                        sqlEntity.getTable(), sqlEntity.getCondition());
             }
         }
         // sql语句 增加 {key} 占位符功能

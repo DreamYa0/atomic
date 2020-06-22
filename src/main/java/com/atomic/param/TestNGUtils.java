@@ -24,7 +24,10 @@ public final class TestNGUtils {
      * @param testResult
      * @throws Exception
      */
-    public static void injectResultAndParameters(Map<String, Object> context, ITestResult testResult, Object testInstance) throws Exception {
+    public static void injectResultAndParameters(Map<String, Object> context,
+                                                 ITestResult testResult,
+                                                 Object testInstance) throws Exception {
+
         Method testMethod = TestNGUtils.getTestMethod(testResult);
         int parameters = testMethod.getGenericParameterTypes().length;
         if (parameters > 1) {
@@ -54,7 +57,8 @@ public final class TestNGUtils {
      * @return
      * @throws Exception
      */
-    public static Object[] injectResultAndParametersByDefault(Map<String, Object> map, Method testMethod) throws Exception {
+    public static Object[] injectResultAndParametersByDefault(Map<String, Object> map,
+                                                              Method testMethod) throws Exception {
         int parameters = testMethod.getGenericParameterTypes().length;
         Object[] objects;
         if (parameters > 1) {
@@ -117,9 +121,11 @@ public final class TestNGUtils {
             for (String dependsOnMethodName : dependsOnMethodNames) {
                 Object dependMethodReturn;
                 if (ParamUtils.isDependencyIndexNoNull(context)) {
-                    dependMethodReturn = SaveResultCache.getTestResultInCache(dependsOnMethodName, context.get(Constants.DEPENDENCY_INDEX));
+                    dependMethodReturn = SaveResultCache.getTestResultInCache(dependsOnMethodName,
+                            context.get(Constants.DEPENDENCY_INDEX));
                 } else {
-                    dependMethodReturn = SaveResultCache.getTestResultInCache(dependsOnMethodName, context.get(Constants.CASE_INDEX));
+                    dependMethodReturn = SaveResultCache.getTestResultInCache(dependsOnMethodName,
+                            context.get(Constants.CASE_INDEX));
                 }
                 if (dependMethodReturn != null) {
                     context.put(dependsOnMethodName, dependMethodReturn);

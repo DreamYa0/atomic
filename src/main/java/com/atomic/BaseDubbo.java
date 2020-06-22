@@ -97,6 +97,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
 
     @AfterClass(alwaysRun = true)
     public void closeSqlTools() {
+
     }
 
     @Override
@@ -122,7 +123,8 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
             Class<? extends T> finalClazz = clazz;
             String finalDubboServiceVersion = dubboServiceVersion;
             // 异步加载
-            future = CompletableFuture.supplyAsync(() -> dubboServiceFactory.getService(finalClazz, finalDubboServiceVersion));
+            future = CompletableFuture.supplyAsync(() -> dubboServiceFactory.getService(finalClazz,
+                    finalDubboServiceVersion));
 
             if (testResult.getParameters() == null || testResult.getParameters().length == 0) {
                 Reporter.log("[BaseDubbo#run()]:{} ---> 获取测试入参异常！");
@@ -154,7 +156,11 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
      * @param testMethodName 被测方法名
      * @throws Exception
      */
-    private void autoTest(ITestResult testResult, Class<? extends T> clazz, CompletableFuture<Object> future, String testMethodName) throws Exception {
+    private void autoTest(ITestResult testResult,
+                          Class<? extends T> clazz,
+                          CompletableFuture<Object> future,
+                          String testMethodName) throws Exception {
+
         // 跳过自动化测试用例
         if (getAutoTestMode(getTestMethod(testResult)) == AutoTestMode.NONE) {
             System.out.println("-------------------自动化测试用例已跳过-------------------");
@@ -174,7 +180,8 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         allTestCases.forEach(newParam -> removeValueByKeys(newParam, removeKeys));
         // 去除List中重复的Map
         toHeavy4ListMap(allTestCases);
-        System.out.println("----------------------------------------自动化测试开始，测试用例数量：" + allTestCases.size() + "----------------------------------------");
+        System.out.println("----------------------------------------自动化测试开始，测试用例数量：" +
+                allTestCases.size() + "----------------------------------------");
         allTestCases.forEach(Param -> {
             // 合并参数
             MapUtils.mergeMap(paramMap, Param);
@@ -189,7 +196,8 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
             }
         });
         long end = System.currentTimeMillis();
-        System.out.println("----------------------------------------自动化测试结束，耗时：" + (end - start) / 1000 + "s----------------------------------------");
+        System.out.println("----------------------------------------自动化测试结束，耗时：" +
+                (end - start) / 1000 + "s----------------------------------------");
         // 如果有异常则抛出，提醒测试未通过
         printExceptions(exception[0], exceptionMsgs);
     }
@@ -232,7 +240,12 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
      * @param testMethodName 测试方法名称
      * @throws Exception
      */
-    private void startRunTest(ITestResult testResult, Class<? extends T> clazz, Map<String, Object> context, String testMethodName, CompletableFuture<Object> future) throws Exception {
+    private void startRunTest(ITestResult testResult,
+                              Class<? extends T> clazz,
+                              Map<String, Object> context,
+                              String testMethodName,
+                              CompletableFuture<Object> future) throws Exception {
+
         initDb();
         // 先执行beforeTest
         beforeTest(context);
@@ -250,7 +263,10 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
      * @param methodMeta
      * @throws Exception
      */
-    private void runForEachTest(final ITestResult testResult, final Map<String, Object> context, final MethodMeta methodMeta) throws Exception {
+    private void runForEachTest(final ITestResult testResult,
+                                final Map<String, Object> context,
+                                final MethodMeta methodMeta) throws Exception {
+
         // 先判断是不是foreach循环，不是就只执行一次
         Object param = context.get(methodMeta.getMultiTimeField());
         execMethodMulitTimes(param, paramValue -> prepareExecMethod(testResult, paramValue, context, methodMeta));
@@ -268,15 +284,23 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         }
     }
 
-    private void prepareExecMethod(ITestResult testResult, Object paramValue, Map<String, Object> param, final MethodMeta methodMeta) throws Exception {
+    private void prepareExecMethod(ITestResult testResult,
+                                   Object paramValue,
+                                   Map<String, Object> param,
+                                   final MethodMeta methodMeta) throws Exception {
+
         // 如果有新值，替换成新值
         Map<String, Object> newParam = Maps.newHashMap(param);
         if (paramValue != null) {
             newParam.put(methodMeta.getMultiTimeField(), paramValue);
         }
+
         //构造入参
         final Object[] parameters = ParamUtils.generateParametersNew(methodMeta, newParam);
-        if ((!ParamUtils.isAutoTest(param) && !isAutoTest(getTestMethod(testResult))) && isScenario(getTestMethod(testResult))) {
+
+        if ((!ParamUtils.isAutoTest(param) && !isAutoTest(getTestMethod(testResult))) &&
+                isScenario(getTestMethod(testResult))) {
+
             // 保存测试场景接口入参对象
             saveTestRequestInCache(parameters[0], testResult, param);
         }
@@ -292,16 +316,22 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
      * @param context    入参
      * @throws Exception
      */
-    private void execMethod(ITestResult testResult, final Object[] parameters, MethodMeta methodMeta, Map<String, Object> context) throws Exception {
-        //回调函数，为testCase方法传入，入参和返回结果
-        ITestResultCallback callback = paramAndResultCallBack();
-        startTestTime(testResult);//记录方法调用开始时间
+    private void execMethod(ITestResult testResult,
+                            final Object[] parameters,
+                            MethodMeta methodMeta,
+                            Map<String, Object> context) throws Exception {
+
+        //记录方法调用开始时间
+        startTestTime(testResult);
         //通过反射调用方法
         Object result = methodMeta.getInterfaceMethod().invoke(methodMeta.getInterfaceObj(), parameters);
-        endTestTime(testResult);//记录方法调用结束时间
+        //记录方法调用结束时间
+        endTestTime(testResult);
+
         if (result == null) {
             throw new InvokeException("调用测试方法返回结果为null！");
         }
+
         if (!ParamUtils.isAutoTest(context) && !isAutoTest(getTestMethod(testResult))) {
             //实现测试方法名、入参、返回结果、入参、CASE_INDEX数据入库
             // saveScenarioTestData(parameters, result, null, context, getTestCaseClassName(testResult));
@@ -309,7 +339,8 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         }
         boolean isPrintResult = AnnotationUtils.isPrintResult(methodMeta.getTestMethod());
         if (ParamUtils.isAutoTest(context) && !isPrintResult) {
-            System.out.println(methodMeta.getInterfaceMethod().getName() + "-----------------测试用例执行完一个！-----------------");
+            System.out.println(methodMeta.getInterfaceMethod().getName() + "-----------------测试用例执行完一个！" +
+                    "-----------------");
         } else {
             ParamPrint.resultPrint(methodMeta.getMethodName(), result, context, parameters);
         }
@@ -329,6 +360,8 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
             assertResult(result, testResult, this, context, callback, parameters);
         }*/
 
+        //回调函数，为testCase方法传入，入参和返回结果
+        ITestResultCallback callback = paramAndResultCallBack();
         assertResult(result, testResult, this, context, callback, parameters);
     }
 

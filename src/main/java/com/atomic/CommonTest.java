@@ -356,7 +356,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
 
         if (isAutoTest(context) && !AnnotationUtils.isPrintResult(methodMeta.getTestMethod())) {
-            System.out.println(method.getName() + "-----------------------------测试用例执行完一个-----------------------------");
+            System.out.println(method.getName() + "----------------------------- 测试用例执行完一个 " +
+                    "-----------------------------");
         } else {
             // parameters 可能被接口改变，打印出来看起来就像有问题
             resultPrint(method.getName(), result, context, parameters);

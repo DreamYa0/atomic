@@ -96,9 +96,11 @@ public class SaveResultListener extends TestListenerAdapter {
 
                 if (methodsReturn instanceof Response) {
                     Response response = (Response) methodsReturn;
-                    insertData(projectId, className, methodName, caseName, param.toString(), response.body().asString(), expectedReturn, testStatus, round.get(), runAuthor);
+                    insertData(projectId, className, methodName, caseName, param.toString(),
+                            response.body().asString(), expectedReturn, testStatus, round.get(), runAuthor);
                 } else {
-                    insertData(projectId, className, methodName, caseName, param.toString(), methodsReturn.toString(), expectedReturn, testStatus, round.get(), runAuthor);
+                    insertData(projectId, className, methodName, caseName, param.toString(),
+                            methodsReturn.toString(), expectedReturn, testStatus, round.get(), runAuthor);
                 }
                 return;
 
@@ -120,7 +122,8 @@ public class SaveResultListener extends TestListenerAdapter {
                 } catch (Exception e) {
                     jsonReturn = JSON.toJSONString(methodsReturn);
                 }
-                insertData(projectId, className, methodName, caseName, jsonParam, jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
+                insertData(projectId, className, methodName, caseName, jsonParam, jsonReturn, expectedReturn,
+                        testStatus, round.get(), runAuthor);
                 return;
             }
 
@@ -130,7 +133,8 @@ public class SaveResultListener extends TestListenerAdapter {
             } catch (Exception e) {
                 jsonReturn = JSON.toJSONString(methodsReturn);
             }
-            insertData(projectId, className, methodName, caseName, "{}", jsonReturn, expectedReturn, testStatus, round.get(), runAuthor);
+            insertData(projectId, className, methodName, caseName, "{}", jsonReturn,
+                    expectedReturn, testStatus, round.get(), runAuthor);
 
         } catch (Exception e) {
             System.out.println("---------------------" + className + "#" + methodName + "--------------------");
@@ -153,7 +157,8 @@ public class SaveResultListener extends TestListenerAdapter {
         Object[] queryProjectParam = {projectName};
         AutoTestProject autoTestProject = ReportDb.queryQaProjectValue(queryProject, queryProjectParam);
         if (autoTestProject == null) {
-            String insertProject = "insert into autotest_project (project_name,project_status,author,create_time,update_time) values (?,?,?,?,?)";
+            String insertProject = "insert into autotest_project (project_name,project_status,author," +
+                    "create_time,update_time) values (?,?,?,?,?)";
             Object[] insertProjectParam = {projectName, 1, runAuthor, new Date(), new Date()};
             ReportDb.updateValue(insertProject, insertProjectParam);
             AutoTestProject queryAutoTestProject = ReportDb.queryQaProjectValue(queryProject, queryProjectParam);
@@ -173,7 +178,9 @@ public class SaveResultListener extends TestListenerAdapter {
             , String methodsParameter, String methodsReturn, String expectedReturn
             , int testStatus, Integer round, String runAuthor) {
         if (caseName != null) {
-            String sql = "insert into autotest_result (project_id,class_name,methods_name,case_name,methods_parameter,methods_return,expected_return,is_pass,round,run_author,create_time) values(?,?,?,?,?,?,?,?,?,?,?)";
+            String sql = "insert into autotest_result (project_id,class_name,methods_name,case_name," +
+                    "methods_parameter,methods_return,expected_return,is_pass,round," +
+                    "run_author,create_time) values(?,?,?,?,?,?,?,?,?,?,?)";
             Object[] params = {projectId, className, methodName, caseName
                     , methodsParameter, methodsReturn, expectedReturn
                     , testStatus, round, runAuthor, new Date()};

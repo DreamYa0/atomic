@@ -37,12 +37,14 @@ public class UnitTestFilter4Dubbo implements Filter {
 
         //录制模式，录制数据到DB
         if (MockContext.getContext().getMode() == TestMethodMode.REC) {
+
             Result result = invoker.invoke(invocation);
 
             MockData4Rpc mockData4Rpc = new MockData4Rpc();
             mockData4Rpc.setRpcRequest(JacksonUtils.encode(invocation.getArguments()));
             mockData4Rpc.setApiResult(result.getValue());
-            mockData4Rpc.setRpcMethod(invocation.getInvoker().getInterface().getName() + ":" + invocation.getMethodName());
+            mockData4Rpc.setRpcMethod(invocation.getInvoker().getInterface().getName() + ":" +
+                    invocation.getMethodName());
             mockData4Rpc.setAttachments(result.getAttachments());
             mockDataService.insertMockData(mockData4Rpc);
 

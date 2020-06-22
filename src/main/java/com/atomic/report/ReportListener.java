@@ -112,14 +112,16 @@ public class ReportListener implements IReporter {
                         if (failSize > 0) {
                             resultNode.getModel().setStatus(Status.FAIL);
                         }
-                        resultNode.getModel().setDescription(String.format("Pass: %s ; Fail: %s ; Skip: %s ;", passSize, failSize, skipSize));
+                        resultNode.getModel().setDescription(String.format("Pass: %s ; Fail: %s ; Skip: %s ;",
+                                passSize, failSize, skipSize));
                     }
                     buildTestNodes(resultNode, context.getFailedTests(), Status.FAIL);
                     buildTestNodes(resultNode, context.getSkippedTests(), Status.SKIP);
                     buildTestNodes(resultNode, context.getPassedTests(), Status.PASS);
                 }
                 if (suiteTest != null) {
-                    suiteTest.getModel().setDescription(String.format("Pass: %s ; Fail: %s ; Skip: %s ;", suitePassSize, suiteFailSize, suiteSkipSize));
+                    suiteTest.getModel().setDescription(String.format("Pass: %s ; Fail: %s ; Skip: %s ;",
+                            suitePassSize, suiteFailSize, suiteSkipSize));
                     if (suiteFailSize > 0) {
                         suiteTest.getModel().setStatus(Status.FAIL);
                     }
@@ -210,7 +212,8 @@ public class ReportListener implements IReporter {
                     String filePath = resource + className + ".xls";
 
                     ExcelResolver excel = new ExcelResolver(filePath, "exceptResult");
-                    Map<String, Object> exceptResult = excel.readDataByRow(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
+                    Map<String, Object> exceptResult = excel.readDataByRow(
+                            Integer.parseInt(context.get(Constants.CASE_INDEX).toString()));
                     test.info("断言内容：" + GsonUtils.getGson().toJson(exceptResult));
                 }
 
@@ -276,7 +279,8 @@ public class ReportListener implements IReporter {
         } else {
             caseName = param.get(Constants.CASE_NAME).toString();
         }
-        String sql = "SELECT * FROM autotest_result WHERE class_name=? AND methods_name=? AND case_name=? order by create_time desc";
+        String sql = "SELECT * FROM autotest_result WHERE class_name=? AND methods_name=? AND case_name=? " +
+                "order by create_time desc";
         Object[] params = {className, methodName, caseName};
         AutoTestResult result = ReportDb.queryQaMethodValue(sql, params);
         Map<String, String> resultMap = Maps.newHashMap();

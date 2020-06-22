@@ -17,9 +17,11 @@ import java.util.Map;
  */
 public class AtomicAutoTestRegistrar implements ImportBeanDefinitionRegistrar {
     @Override
-    public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+    public void registerBeanDefinitions(AnnotationMetadata annotationMetadata,
+                                        BeanDefinitionRegistry beanDefinitionRegistry) {
 
-        Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableAtomic.class.getName(), false);
+        Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableAtomic.class.getName(),
+                false);
         GlobalConfig.projectName = attributes.get("projectName").toString();
         GlobalConfig.runner = attributes.get("runner").toString();
 

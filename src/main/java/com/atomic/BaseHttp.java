@@ -102,7 +102,10 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
         prepareRequest(context, callBack, testResult);
     }
 
-    private void prepareRequest(Map<String, Object> context, IHookCallBack callBack, ITestResult testResult) throws Exception {
+    private void prepareRequest(Map<String, Object> context,
+                                IHookCallBack callBack,
+                                ITestResult testResult) throws Exception {
+
         String httpHost;
         if (!isHttpHostNoNull(context)) {
             httpHost = CenterConfig.newInstance().getHttpHost();
@@ -112,7 +115,8 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
         HttpRequest request = new HttpRequest(httpHost);
         if (Constants.PROFILE_TESTING.equals(GlobalConfig.getProfile())) {
             // 预发布环境设置代理
-            String httpProxy = CenterConfig.newInstance().readPropertyConfig(GlobalConfig.getProfile()).get(HTTP_PROXY);
+            String httpProxy = CenterConfig.newInstance().readPropertyConfig(
+                    GlobalConfig.getProfile()).get(HTTP_PROXY);
             String host = httpProxy.split(":")[0];
             int port = Integer.parseInt(httpProxy.split(":")[1]);
             InetSocketAddress address = new InetSocketAddress(host, port);
@@ -128,14 +132,18 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
         }
         if (isHttpHeaderNoNull(context)) {
             String headerString = context.get(HTTP_HEADER).toString();
-            Map<String, String> headerMap = JSON.parseObject(headerString, new TypeReference<Map<String, String>>() {
+            Map<String, String> headerMap = JSON.parseObject(headerString,
+                    new TypeReference<Map<String, String>>() {
             });
             headerMap.forEach(request::header);
         }
         execute(context, callBack, testResult, request);
     }
 
-    private void execute(Map<String, Object> context, IHookCallBack callBack, ITestResult testResult, HttpRequest request) throws Exception {
+    private void execute(Map<String, Object> context,
+                         IHookCallBack callBack,
+                         ITestResult testResult,
+                         HttpRequest request) throws Exception {
 
         IHandler getHandler = new GetHandler();
         IHandler postHandler = new PostHandler();
@@ -154,7 +162,10 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
         handleResponse(response, testResult, callBack, context);
     }
 
-    private void handleResponse(HttpResponse response, ITestResult testResult, IHookCallBack callBack, Map<String, Object> context) throws Exception {
+    private void handleResponse(HttpResponse response,
+                                ITestResult testResult,
+                                IHookCallBack callBack,
+                                Map<String, Object> context) throws Exception {
 
         String result = response.body();
 

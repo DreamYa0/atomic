@@ -44,7 +44,8 @@ public class UnitTestFilter4Mybatis implements Interceptor {
 
             Object result = mockDataService.getMockData(invocation);
             if (result == null) {
-                Reporter.log("{} 调用的方法:{}mock数据不存在" + MockContext.getContext().getTestMethod() + invocation.getTarget());
+                Reporter.log("{} 调用的方法:{}mock数据不存在" + MockContext.getContext().getTestMethod() +
+                        invocation.getTarget());
                 throw new RuntimeException("mock数据不存在");
             }
             return result;
