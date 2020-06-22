@@ -301,7 +301,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
             // 注入参数和结果，param 会去掉系统使用的一些数据
             injectResultAndParameters(context, testResult, this);
         } catch (Exception e) {
-            Reporter.log("[BaseRestful#testCallBack()]:{} ---> 为TestCase方法注入入参和返回结果异常！");
+            Reporter.log("为TestCase方法注入入参和返回结果异常！");
             throw new InjectResultException(e);
         }
         //回调测试方法

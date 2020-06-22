@@ -63,7 +63,7 @@ public class AutoTest {
         Map<String, Object> newParam = getParamContextWithoutExtraInfo(param);
         String error = String.format("方法执行自动化测试时发生错误！, 方法名是：%s, 入参是：%s",
                 methodName, getJSONStringWithDateFormat(newParam));
-        Reporter.log("[AutoTest#handleException()]:{" + error + "}");
+        Reporter.log(error);
 
         String errorMsg = e.getMessage() != null ? e.getMessage() :
                 ((InvocationTargetException) e).getTargetException() != null ?
@@ -263,7 +263,7 @@ public class AutoTest {
         if (method.getGenericParameterTypes()[paramIndex] instanceof ParameterizedType) {
             if (ArrayUtils.isEmpty(((ParameterizedType) (method.getGenericParameterTypes()[paramIndex]))
                     .getActualTypeArguments())) {
-                Reporter.log("[ParamUtils#getParamType()]:{} ---> 不能得到实际的类型参数！");
+                Reporter.log("不能得到实际的类型参数！");
                 throw new Exception("---------------不能得到实际的类型参数!---------------");
             }
             // Request<List<Integer>>型
@@ -536,7 +536,7 @@ public class AutoTest {
         while (totalAutoTestCount > maxTestCases || totalAutoTestCount < 0) {
             autoTestValuesLevel--;// 减少每个属性的测试值个数
             if (autoTestValuesLevel < AutoTestEnum.VERY_SMALL.getLevel()) {
-                Reporter.log("[AutoTest#generateAutoTestCasesByMultiple()]:{自动化测试用例过多！}");
+                Reporter.log("自动化测试用例过多！");
                 throw new AutoTestException(String.format("auto test cases are too many to start, " +
                         "the max is %s, the combination number is %s, params is %s", maxTestCases,
                         totalAutoTestCount, getJSONString(autoTestItemList)));

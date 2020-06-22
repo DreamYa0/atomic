@@ -239,7 +239,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
 
         // 期望结果为 Y 直接抛异常 ；beforeTest里面的异常也直接抛出
         if (isExpectSuccess(context) || isExceptionThrowsBySpecialMethod(e, "beforeTest")) {
-            Reporter.log("[ExceptionUtils#handleException()]:{} ---> beforeTest方法执行异常！");
+            Reporter.log("beforeTest方法执行异常！");
             ThrowException.throwNewException(e);
             throw new RuntimeException(e);
         }

@@ -63,11 +63,11 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
      */
     private static void checkHttpKeyWord(Map<String, Object> context) {
         if (!ParamUtils.isHttpModeNoNull(context)) {
-            Reporter.log("[BaseHttp#checkKeyWord()]:{} ---> Http Mode not be empty");
+            Reporter.log("Http Mode not be empty");
             throw new ParameterException("Http Mode not be empty.");
         }
         if (!ParamUtils.isHttpMethodNoNull(context)) {
-            Reporter.log("[BaseHttp#checkKeyWord()]:{} ---> Http Method not be null");
+            Reporter.log("Http Method not be null");
             throw new ParameterException("Http Method not be null.");
         }
     }
@@ -214,7 +214,7 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
             // 注入参数和结果，param 会去掉系统使用的一些数据
             injectResultAndParameters(context, testResult, this);
         } catch (Exception e) {
-            Reporter.log("[BaseHttp#testCallBack()]:{} ---> 为TestCase方法注入入参和返回结果时出现异常！");
+            Reporter.log("为TestCase方法注入入参和返回结果时出现异常！");
             throw new InjectResultException(e);
         }
         //回调测试方法

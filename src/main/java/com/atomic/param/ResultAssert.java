@@ -356,7 +356,7 @@ public final class ResultAssert {
                                 }
                             }
                         } catch (Exception e) {
-                            Reporter.log("[ResultAssert#assertExpectedResult()]:{获取返回实际值异常！！}",
+                            Reporter.log("获取返回实际值异常！",
                                     true);
                         }
                     }
@@ -364,7 +364,7 @@ public final class ResultAssert {
                 return true;
             }
         } else {
-            Reporter.log("[ResultAssert#assertExpectedResult()]:{方法返回值不是Result<T>类型！}");
+            Reporter.log("方法返回值不是Result<T>类型！");
             throw new RuntimeException("方法返回值不是Result<T>类型");
         }
         return false;
@@ -698,7 +698,7 @@ public final class ResultAssert {
         callback.afterTestMethod(context, result, context.get(Constants.PARAMETER_NAME_));
         // result为HttpEntity实现类，则跳过自动断言
         if (result instanceof HttpEntity) {
-            Reporter.log("[ResultAssert#assertResult() ]:{测试结果需手动断言！}", true);
+            Reporter.log("测试结果需手动断言！", true);
         } else {
             // expectedResult不填的就不管
             if (isExpectedResultNoNull(context)) {
@@ -722,7 +722,7 @@ public final class ResultAssert {
 
                 expectMap.forEach((key, value) -> Assert.assertEquals(actualMap.get(key).toString(), value.toString()));
             } else {
-                Reporter.log("[ResultAssert#assertResult() ]:{测试结果需手动断言！}", true);
+                Reporter.log("测试结果需手动断言！", true);
             }
         }
     }

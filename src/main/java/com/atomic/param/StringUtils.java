@@ -343,7 +343,7 @@ public final class StringUtils {
                 }
             } catch (Exception e) {
                 Reporter.log("excel中的值转化为入参对象值异常！", true);
-                Reporter.log(String.format("StringUtil#transferMap2Bean error, field is %s, value is %s ",
+                Reporter.log(String.format("transferMap2Bean error, field is %s, value is %s ",
                         field.getName(), valMap.get(field.getName())) + e);
                 e.printStackTrace();
                 //continue;

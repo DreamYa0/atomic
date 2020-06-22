@@ -87,7 +87,7 @@ public final class AssertCheck {
         Object[] queryParam = {methodMeta.getMethodName(), JSON.toJSONString(parameter)};
         AutoTestAssert autoAssert = ReportDb.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert == null) {
-            Reporter.log("[AssertCheck#replayMode()]:{未录制有预期断言结果，请先执行断言录制！}");
+            Reporter.log("未录制有预期断言结果，请先执行断言录制！");
             throw new AssertCheckException("未录制有预期断言结果，请先执行断言录制！");
         }
         JSONObject expectedData = JSON.parseObject(autoAssert.getMethod_return());
@@ -109,14 +109,14 @@ public final class AssertCheck {
         try {
             JSONObject.parse(result);
         } catch (Exception e) {
-            Reporter.log("[AssertCheck#handleException()]:{测试结果转换JSONObject异常！}");
+            Reporter.log("测试结果转换JSONObject异常！");
             ResultAssert.assertResult(result, context, callback);
         }
         String querySql = "select * from autotest_assert where method_name=? and method_param=?";
         Object[] queryParam = {methodName, context.get(Constants.PARAMETER_NAME_).toString()};
         AutoTestAssert autoAssert = ReportDb.queryQaAutoAssetValue(querySql, queryParam);
         if (autoAssert == null) {
-            Reporter.log("[AssertCheck#replayMode()]:{未录制有预期断言结果，请先执行断言录制！}");
+            Reporter.log("未录制有预期断言结果，请先执行断言录制！");
             throw new AssertCheckException("未录制有预期断言结果，请先执行断言录制！");
         }
         Assert.assertTrue(autoAssert.getMethod_return().equals(result));

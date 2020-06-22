@@ -42,7 +42,7 @@ public abstract class AnnotationUtils {
             if (rollBack == null) {
                 return false;
             } else if (rollBackAll != null) {
-                Reporter.log("AnnotationUtils#isRollBackMethod() -> 不能同时存在两个类型的数据回滚注解！");
+                Reporter.log("不能同时存在两个类型的数据回滚注解！");
                 throw new AnnotationException("不能同时存在两个类型的数据回滚注解！");
             } else if (rollBack.enabled()) {
                 if ("".equals(rollBack.dbName()) || rollBack.tableName().length == 0) {
@@ -68,7 +68,7 @@ public abstract class AnnotationUtils {
             RollBackAll rollBackAll = method.getAnnotation(RollBackAll.class);
             if (rollBackAll != null) {
                 if (rollBack != null) {
-                    Reporter.log("AnnotationUtils#isRollBackAllMethod() -> 不能同时存在两个类型的数据回滚注解！");
+                    Reporter.log("不能同时存在两个类型的数据回滚注解！");
                     throw new AnnotationException("不能同时存在两个类型的数据回滚注解！");
                 } else if (!rollBackAll.enabled()) {
                     return false;
@@ -91,7 +91,7 @@ public abstract class AnnotationUtils {
         for (int i = 0; i < dbAndTable.length; i++) {
             String[] dbNameAndTableName = dbAndTable[i].split("\\.");
             if (dbNameAndTableName.length != 2) {
-                Reporter.log("AnnotationUtils#getDbNameAndTableName() -> 传入的库名和表名方式错误！");
+                Reporter.log("传入的库名和表名方式错误！");
                 throw new AnnotationException("传入的库名和表名方式错误！");
             }
             multimap.put(dbNameAndTableName[0], dbNameAndTableName[1]);
@@ -280,7 +280,7 @@ public abstract class AnnotationUtils {
                 return false;
             }
             if ("".equals(serviceVersion.version())) {
-                Reporter.log("AnnotationUtils#isServiceVersion()]:{} ---> dubbo服务版本号不能为空！");
+                Reporter.log("dubbo服务版本号不能为空！");
                 throw new AnnotationException("dubbo服务版本号不能为空！");
             }
         }

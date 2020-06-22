@@ -79,7 +79,7 @@ public final class RollBack {
             try {
                 DbUtil.use(DataSourceUtils.getDataSource(dbName)).execute(sql);
             } catch (SQLException e) {
-                /*Reporter.log("[RollBack#excuteSql()]:{执行数据回滚SQL语句异常! sql：" + sql + "}",true);
+                /*Reporter.log("执行数据回滚SQL语句异常! sql：" + sql ,true);
                 e.printStackTrace();*/
                 continue;
             }

@@ -66,7 +66,7 @@ public abstract class AbstractRestTest {
             set.add(TestNGUtils.injectResultAndParametersByDefault(map, method));
         }
         if (set.size() == 0) {
-            Reporter.log("[CommonTest#handleParams()]:{没有测试用例！}");
+            Reporter.log("没有测试用例！");
             System.err.println("------------------没有测试用例！------------------");
         }
         return set.iterator();

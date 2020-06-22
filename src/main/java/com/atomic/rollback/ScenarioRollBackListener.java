@@ -33,7 +33,7 @@ public class ScenarioRollBackListener extends TestListenerAdapter {
         Map<String, String[]> tableNameList = RollBack.newInstance().getTableNames4Scenario(testNGMethods,
                 dbNameAndChanges);
         if (dbNameAndChanges.size() > 20) {
-            Reporter.log("[ScenarioRollBackListener#startRollBack()]:{} ---> 场景测试回滚数据库不能超过20个！");
+            Reporter.log("场景测试回滚数据库不能超过20个！");
             throw new RollBackException("场景测试回滚数据库不能超过20个！");
         }
         if (dbNameAndChanges.size() > 0) {

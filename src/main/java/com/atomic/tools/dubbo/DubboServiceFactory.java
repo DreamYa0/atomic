@@ -99,7 +99,7 @@ public class DubboServiceFactory {
         try {
             object = serviceCache.get(key, () -> getRemoteService(clazz, version));
         } catch (ExecutionException e) {
-            Reporter.log("[DubboServiceFactory#getService()]:{} ---> 获取远程服务失败！");
+            Reporter.log("获取远程服务失败！");
             throw new DubboServiceException("获取dubbo服务异常！", e);
         }
         return (T) object;
@@ -148,7 +148,7 @@ public class DubboServiceFactory {
                 return reference.get();
             });
         } catch (ExecutionException e) {
-            Reporter.log("[DubboServiceFactory#getGenericService()]:{} ---> 获取远程服务失败！");
+            Reporter.log("获取远程服务失败！");
             throw new DubboServiceException("获取dubbo服务异常！", e);
         }
         return genericService;
@@ -174,7 +174,7 @@ public class DubboServiceFactory {
                 return reference.get();
             });
         } catch (ExecutionException e) {
-            Reporter.log("[DubboServiceFactory#getGenericService()]:{} ---> 获取远程服务失败！");
+            Reporter.log("获取远程服务失败！");
             throw new DubboServiceException("获取dubbo服务异常！", e);
         }
         return genericService;

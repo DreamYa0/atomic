@@ -112,7 +112,7 @@ public abstract class ExceptionUtils {
     public static void handleException(ITestResult iTestResult, Class<?> clazz, String testMethodName, Map<String, Object> param, Exception e, CompletableFuture<Object> future) {
         //beforeTest里面的异常也直接抛出
         if (isExceptionThrowsBySpecialMethod(e, "beforeTest")) {
-            Reporter.log("[ExceptionUtils#handleException()]:{beforeTest方法执行异常！}");
+            Reporter.log("beforeTest方法执行异常！");
             ThrowException.throwNewException(e);
             throw new RuntimeException(e);
         }
@@ -127,7 +127,7 @@ public abstract class ExceptionUtils {
                 MethodMeta methodMeta = MethodMetaUtils.getMethodMeta(iTestResult, clazz, testMethodName, param, future);
                 ParamPrint.resultPrint(methodMeta.getInterfaceMethod().getName(), param.get(Constants.RESULT_NAME), param, param.get(Constants.PARAMETER_NAME_));
             } catch (Exception e1) {
-                Reporter.log("[ExceptionUtils#handleException()]:{获取测试所需的属性时异常！}");
+                Reporter.log("获取测试所需的属性时异常！");
                 throw new MethodMetaException(e1);
             }
         }

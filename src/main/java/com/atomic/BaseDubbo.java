@@ -127,7 +127,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
                     finalDubboServiceVersion));
 
             if (testResult.getParameters() == null || testResult.getParameters().length == 0) {
-                Reporter.log("[BaseDubbo#run()]:{} ---> 获取测试入参异常！");
+                Reporter.log("获取测试入参异常！");
                 throw new ParameterException("获取测试入参异常！");
             }
             // 获取测试入参
@@ -379,7 +379,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
                     // 注入参数和结果，param 会去掉系统使用的一些数据
                     injectResultAndParameters(context, testResult, this);
                 } catch (Exception e) {
-                    Reporter.log("[BaseDubbo#testCallBack()]:{} ---> 为TestCase方法注入入参和返回结果异常！");
+                    Reporter.log("为TestCase方法注入入参和返回结果异常！");
                     throw new InjectResultException(e);
                 }
                 //回调测试方法

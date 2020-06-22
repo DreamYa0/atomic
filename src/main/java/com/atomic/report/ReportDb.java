@@ -78,7 +78,7 @@ public final class ReportDb {
              */
             obj = qr.query(conn, sqlString, new BeanHandler<AutoTestResult>(AutoTestResult.class), params);
         } catch (SQLException e) {
-            Reporter.log("[CIDbUtils#queryQaMethodValue]异常信息：{}", true);
+            Reporter.log(String.format("异常信息：%s",e.getMessage()), true);
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -96,7 +96,7 @@ public final class ReportDb {
         try {
             obj = qr.query(conn, sqlString, new BeanHandler<>(AutoTestProject.class), params);
         } catch (SQLException e) {
-            Reporter.log("[CIDbUtils#queryQaProjectValue]异常信息：{}", true);
+            Reporter.log(String.format("异常信息：%s",e.getMessage()), true);
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -116,7 +116,7 @@ public final class ReportDb {
         try {
             obj = qr.query(conn, sqlString, new BeanHandler<>(AutoTestAssert.class), params);
         } catch (SQLException e) {
-            Reporter.log("[CIDbUtils#queryQaAutoAssetValue]异常信息：{}", true);
+            Reporter.log(String.format("异常信息：%s",e.getMessage()), true);
         } finally {
             DbUtils.closeQuietly(conn);
         }
@@ -134,7 +134,7 @@ public final class ReportDb {
         try {
             qr.update(conn, sqlString, params);
         } catch (SQLException e) {
-            Reporter.log("[CIDbUtils#updateValue]异常信息：{}", true);
+            Reporter.log(String.format("异常信息：%s",e.getMessage()), true);
         } finally {
             DbUtils.closeQuietly(conn);
         }
