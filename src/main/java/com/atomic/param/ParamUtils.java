@@ -3,11 +3,10 @@ package com.atomic.param;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.atomic.exception.ParameterException;
-import com.atomic.param.assertcheck.AssertCheckUtils;
+import com.atomic.exception.QueryDataException;
 import com.atomic.param.entity.MethodMeta;
-import com.atomic.param.parser.ExcelResolver;
+import com.atomic.util.DataSourceUtils;
 import com.atomic.util.GsonUtils;
-import com.atomic.util.ReflectionUtils;
 import com.g7.framework.common.dto.BaseRequest;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -20,20 +19,17 @@ import org.springframework.util.CollectionUtils;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Objects;
+
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -46,6 +42,7 @@ public final class ParamUtils {
     private static final Logger logger = LoggerFactory.getLogger(ParamUtils.class);
 
     private ParamUtils() {
+
     }
 
     /**
@@ -167,31 +164,99 @@ public final class ParamUtils {
     }
 
     /**
-     * 获取第一个入参
-     * @param param 入参
-     * @param <T>
+     * excel 支持sql语句，格式：sql:dataSourceName:select XXX
+     * @param value
+     * @param type
      * @return
-     * @throws Exception
+     * @throws SQLException
      */
-    public static <T> T getParameter(MethodMeta methodMeta, Map<String, Object> param) {
-        return getParameter(methodMeta, param, 0);
+    public static String getSqlValue(String value, Type type) throws SQLException {
+        // 格式：sql:dataBaseName:select XXX
+        if (value.startsWith("sql:")) {
+            value = value.substring(4);
+            int index = value.indexOf(":");
+            if (index > -1) {
+                String dataSourceName = value.substring(0, index);
+                String sql = value.substring(index + 1);
+                List<Map<Integer, Object>> datalist = DataSourceUtils.queryData(dataSourceName, sql);
+                value = handleDataList(datalist, value, type, sql);
+            }
+        }
+        return value;
     }
 
     /**
-     * 获取某个入参
-     * @param param 入参
-     * @param index 参数位置索引
-     * @param <T>
+     * 处理查询出的结果集
+     * @param datalist
+     * @param value
+     * @param type
+     * @param sql
      * @return
-     * @throws Exception
      */
-    @SuppressWarnings("unchecked")
-    private static <T> T getParameter(MethodMeta methodMeta, Map<String, Object> param, int index) {
-        if (index < 0 || index >= methodMeta.getParamTypes().length) {
-            throw new RuntimeException(String.format("size is %s, index is %s",
-                    methodMeta.getParamTypes().length, index));
+    public static String handleDataList(List<Map<Integer, Object>> datalist, String value, Type type, String sql) {
+        if (!CollectionUtils.isEmpty(datalist)) {
+            if (type instanceof ParameterizedTypeImpl && ((ParameterizedTypeImpl) type).getRawType() == List.class) {
+                List<String> list = new ArrayList<>(datalist.size());
+                // 只要第一个字段
+                list.addAll(datalist.stream().map(map -> String.valueOf(map.get(0))).collect(toList()));
+                value = JSON.toJSONString(list);
+            } else {
+                value = String.valueOf(datalist.get(0).get(0));// 只要第一个字段
+            }
+        } else {
+            Reporter.log("请检查sql语句格式是否有误或查询数据是否存在！sql：" + sql + "");
+            throw new QueryDataException(String.format("请检查sql语句格式是否有误或查询数据是否存在！sql ：%s", sql));
         }
-        return (T) param.get(Constants.PARAMETER_NAME_ + index);
+        return value;
+    }
+
+    /**
+     * 判断excel中的值是否为空
+     * @param value
+     * @return
+     */
+    public static boolean isExcelValueEmpty(Object value) {
+        return value == null || org.apache.commons.lang3.StringUtils.isEmpty(value.toString()) ||
+                Constants.EXCEL_NULL.equalsIgnoreCase(value.toString());
+    }
+
+    /**
+     * 拼接boolean字段方法
+     * @param fieldName
+     * @return
+     */
+    public static String parIsSetName(String fieldName) {
+        if (null == fieldName || "".equals(fieldName)) {
+            return null;
+        }
+        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
+
+    /**
+     * 拼接在某属性的 set方法
+     * @param fieldName
+     * @return String
+     */
+    public static String parSetName(String fieldName, String fieldType) {
+        if (null == fieldName || "".equals(fieldName)) {
+            return null;
+        }
+        if (("Boolean".equals(fieldType) || "boolean".equals(fieldType)) && fieldName.startsWith("is")) {
+            fieldName = fieldName.substring(2);
+        }
+        return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
+
+    /**
+     * 把首字母转为小写
+     * @param str
+     * @return
+     */
+    public static String lowerFirst(String str) {
+        if (Objects.isNull(str)||str.length()==0) {
+            return str;
+        }
+        return str.replaceFirst(str.substring(0, 1), str.substring(0, 1).toLowerCase());
     }
 
     /**
@@ -233,247 +298,12 @@ public final class ParamUtils {
     }
 
     /**
-     * 使用map自动构造所有入参
-     * @param methodMeta 属性
-     * @param newParam   excel入参
-     * @return 入参对象
-     * @throws Exception 异常
-     */
-    public static Object[] generateParametersNew(final MethodMeta methodMeta,
-                                                 Map<String, Object> newParam) throws Exception {
-        final Object[] parameters = new Object[methodMeta.getParamTypes().length];
-        for (int i = 0; i < methodMeta.getParamTypes().length; i++) {
-            Type type = methodMeta.getParamTypes()[i];
-            parameters[i] = generateParametersNew(type, newParam, getParamName(methodMeta, i));
-        }
-        return parameters;
-    }
-
-    private static Object generateParametersNew(Type type,
-                                                Map<String, Object> param,
-                                                String paramName) throws Exception {
-        // 类，如：方法xxxx(Request)
-        if (type instanceof Class) {
-            return generateParametersNew(param, (Class<?>) type, paramName);
-        } else {
-            // 泛型，取出泛型对象中的参数，如：方法xxxx(Request<T>)中的T
-            Type parameterizedType = ((ParameterizedType) type).getActualTypeArguments()[0];
-            return generateParametersNew(type, parameterizedType, param, paramName);
-        }
-    }
-
-    /**
-     * 一般类的初始化
-     * @param param     数据
-     * @param clazz     该入参类型
-     * @param paramName 入参名称
-     * @return
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    private static Object generateParametersNew(Map<String, Object> param,
-                                                Class<?> clazz,
-                                                String paramName) throws Exception {
-
-        if (clazz.equals(HttpSession.class)) {
-
-            // 如接口请求参数中，存在HttpSession时，如Controller层入参可能存在HttpSession
-            return param.get(Constants.HTTP_SESSION);
-
-        } else if (clazz.equals(HttpServletRequest.class)) {
-
-            // 如接口请求参数中，存在HttpServletRequest时，如Controller层入参可能存在HttpServletRequest
-            return param.get(Constants.HTTP_SERVLET_REQUEST);
-
-        } else if (clazz.equals(HttpServletResponse.class)) {
-
-            // 如接口请求参数中，存在HttpServletResponse时，如Controller层入参可能存在HttpServletResponse
-            return param.get(Constants.HTTP_SERVLET_RESPONSE);
-
-        } else if (clazz.isInterface()) {
-
-            // 暂时不会出现接口入参为接口的情况，暂不处理
-
-        }
-
-        Object value;
-        // 基础类和包装类
-        if (StringUtils.isBasicType(clazz)) {
-            value = StringUtils.json2Bean(clazz.getSimpleName(), StringUtils.getValue(param.get(paramName)), clazz);
-        } else if (clazz.isEnum()) {
-            value = StringUtils.json2Bean(clazz.getSimpleName(), StringUtils.getValue(param.get(paramName)), clazz);
-        } else {
-            // 复杂类
-            value = ReflectionUtils.initFromClass(clazz);
-            StringUtils.transferMap2Bean(value, param);
-        }
-        return value;
-    }
-
-    /**
-     * 类似 Request<Integer>, Request<DTO>, XXXRequest<DTO> 型初始化
-     * @param paramType
-     * @param parameterizedType
-     * @param param
-     * @param paramName
-     * @return
-     * @throws IllegalAccessException
-     */
-    @SuppressWarnings("unchecked")
-    private static Object generateParametersNew(Type paramType,
-                                                Type parameterizedType,
-                                                Map<String, Object> param,
-                                                String paramName) throws Exception {
-
-        Class<?> requestClass = ((ParameterizedTypeImpl) paramType).getRawType();
-        Object request;
-        Object data;
-        if (requestClass.isInterface()) {
-            request = JSON.parseObject(getString(param, paramName), paramType);
-        } else {
-            request = ReflectionUtils.initFromClass(requestClass);
-
-            // 为请求入参对象公共属性设置值
-            generateCommonParameters(request, param);
-
-            if (parameterizedType instanceof ParameterizedType) {
-                data = JSON.parseObject(getString(param, paramName), parameterizedType);
-            } else {
-                Class<?> paramClass = (Class<?>) parameterizedType;
-                if (StringUtils.isBasicType(paramClass)) {
-                    data = StringUtils.json2Bean(paramClass.getSimpleName(), getString(param, paramName), parameterizedType);
-                    setRequestData(request, data);
-                    return request;
-                } else {
-
-                    if (param.containsKey("data")) {
-                        // 当Excel中data字段值为Json时
-                        String dataJson = param.get("data").toString();
-                        data = StringUtils.json2Bean(GsonUtils.getGson(), dataJson, paramClass);
-                    } else {
-                        // 设置属性值
-                        data = ReflectionUtils.initFromClass(paramClass);
-                        StringUtils.transferMap2Bean(data, param);
-                    }
-                }
-            }
-            // 设置属性值
-            setRequestData(request, data);
-        }
-        return request;
-    }
-
-    /**
-     * 构造入参请求对象公共属性的值
-     * @param request 入参Request或者BaseRequest对象
-     * @param param   入参map集合
-     */
-    private static void generateCommonParameters(Object request, Map<String, Object> param) {
-
-        try {
-            // 获取类中以及父类中的所有属性
-            List<Field> fields = ReflectionUtils.getAllFieldsList(request.getClass());
-
-            // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
-            List<Field> collect = filterFields(fields);
-
-            for (Field field : collect) {
-
-                // 公共属性为基本类型
-                String fieldName = field.getName();
-                Type fieldType = field.getGenericType();
-
-                if (fieldType instanceof TypeVariable) {
-                    // 如果 Field 为类型变量，则跳过
-                    continue;
-                }
-
-                if (param.containsKey(fieldName)) {
-                    // Excel中包含 公共属性为自定义对象或基本类型字段的值
-                    String fieldValue = param.get(fieldName).toString();
-
-                    if (org.apache.commons.lang3.StringUtils.isNoneEmpty(fieldValue)) {
-
-                        try {
-                            // 如果excel包含属性字段名称，默认excel中的值为Json格式
-                            Object actualValue = StringUtils.json2Bean(fieldName, fieldValue, fieldType);
-
-                            // 按照正常情况是根据set方法来设值，但是为了兼容lombok插件采用这种不是很优雅的方式
-                            field.setAccessible(true);
-                            field.set(request, actualValue);
-                        } catch (Exception e) {
-                            logger.error("给请求入参对象公共自定义对象属性设值失败，属性名称为：{}，对应设置的值为：{}",
-                                    fieldName, fieldValue, e);
-                        }
-                    }
-
-
-                } else if (Boolean.FALSE.equals(StringUtils.isBasicType((Class<?>) fieldType))) {
-                    // 采用excel多sheet进行设计,且字段为自定义对象
-                    // 实例化field所表示的对象
-                    Object commonObj = ReflectionUtils.initFromClass((Class<?>) field.getGenericType());
-
-                    try {
-                        Object object = param.get(Constants.TESTMETHODMETA);
-                        MethodMeta methodMeta = (MethodMeta) object;
-
-                        Class<?> testClass = methodMeta.getTestClass();
-                        String className = testClass.getSimpleName();
-                        String resource = testClass.getResource("").getPath();
-                        String filePath = resource + className + ".xls";
-                        String sheetName = field.getName();
-                        ExcelResolver excel = new ExcelResolver(filePath,sheetName);
-                        List<Map<String, Object>> sheetParams = excel.readDataByRow();
-
-                        if (Boolean.FALSE.equals(CollectionUtils.isEmpty(sheetParams))) {
-
-                            Map<String, Object> sheetParam = sheetParams.get(
-                                    Integer.parseInt(param.get(Constants.CASE_INDEX).toString()) - 1);
-
-                            Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
-                            AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
-
-                            sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
-                            StringUtils.transferMap2Bean(commonObj, sheetParam);
-                        } else {
-
-                            // 如果MethodMeta、Sheet不存在，则在默认sheet页中获取commonObj对象各个字段的值
-                            StringUtils.transferMap2Bean(commonObj, param);
-                        }
-                    } catch (Exception e) {
-                        // 如果MethodMeta、Sheet不存在，则按照原逻辑处理
-                        StringUtils.transferMap2Bean(commonObj, param);
-                    }
-
-                    field.setAccessible(true);
-                    field.set(request, commonObj);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("给请求入参对象公共属性设值失败！", e);
-        }
-    }
-
-    /**
-     * 过滤实体中的公共参数
-     * @param fields 属性集合
-     * @return 过滤后的属性集合
-     */
-    public static List<Field> filterFields(List<Field> fields) {
-        return fields.stream()
-                .filter(field -> Boolean.FALSE.equals(field.getName().equals("serialVersionUID")
-                        || field.getName().equals("data")
-                        || field.getName().equals("log")))
-                .collect(Collectors.toList());
-    }
-
-    /**
      * 获取Key对应Value，并转换成String
      * @param map
      * @param key
      * @return
      */
-    private static String getString(Map<?, ?> map, Object key) {
+    public static String getString(Map<?, ?> map, Object key) {
         if (map.get(key) == null || "".equals(map.get(key).toString())) {
             return null;
         } else {
@@ -491,24 +321,6 @@ public final class ParamUtils {
             return true;
         }
         return false;
-    }
-
-    /**
-     * 为Request中的data字段注入值
-     * @param request
-     * @param data
-     * @throws Exception
-     */
-    private static void setRequestData(Object request, Object data) throws Exception {
-        // 查找泛型是T的属性，但是因为被擦除了，类型是Object
-        Optional.ofNullable(ReflectionUtils.getField(request, Object.class, "data")).ifPresent(f -> {
-            f.setAccessible(true);
-            try {
-                f.set(request, data);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        });
     }
 
     /**

@@ -7,7 +7,7 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcException;
-import com.atomic.config.TestMethodMode;
+import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.data.DubboMockData2FileServiceImpl;
 import com.atomic.tools.mock.data.MockContext;
 import com.atomic.tools.mock.data.MockDataService;

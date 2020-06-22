@@ -2,6 +2,7 @@ package com.atomic.util;
 
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.GetBeanException;
+import com.atomic.param.ParamUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -9,8 +10,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.InvocationTargetException;
-
-import static com.atomic.param.StringUtils.lowerFirst;
 
 
 /**
@@ -47,7 +46,7 @@ public class ApplicationUtils implements ApplicationContextAware {
         } catch (Exception e) {
             try {
                 // 接口代理，还可以配置 <aop:config proxy-target-class="true">
-                return applicationContext.getBean(lowerFirst(interfaceType.getSimpleName()));
+                return applicationContext.getBean(ParamUtils.lowerFirst(interfaceType.getSimpleName()));
             } catch (Exception e1) {
                 try {
                     // 如果为代理类时获取他的目标类

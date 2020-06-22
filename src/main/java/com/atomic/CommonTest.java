@@ -1,26 +1,24 @@
 package com.atomic;
 
-import com.alibaba.fastjson.JSON;
 import com.atomic.annotations.AnnotationUtils;
-import com.atomic.config.TestMethodMode;
-import com.atomic.enums.AutoTestMode;
 import com.atomic.exception.MethodMetaException;
 import com.atomic.exception.ParameterException;
 import com.atomic.exception.ThrowException;
-import com.atomic.param.AutoTest;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
 import com.atomic.param.ITestResultCallback;
-import com.atomic.param.StringUtils;
-import com.atomic.param.TestNGUtils;
-import com.atomic.param.assertcheck.AssertCheckUtils;
+import com.atomic.param.ObjUtils;
+import com.atomic.param.ParamUtils;
 import com.atomic.param.entity.MethodMeta;
-import com.atomic.report.ReportListener;
-import com.atomic.rollback.IntegrationTestRollBackListener;
-import com.atomic.tools.mock.dto.MockData;
+import com.atomic.tools.assertcheck.AssertCheckUtils;
+import com.atomic.tools.autotest.AutoTestManager;
+import com.atomic.tools.autotest.AutoTestMode;
+import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.helper.MockFileHelper;
-import com.atomic.util.FileUtils;
+import com.atomic.tools.report.ReportListener;
+import com.atomic.tools.rollback.IntegrationTestRollBackListener;
 import com.atomic.util.MapUtils;
+import com.atomic.util.TestNGUtils;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -56,26 +54,24 @@ import java.util.concurrent.Executors;
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ExceptionUtils.isExceptionThrowsBySpecialMethod;
-import static com.atomic.param.AutoTest.generateAutoTestCases;
 import static com.atomic.param.Constants.EXCEL_DESC;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
 import static com.atomic.param.Constants.RESULT_NAME;
 import static com.atomic.param.Constants.THREAD_COUNT;
-import static com.atomic.param.MethodMetaUtils.getMethodMeta;
-import static com.atomic.param.ParamPrint.resultPrint;
-import static com.atomic.param.ParamUtils.generateParametersNew;
 import static com.atomic.param.ParamUtils.isAutoTest;
 import static com.atomic.param.ParamUtils.isExpectSuccess;
-import static com.atomic.param.ResultAssert.assertResult;
-import static com.atomic.param.ResultAssert.exceptionDeal;
-import static com.atomic.param.StringUtils.isExcelValueEmpty;
-import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.report.SaveResultCache.saveTestRequestInCache;
-import static com.atomic.report.SaveResultCache.saveTestResultInCache;
-import static com.atomic.report.SaveRunTime.endTestTime;
-import static com.atomic.report.SaveRunTime.startTestTime;
+import static com.atomic.param.entity.MethodMetaUtils.getMethodMeta;
+import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
+import static com.atomic.tools.assertcheck.ResultAssert.exceptionDeal;
+import static com.atomic.tools.autotest.AutoTestManager.generateAutoTestCases;
 import static com.atomic.tools.mock.data.MockContext.getContext;
+import static com.atomic.tools.report.ParamPrint.resultPrint;
+import static com.atomic.tools.report.SaveResultCache.saveTestRequestInCache;
+import static com.atomic.tools.report.SaveResultCache.saveTestResultInCache;
+import static com.atomic.tools.report.SaveRunTime.endTestTime;
+import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.ApplicationUtils.getBean;
+import static com.atomic.util.TestNGUtils.injectResultAndParameters;
 
 
 /**
@@ -112,30 +108,39 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             super.run(callBack, testResult);
             return;
         }
+
         if (testResult.getParameters() == null || testResult.getParameters().length == 0) {
             Reporter.log("------------------ 获取测试入参异常！------------------");
             throw new ParameterException("获取测试入参异常！");
         }
+
         // 获取param
         Map<String, Object> context = TestNGUtils.getParamContext(testResult);
         // 注入场景测试所需要的依赖方法的返回结果
         TestNGUtils.injectScenarioReturnResult(testResult, context);
         // 为mock注入caseIndex
         getContext().setCaseIndex((Integer) context.get(Constants.CASE_INDEX));
+
+        // 录制模式
         if (getContext().getMode() == TestMethodMode.REC) {
-            deleteData();
+            MockFileHelper.deleteData();
         }
+
+        // 回放模式
         if (getContext().getMode() == TestMethodMode.REPLAY) {
-            loadData();
+            MockFileHelper.loadData();
         }
+
         try {
-            // 自动化测试
+
             if (isAutoTest(context)) {
+                // 自动化测试
                 autoTest(callBack, testResult);
             } else if (isMultiThreads(context)) {
                 // 多线程测试
                 multiThreadTest(context, callBack, testResult);
             } else {
+                // 普通测试
                 startRunTest(context, callBack, testResult);
             }
         } catch (Exception e) {
@@ -149,7 +154,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
      * @return
      */
     private boolean isMultiThreads(Map<String, Object> context) {
-        return !isExcelValueEmpty(context.get(THREAD_COUNT)) &&
+        return !ParamUtils.isExcelValueEmpty(context.get(THREAD_COUNT)) &&
                 Integer.parseInt(context.get(THREAD_COUNT).toString()) > 1;
     }
 
@@ -174,14 +179,14 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
                     exception[0] = e;
                 }
                 // 这里不抛异常，全部自动测试跑一遍，暴露问题，跑完再处理
-                AutoTest.handleException(e, exceptionMsgs, testResult, newParam);
+                AutoTestManager.handleException(e, exceptionMsgs, testResult, newParam);
             }
         });
         long end = System.currentTimeMillis();
         System.out.println("------------------------------------------自动化测试结束，耗时："
                 + (end - start) / 1000 + "s------------------------------------------");
         // 如果有异常则抛出，提醒测试未通过
-        AutoTest.printExceptions(exception[0], exceptionMsgs);
+        AutoTestManager.printExceptions(exception[0], exceptionMsgs);
     }
 
     @SuppressWarnings("all")
@@ -286,7 +291,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
 
     private void execMethodMulitTimes(Object paramValue, ITestMethodMultiTimes testMethod) throws Exception {
         // 循环遍历
-        StringUtils.ForEachClass forEachClass = StringUtils.getForEachClass(paramValue);
+        ObjUtils.ForEachClass forEachClass = ObjUtils.getForEachClass(paramValue);
         if (forEachClass != null) {
             for (int i = forEachClass.getStart(); i <= forEachClass.getEnd(); i++) {
                 testMethod.execTestMethod(String.valueOf(i));
@@ -314,7 +319,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         newParam.put(Constants.HTTP_SERVLET_RESPONSE, response);
 
         // 构造请求入参对象
-        final Object[] parameters = generateParametersNew(methodMeta, newParam);
+        final Object[] parameters = ObjUtils.generateParametersNew(methodMeta, newParam);
 
         if ((!isAutoTest(context) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) &&
                 isScenario(TestNGUtils.getTestMethod(testResult))) {
@@ -389,27 +394,6 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }*/
 
         assertResult(result, testResult, this, context, callback, parameters);
-    }
-
-    /**
-     * 删除Mock数据
-     */
-    private void deleteData() {
-        FileUtils.removeDir(MockFileHelper.getMockFile(getContext().getCaseIndex()));
-    }
-
-    /**
-     * 保存Mock数据
-     */
-    private void loadData() {
-        try {
-            File file = new File(MockFileHelper.getMockFile(getContext().getCaseIndex()));
-            String data = MockFileHelper.getFileString(file);
-            MockData mockData = JSON.parseObject(data, MockData.class);
-            getContext().setMockData(mockData);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

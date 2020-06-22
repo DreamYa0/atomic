@@ -1,6 +1,6 @@
 package com.atomic.tools.mock.mybatis;
 
-import com.atomic.config.TestMethodMode;
+import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.data.MockContext;
 import com.atomic.tools.mock.data.MockDataService;
 import com.atomic.tools.mock.data.MybatisMockData2FileServiceImpl;

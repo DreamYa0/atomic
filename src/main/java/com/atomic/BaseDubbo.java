@@ -2,21 +2,21 @@ package com.atomic;
 
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.GlobalConfig;
-import com.atomic.enums.AutoTestMode;
+import com.atomic.tools.autotest.AutoTestMode;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.InvokeException;
 import com.atomic.exception.ParameterException;
-import com.atomic.report.ReportListener;
-import com.atomic.rollback.RollBackListener;
-import com.atomic.rollback.ScenarioRollBackListener;
-import com.atomic.param.AutoTest;
-import com.atomic.param.HandleMethodName;
+import com.atomic.tools.report.ReportListener;
+import com.atomic.tools.rollback.RollBackListener;
+import com.atomic.tools.rollback.ScenarioRollBackListener;
+import com.atomic.tools.autotest.AutoTestManager;
+import com.atomic.tools.report.HandleMethodName;
 import com.atomic.param.ITestMethodMultiTimes;
 import com.atomic.param.ITestResultCallback;
-import com.atomic.param.MethodMetaUtils;
-import com.atomic.param.ParamPrint;
+import com.atomic.param.entity.MethodMetaUtils;
+import com.atomic.tools.report.ParamPrint;
 import com.atomic.param.ParamUtils;
-import com.atomic.param.StringUtils;
+import com.atomic.param.ObjUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.tools.dubbo.DubboServiceFactory;
 import com.atomic.util.MapUtils;
@@ -40,21 +40,21 @@ import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.annotations.AnnotationUtils.isServiceVersion;
 import static com.atomic.exception.ExceptionUtils.handleException;
-import static com.atomic.report.SaveRunTime.endTestTime;
-import static com.atomic.report.SaveRunTime.startTestTime;
-import static com.atomic.param.AutoTest.generateAutoTestCases;
-import static com.atomic.param.AutoTest.printExceptions;
+import static com.atomic.tools.report.SaveRunTime.endTestTime;
+import static com.atomic.tools.report.SaveRunTime.startTestTime;
+import static com.atomic.tools.autotest.AutoTestManager.generateAutoTestCases;
+import static com.atomic.tools.autotest.AutoTestManager.printExceptions;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.CASE_NAME;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
-import static com.atomic.param.ExcelParamConverter.getDataBeforeTest;
-import static com.atomic.param.ResultAssert.assertResult;
-import static com.atomic.param.TestNGUtils.getParamContext;
-import static com.atomic.param.TestNGUtils.getTestMethod;
-import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.param.TestNGUtils.injectScenarioReturnResult;
-import static com.atomic.report.SaveResultCache.saveTestRequestInCache;
-import static com.atomic.report.SaveResultCache.saveTestResultInCache;
+import static com.atomic.param.excel.ExcelParamConverter.getDataBeforeTest;
+import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
+import static com.atomic.util.TestNGUtils.getParamContext;
+import static com.atomic.util.TestNGUtils.getTestMethod;
+import static com.atomic.util.TestNGUtils.injectResultAndParameters;
+import static com.atomic.util.TestNGUtils.injectScenarioReturnResult;
+import static com.atomic.tools.report.SaveResultCache.saveTestRequestInCache;
+import static com.atomic.tools.report.SaveResultCache.saveTestResultInCache;
 
 
 /**
@@ -192,7 +192,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
                     exception[0] = e;
                 }
                 // 这里不抛异常，全部自动测试跑一遍，暴露问题，跑完再处理
-                AutoTest.handleException(e, exceptionMsgs, testResult, paramMap);
+                AutoTestManager.handleException(e, exceptionMsgs, testResult, paramMap);
             }
         });
         long end = System.currentTimeMillis();
@@ -274,7 +274,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
 
     private void execMethodMulitTimes(Object paramValue, ITestMethodMultiTimes testMethod) throws Exception {
         // 循环遍历
-        StringUtils.ForEachClass forEachClass = StringUtils.getForEachClass(paramValue);
+        ObjUtils.ForEachClass forEachClass = ObjUtils.getForEachClass(paramValue);
         if (forEachClass != null) {
             for (int i = forEachClass.getStart(); i <= forEachClass.getEnd(); i++) {
                 testMethod.execTestMethod(String.valueOf(i));
@@ -296,7 +296,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         }
 
         //构造入参
-        final Object[] parameters = ParamUtils.generateParametersNew(methodMeta, newParam);
+        final Object[] parameters = ObjUtils.generateParametersNew(methodMeta, newParam);
 
         if ((!ParamUtils.isAutoTest(param) && !isAutoTest(getTestMethod(testResult))) &&
                 isScenario(getTestMethod(testResult))) {

@@ -4,7 +4,7 @@
     <test name="Atomic-Test">
         <method-selectors>
             <method-selector>
-                <selector-class name="com.atomic.runtime.RunTestSelector" priority="-1"/>
+                <selector-class name="com.atomic.runner.RunTestSelector" priority="-1"/>
             </method-selector>
         </method-selectors>
         <packages>

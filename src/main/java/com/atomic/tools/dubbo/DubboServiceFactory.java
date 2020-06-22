@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * @author dreamyao
- * @Date
+ * @date
  * @title
  */
 @ThreadSafe
@@ -63,16 +63,17 @@ public class DubboServiceFactory {
 
     /**
      * 获取远程服务代理
-     * @param clazz
-     * @param version
-     * @param <T>
-     * @return
+     *
+     * @param clazz   clazz
+     * @param version 服务版本
+     * @param <T>     类型
+     * @return 实例
      */
     public <T> T getService(Class<? extends T> clazz, String... version) {
         //为获取覆盖率做全局配置,强制指定请求服务地址
         try {
-            if (GlobalConfig.hostDomain != null) {
-                String url = "dubbo://" + GlobalConfig.hostDomain + "/" + clazz.getName();
+            if (GlobalConfig.getHostDomain() != null) {
+                String url = "dubbo://" + GlobalConfig.getHostDomain() + "/" + clazz.getName();
                 T t = getServiceByUrl(clazz, url, version);
                 checkService(t, clazz);
                 return t;
@@ -84,16 +85,9 @@ public class DubboServiceFactory {
         return getService(clazz, profile, version[0]);
     }
 
-    /**
-     * 先从缓存中获取服务，如果本地缓存没有此服务则从远程注册中心获取
-     * @param clazz
-     * @param profile
-     * @param version
-     * @param <T>
-     * @return
-     */
     @SuppressWarnings("unchecked")
     private <T> T getService(Class<? extends T> clazz, String profile, String version) {
+        // 先从缓存中获取服务，如果本地缓存没有此服务则从远程注册中心获取
         String key = clazz.getName() + "_" + profile + "_" + version;
         Object object;
         try {
@@ -105,15 +99,8 @@ public class DubboServiceFactory {
         return (T) object;
     }
 
-    /**
-     * 从远程注册中心获取服务
-     * @param clazz
-     * @param version
-     * @param <T>
-     * @return
-     */
     private <T> T getRemoteService(Class<? extends T> clazz, String version) {
-        // 引用远程服务
+        // 引用远程服务，从远程注册中心获取服务
         ReferenceConfig<T> reference = new ReferenceConfig<>();
         reference.setApplication(application);
         reference.setRegistry(registry);
@@ -129,8 +116,9 @@ public class DubboServiceFactory {
 
     /**
      * 获取服务的泛化调用
-     * @param clazz
-     * @return
+     *
+     * @param clazz clazz
+     * @return 泛化调用
      */
     public GenericService getGenericService(Class<?> clazz) {
         String interfaceName = clazz.getSimpleName();
@@ -156,8 +144,9 @@ public class DubboServiceFactory {
 
     /**
      * 获取服务的泛化调用
-     * @param interfaceName
-     * @return
+     *
+     * @param interfaceName 接口名称
+     * @return 泛化调用
      */
     public GenericService getGenericService(String interfaceName) {
         GenericService genericService;
@@ -180,11 +169,8 @@ public class DubboServiceFactory {
         return genericService;
     }
 
-    /**
-     * 获取点对点直连的service
-     * @return
-     */
     private <T> T getServiceByUrl(Class<? extends T> clazz, String url, String... version) {
+        // 获取点对点直连的service
         ReferenceConfig<T> reference = new ReferenceConfig<>();
         reference.setApplication(application);
         reference.setUrl(url);
@@ -196,14 +182,8 @@ public class DubboServiceFactory {
         return reference.get();
     }
 
-    /**
-     * 检测获取的服务是否存在
-     * @param t
-     * @param clazz
-     * @param <T>
-     * @throws Exception
-     */
     private <T> void checkService(T t, Class<? extends T> clazz) throws Exception {
+        // 检测获取的服务是否存在
         Method method = clazz.getMethods()[0];
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] params = new Object[parameterTypes.length];

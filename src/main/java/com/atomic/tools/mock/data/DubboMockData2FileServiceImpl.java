@@ -2,12 +2,11 @@ package com.atomic.tools.mock.data;
 
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.RpcResult;
-import com.atomic.param.StringUtils;
+import com.atomic.param.ObjUtils;
 import com.atomic.tools.mock.dto.MockData;
 import com.atomic.tools.mock.dto.MockData4Rpc;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.tools.mock.util.JacksonUtils;
-import com.atomic.util.FileUtils;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class DubboMockData2FileServiceImpl implements MockDataService<MockData4R
         try {
             Method method = invocation.getInvoker().getInterface()
                     .getMethod(invocation.getMethodName(), invocation.getParameterTypes());
-            Object apiResult = StringUtils.json2Bean("", JacksonUtils.encode(ret.getValue()),
+            Object apiResult = ObjUtils.json2Bean("", JacksonUtils.encode(ret.getValue()),
                     method.getGenericReturnType());
             ret.setValue(apiResult);
 
@@ -62,6 +61,6 @@ public class DubboMockData2FileServiceImpl implements MockDataService<MockData4R
 
     @Override
     public void deleteMockData() {
-        FileUtils.removeDir(MockFileHelper.getMockFile(MockContext.getContext().getCaseIndex()));
+        MockFileHelper.removeDir(MockFileHelper.getMockFile(MockContext.getContext().getCaseIndex()));
     }
 }

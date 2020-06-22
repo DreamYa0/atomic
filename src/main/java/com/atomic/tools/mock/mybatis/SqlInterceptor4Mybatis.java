@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.atomic.param.StringUtils.isBasicType;
+import static com.atomic.param.ObjUtils.isBasicType;
 import static java.util.stream.Collectors.toList;
 
 /**

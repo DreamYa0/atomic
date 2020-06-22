@@ -1,6 +1,6 @@
 package com.atomic.param.values;
 
-import com.atomic.enums.AutoTestEnum;
+import com.atomic.tools.autotest.AutoTestEnum;
 import com.google.common.collect.Lists;
 
 import java.text.SimpleDateFormat;

@@ -1,6 +1,5 @@
 package com.atomic.tools.mock.data;
 
-import com.atomic.config.TestMethodMode;
 import com.atomic.tools.mock.dto.MockData;
 
 /**

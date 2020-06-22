@@ -1,7 +1,7 @@
 package com.atomic;
 
-import com.atomic.param.TestNGUtils;
-import com.atomic.param.parser.ExcelResolver;
+import com.atomic.util.TestNGUtils;
+import com.atomic.param.excel.parser.ExcelResolver;
 import org.testng.Reporter;
 import org.testng.annotations.DataProvider;
 

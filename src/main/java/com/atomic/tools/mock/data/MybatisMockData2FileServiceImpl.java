@@ -1,10 +1,9 @@
 package com.atomic.tools.mock.data;
 
 import com.alibaba.fastjson.JSON;
-import com.atomic.param.StringUtils;
+import com.atomic.param.ObjUtils;
 import com.atomic.tools.mock.dto.MockData4Db;
 import com.atomic.tools.mock.helper.MockFileHelper;
-import com.atomic.util.FileUtils;
 import org.apache.ibatis.plugin.Invocation;
 
 import java.lang.reflect.Type;
@@ -36,7 +35,7 @@ public class MybatisMockData2FileServiceImpl implements MockDataService<MockData
         Object dbResult = dbData.get(MockContext.getContext().getDbOrderAndIncrease() - 1);
         try {
             Type genericReturnType = invocation.getMethod().getGenericReturnType();
-            return StringUtils.json2Bean("", JSON.toJSONString(dbResult), genericReturnType);
+            return ObjUtils.json2Bean("", JSON.toJSONString(dbResult), genericReturnType);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -51,6 +50,6 @@ public class MybatisMockData2FileServiceImpl implements MockDataService<MockData
 
     @Override
     public void deleteMockData() {
-        FileUtils.removeDir(MockFileHelper.getMockFile(MockContext.getContext().getCaseIndex()));
+        MockFileHelper.removeDir(MockFileHelper.getMockFile(MockContext.getContext().getCaseIndex()));
     }
 }

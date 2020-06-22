@@ -8,13 +8,13 @@ import com.atomic.config.CenterConfig;
 import com.atomic.config.GlobalConfig;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.ParameterException;
-import com.atomic.report.ReportListener;
-import com.atomic.rollback.RollBackListener;
-import com.atomic.rollback.ScenarioRollBackListener;
+import com.atomic.tools.report.ReportListener;
+import com.atomic.tools.rollback.RollBackListener;
+import com.atomic.tools.rollback.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
-import com.atomic.param.TestNGUtils;
+import com.atomic.util.TestNGUtils;
 import com.atomic.tools.http.GetHandler;
 import com.atomic.tools.http.IHandler;
 import com.atomic.tools.http.PostHandler;
@@ -32,20 +32,20 @@ import java.util.Map;
 
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.exception.ThrowException.throwNewException;
-import static com.atomic.report.SaveRunTime.endTestTime;
-import static com.atomic.report.SaveRunTime.startTestTime;
+import static com.atomic.tools.report.SaveRunTime.endTestTime;
+import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.HTTP_HEADER;
 import static com.atomic.param.Constants.HTTP_HOST;
 import static com.atomic.param.Constants.HTTP_PROXY;
-import static com.atomic.param.HandleMethodName.getTestMethodName;
-import static com.atomic.param.ParamPrint.resultPrint;
+import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
+import static com.atomic.tools.report.ParamPrint.resultPrint;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
-import static com.atomic.param.ResultAssert.assertResult;
-import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.report.SaveResultCache.saveTestResultInCache;
+import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
+import static com.atomic.util.TestNGUtils.injectResultAndParameters;
+import static com.atomic.tools.report.SaveResultCache.saveTestResultInCache;
 
 
 /**

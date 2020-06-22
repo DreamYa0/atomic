@@ -1,13 +1,12 @@
 package com.atomic.config;
 
 
-import com.atomic.enums.TestMode;
+import com.atomic.tools.mock.data.TestMode;
 import com.atomic.util.FileUtils;
-import com.google.common.collect.Lists;
+import com.google.common.base.Splitter;
 import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,97 +18,90 @@ import java.util.Properties;
  */
 public class GlobalConfig {
 
-    private static final String testConfFilePath = "/test.properties";
-    public static String projectName = "";
-    public static String runner = "";
-    public static String runMode = "debug";
-    public static List<String> casePriorityList, caseTypeList, mailAddrList; //执行用例的list
-    public static List<String> scanPackageList = Lists.newArrayList();//自动扫描的包目录
-    public static String hostDomain = null;
-    private static String serviceVersion = null;
-    private static String profile = "";
-    private static String httpHost = "";
+    private static final String TEST_CONFIG_FILE_PATH = "/test.properties";
+    private static ConfigEntity entity;
 
     static {
         load();
     }
 
     private static void load() {
+
+        entity = new ConfigEntity();
+
         try {
-            InputStream in = FileUtils.getTestFileInputStream(testConfFilePath);
+
+            InputStream in = FileUtils.getTestFileInputStream(TEST_CONFIG_FILE_PATH);
             Properties properties = new Properties();
             properties.load(in);
+
             if (properties.containsKey("profile")) {
                 String env = properties.getProperty("profile");
-                if (env == null || "".equals(env)) {
-                    profile = TestMode.DEV.getName();
-                } else {
-                    profile = env;
-                }
+                entity.setProfile((env == null || "".equals(env)) ? TestMode.T1.getName() : env);
             }
             if (properties.containsKey("mail.addr.list")) {
-                mailAddrList = getListFromString(properties.getProperty("mail.addr.list"), ",",
-                        true);
+                entity.setMailAddrList(splitter(properties.getProperty("mail.addr.list")));
             }
             if (properties.containsKey("host.domain")) {
-                hostDomain = properties.getProperty("host.domain");
+                entity.setHostDomain(properties.getProperty("host.domain"));
             }
             if (properties.containsKey("project.name") &&
                     Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("project.name")))) {
-                projectName = properties.getProperty("project.name");
+                entity.setProjectName(properties.getProperty("project.name"));
             }
             if (properties.containsKey("runner") &&
                     Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("runner")))) {
-                runner = properties.getProperty("runner");
+                entity.setRunner( properties.getProperty("runner"));
             }
             if (properties.containsKey("run.mode")) {
-                runMode = properties.getProperty("run.mode");
+                entity.setRunMode(properties.getProperty("run.mode"));
             }
             if (properties.containsKey("service.version")) {
-                serviceVersion = properties.getProperty("service.version");
+                entity.setServiceVersion(properties.getProperty("service.version"));
             }
             if (properties.containsKey("http.host")) {
-                httpHost = properties.getProperty("http.host");
+                entity.setHttpHost(properties.getProperty("http.host"));
             }
 
-        } catch (IllegalArgumentException e) {
-            System.err.println("配置文件参数非法,请检查test.properties的配置");
-            e.printStackTrace();
         } catch (Exception e) {
-            /*System.out.println("读取test.properties失败");
-            e.printStackTrace();*/
+            throw new RuntimeException("配置文件参数非法,请检查test.properties的配置", e);
         }
     }
 
-    private static List<String> getListFromString(String from, String regex, boolean... ignoreCase) {
-        List<String> list = Lists.newArrayList();
-        if (ignoreCase.length != 0 && ignoreCase[0]) {
-            from = from.toLowerCase();
-        }
-        if (from == null || from.length() == 0) {
-            return list;
-        }
-        if (!from.contains(regex)) {
-            list.add(from);
-            return list;
-        }
-        list.addAll(Arrays.asList(from.split(regex)));
-        return list;
+    @SuppressWarnings("all")
+    private static List<String> splitter(String from) {
+        return Splitter.on(",").splitToList(from);
     }
 
     public static String getServiceVersion() {
-        return serviceVersion;
+        return entity.getServiceVersion();
     }
 
     public static String getProfile() {
-        return profile;
+        return entity.getProfile();
     }
 
     public static String getHttpHost() {
-        return httpHost;
+        return entity.getHttpHost();
     }
 
-    public static void setHttpHost(String httpHost) {
-        GlobalConfig.httpHost = httpHost;
+    public static String getHostDomain() {
+        return entity.getHostDomain();
+    }
+
+    public static String getRunner() {
+        return entity.getRunner();
+    }
+
+    public static void setRunner(String runner) {
+        entity.setRunner(runner);
+    }
+
+    public static String getProjectName() {
+        return entity.getProjectName();
+    }
+
+    public static void setProjectName(String projectName) {
+        entity.setProjectName(projectName);
     }
 }

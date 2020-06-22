@@ -22,8 +22,8 @@ public class AtomicAutoTestRegistrar implements ImportBeanDefinitionRegistrar {
 
         Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(EnableAtomic.class.getName(),
                 false);
-        GlobalConfig.projectName = attributes.get("projectName").toString();
-        GlobalConfig.runner = attributes.get("runner").toString();
+        GlobalConfig.setProjectName(attributes.get("projectName").toString());
+        GlobalConfig.setRunner(attributes.get("runner").toString());
 
         BeanDefinitionBuilder definition = BeanDefinitionBuilder.genericBeanDefinition(ApplicationUtils.class);
         beanDefinitionRegistry.registerBeanDefinition("applicationUtils", definition.getBeanDefinition());

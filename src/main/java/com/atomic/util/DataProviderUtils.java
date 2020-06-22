@@ -2,8 +2,7 @@ package com.atomic.util;
 
 import com.atomic.param.Constants;
 import com.atomic.param.ParamUtils;
-import com.atomic.param.TestNGUtils;
-import com.atomic.param.parser.ExcelResolver;
+import com.atomic.param.excel.parser.ExcelResolver;
 import com.google.common.collect.Sets;
 
 import java.lang.reflect.Method;

@@ -7,6 +7,7 @@ package com.atomic.param;
 public final class CallBack {
 
     private CallBack() {
+
     }
 
     /**
