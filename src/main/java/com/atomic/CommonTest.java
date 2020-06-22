@@ -386,8 +386,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         try {
             File file = new File(MockFileHelper.getMockFile(getContext().getCaseIndex()));
             String data = getFileString(file);
-            Object o = JSON.parseObject(data, MockData.class);
-            MockData mockData = (MockData) o;
+            MockData mockData = JSON.parseObject(data, MockData.class);
             getContext().setMockData(mockData);
         } catch (Exception e) {
             throw new RuntimeException(e);

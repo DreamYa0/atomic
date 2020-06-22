@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.atomic.exception.QueryDataException;
 import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
-import com.atomic.util.DataSourceUtils;
 import com.atomic.param.parser.ExcelResolver;
+import com.atomic.util.DataSourceUtils;
 import com.atomic.util.ReflectionUtils;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import org.springframework.util.CollectionUtils;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
@@ -34,6 +36,10 @@ import static java.util.stream.Collectors.toList;
  */
 public final class StringUtils {
 
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Date.class,
+            (JsonDeserializer<Date>) (json, typeOfT, context) ->
+                    new Date(json.getAsJsonPrimitive().getAsLong())).setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
     private StringUtils() {
     }
 
@@ -42,9 +48,10 @@ public final class StringUtils {
      * @param clz
      * @return
      */
-    public static boolean isBasicType(Class clz) {
+    public static boolean isBasicType(Class<?> clz) {
         try {
-            return clz.isPrimitive() || Arrays.asList("String", "Date", "BigDecimal").contains(clz.getSimpleName()) || ((Class) clz.getField("TYPE").get(null)).isPrimitive();
+            return clz.isPrimitive() || Arrays.asList("String", "Date", "BigDecimal").contains(clz.getSimpleName()) ||
+                    ((Class<?>) clz.getField("TYPE").get(null)).isPrimitive();
         } catch (Exception e) {
             return false;
         }
@@ -82,7 +89,7 @@ public final class StringUtils {
             return value;
         } else if ("Date".equals(fieldType)) {
             return parseDate(value);
-        } else if (type instanceof Class && ((Class) type).isEnum()) {
+        } else if (type instanceof Class && ((Class<?>) type).isEnum()) {
             //增加对枚举的处理
             return Enum.valueOf((Class) type, value);
         } else {
@@ -92,7 +99,6 @@ public final class StringUtils {
             // 按照json解析
             // fastjson不能反序列化，如：en-SB等类型的字符串
             // return JSON.parseObject(value, type);
-            Gson gson = new Gson();
             return gson.fromJson(value, type);
         }
     }
@@ -236,7 +242,7 @@ public final class StringUtils {
      */
     protected static void transferMap2Bean(Object bean, Map<String, Object> valMap) {
 
-        Class cls = bean.getClass();
+        Class<?> cls = bean.getClass();
         List<Field> fields = new ArrayList<>();
         // 获取所有属性，包括继承的
         ReflectionUtils.getAllFields(cls, fields);
@@ -264,25 +270,25 @@ public final class StringUtils {
                     }
 
                     // 如果是基本类型也跳过
-                    if (isBasicType((Class) genericType)) {
+                    if (isBasicType((Class<?>) genericType)) {
                         // 基本类型
                         continue;
                     }
 
                     // 如是枚举类型也跳过
-                    if (((Class) genericType).isEnum()) {
+                    if (((Class<?>) genericType).isEnum()) {
                         continue;
                     }
 
                     // 自定义对象,且excel中未有对应字段的值或属性值为""，则采用excel多sheet进行设计
                     // 实例化自定义对象
-                    Object fieldObj = ReflectionUtils.initFromClass((Class) genericType);
+                    Object fieldObj = ReflectionUtils.initFromClass((Class<?>) genericType);
 
                     try {
                         Object object = valMap.get(Constants.TESTMETHODMETA);
                         MethodMeta methodMeta = (MethodMeta) object;
 
-                        Class testClass = methodMeta.getTestClass();
+                        Class<?> testClass = methodMeta.getTestClass();
                         String className = testClass.getSimpleName();
                         String resource = testClass.getResource("").getPath();
                         String filePath = resource + className + ".xls";
@@ -458,8 +464,8 @@ public final class StringUtils {
             throw new Exception("--------------参数格式错误！, 格式示例：foreach0:100 ---------------");
         }
         ForEachClass forEachClass = new ForEachClass();
-        forEachClass.setStart(Integer.valueOf(list[0]));
-        forEachClass.setEnd(Integer.valueOf(list[1]));
+        forEachClass.setStart(Integer.parseInt(list[0]));
+        forEachClass.setEnd(Integer.parseInt(list[1]));
         return forEachClass;
     }
 

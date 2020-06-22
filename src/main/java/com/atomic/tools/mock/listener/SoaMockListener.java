@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * @author dreamyao
@@ -27,14 +28,10 @@ import java.lang.reflect.Method;
 @ThreadSafe
 public class SoaMockListener implements TestExecutionListener {
 
-    private static final Method GET_TEST_CLASS;
-    private static final Method GET_TEST_METHOD;
     private static final Method GET_APPLICATION_CONTEXT;
 
     static {
         try {
-            GET_TEST_CLASS = TestContext.class.getMethod("getApplicationContext");
-            GET_TEST_METHOD = TestContext.class.getMethod("getTestMethod");
             GET_APPLICATION_CONTEXT = TestContext.class.getMethod("getApplicationContext");
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
@@ -68,14 +65,17 @@ public class SoaMockListener implements TestExecutionListener {
 
     @Override
     public void beforeTestMethod(TestContext testContext) throws Exception {
-        MockContext.getContext().setTestMethod(GET_TEST_METHOD.getName());
-        MockContext.getContext().setTestClass(GET_TEST_CLASS.getName());
+        Method testMethod = testContext.getTestMethod();
+        Class<?> testClass = testContext.getTestClass();
+        MockContext.getContext().setTestMethod(testMethod.getName());
+        MockContext.getContext().setTestClass(testClass.getName());
         MockContext.getContext().setRpcOrder(1);
         MockContext.getContext().setDbOrder(1);
         //未配全局模式,方法级别
         if (globalModeHolder == null) {
-            if (GET_TEST_METHOD.isAnnotationPresent(Mode.class)) {
-                MockContext.getContext().setMode(GET_TEST_METHOD.getAnnotation(Mode.class).value());
+            Mode mode = testMethod.getDeclaredAnnotation(Mode.class);
+            if (Objects.nonNull(mode)) {
+                MockContext.getContext().setMode(mode.value());
             } else {
                 MockContext.getContext().setMode(TestMethodMode.NORMAL);
             }
@@ -86,8 +86,9 @@ public class SoaMockListener implements TestExecutionListener {
         }
         //全局为正常模式，则方法的模式覆盖全局模式
         if (globalModeHolder != null && globalModeHolder.getGlobalMode() == GlobalMode.NORMAL) {
-            if (GET_TEST_METHOD.isAnnotationPresent(Mode.class)) {
-                MockContext.getContext().setMode(GET_TEST_METHOD.getAnnotation(Mode.class).value());
+            Mode mode = testMethod.getDeclaredAnnotation(Mode.class);
+            if (Objects.nonNull(mode)) {
+                MockContext.getContext().setMode(mode.value());
             } else {
                 MockContext.getContext().setMode(TestMethodMode.NORMAL);
             }

@@ -42,9 +42,8 @@ public class UnitTestFilter4Dubbo implements Filter {
             MockData4Rpc mockData4Rpc = new MockData4Rpc();
             mockData4Rpc.setRpcRequest(JacksonUtils.encode(invocation.getArguments()));
             mockData4Rpc.setApiResult(result.getValue());
-
-            mockData4Rpc.setRpcResult(result);
-            mockData4Rpc.setRpcMethod(invocation.getInvoker().getInterface() + ":" + invocation.getMethodName());
+            mockData4Rpc.setRpcMethod(invocation.getInvoker().getInterface().getName() + ":" + invocation.getMethodName());
+            mockData4Rpc.setAttachments(result.getAttachments());
             mockDataService.insertMockData(mockData4Rpc);
 
             return result;

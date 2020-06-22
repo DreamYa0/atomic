@@ -2,20 +2,19 @@ package com.atomic;
 
 import com.atomic.config.CenterConfig;
 import com.atomic.exception.InjectResultException;
-import com.atomic.report.ReportListener;
-import com.atomic.rollback.RollBackListener;
-import com.atomic.report.SaveRunTime;
-import com.atomic.rollback.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.ExcelParamConverter;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.TestNGUtils;
+import com.atomic.report.ReportListener;
 import com.atomic.report.SaveResultCache;
+import com.atomic.report.SaveRunTime;
+import com.atomic.rollback.RollBackListener;
+import com.atomic.rollback.ScenarioRollBackListener;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import io.restassured.http.Header;
 import io.restassured.http.Headers;
 import io.restassured.response.Response;
@@ -146,7 +145,6 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
             specification = specification.headers(headers);
         } else if (isHttpHeaderNoNull(newContext) && newContext.get(HTTP_HEADER) != null) {
 
-            Gson gson = new Gson();
             // 把Header json字符串反序列化为List<Header>
             String headerStr = newContext.get(HTTP_HEADER).toString();
             List<Map<String, String>> headerMapList = gson.fromJson(headerStr, new TypeToken<List<Map<String, String>>>() {
@@ -199,7 +197,6 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
                 response = specification.body(request).when().post(uri);
                 newContext.put(Constants.PARAMETER_NAME_, parameters.get("request"));
 
-                Gson gson = new Gson();
                 parameters = gson.fromJson(request, new TypeToken<Map<String, Objects>>() {}.getType());
 
             } else {

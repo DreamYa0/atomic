@@ -22,7 +22,6 @@ public class UnitTestAssertor  extends AbstractAssertor {
 
         // 当有预期结果时执行详细断言
         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(excContext))) {
-            Gson gson = new Gson();
             String jsonResult = gson.toJson(result);
             JsonPath resultPath = JsonPath.from(jsonResult);
             assertJsonPath(excContext, resultPath);

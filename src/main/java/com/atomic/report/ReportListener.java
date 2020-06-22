@@ -12,6 +12,7 @@ import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.model.TestAttribute;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.restassured.response.Response;
 import org.springframework.util.CollectionUtils;
 import org.testng.IReporter;
@@ -40,6 +41,7 @@ import static java.util.Comparator.comparing;
  */
 public class ReportListener implements IReporter {
 
+    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     private ExtentReports extent;
     private String projectName;
     private String[] runAuthor;
@@ -194,7 +196,6 @@ public class ReportListener implements IReporter {
 
                 Map<String, Object> context = TestNGUtils.getParamContext(result);
                 if (Boolean.FALSE.equals(CollectionUtils.isEmpty(context))) {
-                    Gson gson = new Gson();
                     test.info("入参：" + gson.toJson(context.get(Constants.PARAMETER_NAME_)));
 
                     Object obj = context.get(Constants.RESULT_NAME);

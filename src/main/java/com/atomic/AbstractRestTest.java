@@ -2,6 +2,8 @@ package com.atomic;
 
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.parser.ExcelResolver;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.testng.Reporter;
 import org.testng.annotations.DataProvider;
 
@@ -23,6 +25,8 @@ import static com.atomic.param.ParamUtils.isValueTrue;
  * @since 1.0.0
  */
 public abstract class AbstractRestTest {
+
+    protected static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     /**
      * 接口数据驱动
      * @param method

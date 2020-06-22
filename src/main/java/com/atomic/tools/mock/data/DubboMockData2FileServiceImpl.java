@@ -1,7 +1,6 @@
 package com.atomic.tools.mock.data;
 
 import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcResult;
 import com.atomic.param.StringUtils;
 import com.atomic.tools.mock.dto.MockData;
@@ -11,6 +10,7 @@ import com.atomic.tools.mock.util.JacksonUtils;
 import com.atomic.util.FileUtils;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * @author jsy.
@@ -35,8 +35,11 @@ public class DubboMockData2FileServiceImpl implements MockDataService<MockData4R
         MockData mockData = MockContext.getContext().getMockData();
 
         //根据序号取值，order从1开始，数组从0开始，所以减1
-        Result result = mockData.getRpcData().get(MockContext.getContext().getRpcOrderAndIncrease() - 1);
-        RpcResult ret = (RpcResult) JacksonUtils.decode(JacksonUtils.encode(result), RpcResult.class);
+        MockData4Rpc mockData4Rpc = mockData.getRpcData().get(MockContext.getContext().getRpcOrderAndIncrease() - 1);
+        RpcResult ret = new RpcResult();
+        Map<String, String> attachments = mockData4Rpc.getAttachments();
+        attachments.forEach(ret::setAttachment);
+        ret.setValue(mockData4Rpc.getApiResult());
         try {
             Method method = invocation.getInvoker().getInterface()
                     .getMethod(invocation.getMethodName(), invocation.getParameterTypes());
@@ -53,7 +56,7 @@ public class DubboMockData2FileServiceImpl implements MockDataService<MockData4R
 
     @Override
     public void insertMockData(MockData4Rpc mockData) {
-        MockContext.getContext().getMockData().getRpcData().add((RpcResult) mockData.getRpcResult());
+        MockContext.getContext().getMockData().getRpcData().add(mockData);
 
     }
 

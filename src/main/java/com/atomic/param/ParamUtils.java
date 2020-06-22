@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 public final class ParamUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ParamUtils.class);
+    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     private ParamUtils() {
     }
@@ -543,7 +544,6 @@ public final class ParamUtils {
                     }
                     return jsonStr;
                 } else {
-                    Gson gson = new Gson();
                     try {
                         jsonStr = gson.toJson(obj);
                     } catch (Exception e) {

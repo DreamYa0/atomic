@@ -1,13 +1,13 @@
 package com.atomic.tools.mock.dto;
 
-import com.alibaba.dubbo.rpc.Result;
+import java.util.Map;
 
 public class MockData4Rpc {
 
     private String rpcMethod;
     private String rpcRequest;
-    private Result rpcResult;
     private Object apiResult;
+    private Map<String, String> attachments;
 
     public String getRpcMethod() {
         return rpcMethod;
@@ -25,14 +25,6 @@ public class MockData4Rpc {
         this.rpcRequest = rpcRequest;
     }
 
-    public Result getRpcResult() {
-        return rpcResult;
-    }
-
-    public void setRpcResult(Result rpcResult) {
-        this.rpcResult = rpcResult;
-    }
-
     public Object getApiResult() {
         return apiResult;
     }
@@ -41,4 +33,11 @@ public class MockData4Rpc {
         this.apiResult = apiResult;
     }
 
+    public Map<String, String> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(Map<String, String> attachments) {
+        this.attachments = attachments;
+    }
 }

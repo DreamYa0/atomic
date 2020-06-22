@@ -8,6 +8,7 @@ import com.atomic.param.TestNGUtils;
 import com.atomic.param.entity.AutoTestProject;
 import com.atomic.param.entity.AutoTestResult;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.restassured.response.Response;
 import org.springframework.util.StringUtils;
 import org.testng.ITestResult;
@@ -29,6 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @ThreadSafe
 public class SaveResultListener extends TestListenerAdapter {
+
+    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     /**
      * 项目ID
@@ -85,7 +88,7 @@ public class SaveResultListener extends TestListenerAdapter {
             } else {
                 expectedReturn = context.get(Constants.EXPECTED_RESULT).toString();
             }
-            Gson gson = new Gson();
+
             Object param = context.get(Constants.PARAMETER_NAME_);
 
             if (Objects.isNull(param) && Objects.isNull(methodsReturn)) {
