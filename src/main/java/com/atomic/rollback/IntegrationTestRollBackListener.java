@@ -8,7 +8,6 @@ import com.atomic.tools.db.Changes;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import org.springframework.util.CollectionUtils;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
 import org.testng.ITestResult;
@@ -62,12 +61,14 @@ public class IntegrationTestRollBackListener extends TestListenerAdapter {
 
     @Override
     public void onTestStart(ITestResult testResult) {
+        Changes changes = new Changes();
         if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) &&
                 !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
             String dbName = AnnotationUtils.getDbName(TestNGUtils.getTestMethod(testResult));
             String[] tableNames = AnnotationUtils.getTableName(TestNGUtils.getTestMethod(testResult));
             // 开启监听，当为@RollBack注解时执行单库,多表数据回滚
-            RollBack.newInstance().setStartPoint(dbName, new Changes(), tableNames);
+            dbNameAndChanges.put(dbName, changes);
+            RollBack.newInstance().setStartPoint(dbName, changes, tableNames);
         } else if (AnnotationUtils.isRollBackAllMethod(TestNGUtils.getTestMethod(testResult)) &&
                 !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 当为@RollBackAll注解时执行多库,多表数据回滚
@@ -78,7 +79,7 @@ public class IntegrationTestRollBackListener extends TestListenerAdapter {
                     Set<String> set = multimap.keySet();
                     List<String> stringList = Lists.newArrayList(set);
                     for (String dbName : stringList) {
-                        dbNameAndChanges.put(dbName, new Changes());
+                        dbNameAndChanges.put(dbName, changes);
                     }
                     if (dbNameAndChanges.size() >= 6) {
                         Reporter.log("-----------------回滚数据库限制不能超过6个！--------------");
@@ -99,30 +100,6 @@ public class IntegrationTestRollBackListener extends TestListenerAdapter {
             } catch (RollBackException e) {
                 Reporter.log("-----------------回滚数据库限制不能超过6个！--------------");
                 throw new RollBackException("回滚数据库限制不能超过6个！");
-            }
-        }
-    }
-
-    @Override
-    public void onTestSuccess(ITestResult tr) {
-        finishRollBack();
-    }
-
-    @Override
-    public void onTestFailure(ITestResult tr) {
-        finishRollBack();
-    }
-
-    @Override
-    public void onTestSkipped(ITestResult tr) {
-        finishRollBack();
-    }
-
-    private void finishRollBack() {
-        if (!CollectionUtils.isEmpty(dbNameAndChanges)) {
-            Set<Map.Entry<String, Changes>> entries = dbNameAndChanges.entrySet();
-            for (Map.Entry<String, Changes> map : entries) {
-                RollBack.newInstance().setEndPoint(map.getKey(), map.getValue());
             }
         }
     }
