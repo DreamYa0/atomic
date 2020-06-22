@@ -562,9 +562,7 @@ public class AutoTest {
     }
 
     private static void setArray(int[] index, int value) {
-        for (int i = 0; i < index.length; i++) {
-            index[i] = value;
-        }
+        Arrays.fill(index, value);
     }
 
     /**
@@ -614,7 +612,7 @@ public class AutoTest {
         /**
          * 自动测试参数的类型
          */
-        private Class paramClass;
+        private Class<?> paramClass;
         /**
          * 自动测试参数的自动测试列表
          */
@@ -624,11 +622,11 @@ public class AutoTest {
             this.paramName = paramName;
         }
 
-        public Class getParamClass() {
+        public Class<?> getParamClass() {
             return paramClass;
         }
 
-        public void setParamClass(Class paramClass) {
+        public void setParamClass(Class<?> paramClass) {
             this.paramClass = paramClass;
         }
 
