@@ -6,13 +6,12 @@ import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.entity.AutoTestResult;
 import com.atomic.param.parser.ExcelResolver;
+import com.atomic.util.GsonUtils;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.model.TestAttribute;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.restassured.response.Response;
 import org.springframework.util.CollectionUtils;
 import org.testng.IReporter;
@@ -41,7 +40,6 @@ import static java.util.Comparator.comparing;
  */
 public class ReportListener implements IReporter {
 
-    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     private ExtentReports extent;
     private String projectName;
     private String[] runAuthor;
@@ -196,14 +194,14 @@ public class ReportListener implements IReporter {
 
                 Map<String, Object> context = TestNGUtils.getParamContext(result);
                 if (Boolean.FALSE.equals(CollectionUtils.isEmpty(context))) {
-                    test.info("入参：" + gson.toJson(context.get(Constants.PARAMETER_NAME_)));
+                    test.info("入参：" + GsonUtils.getGson().toJson(context.get(Constants.PARAMETER_NAME_)));
 
                     Object obj = context.get(Constants.RESULT_NAME);
                     if (obj instanceof Response) {
                         Response response = (Response) obj;
                         test.info("出参：" + response.asString());
                     } else {
-                        test.info("出参：" + gson.toJson(obj));
+                        test.info("出参：" + GsonUtils.getGson().toJson(obj));
                     }
 
                     String className = TestNGUtils.getTestCaseClassName(result);
@@ -213,7 +211,7 @@ public class ReportListener implements IReporter {
 
                     ExcelResolver excel = new ExcelResolver(filePath, "exceptResult");
                     Map<String, Object> exceptResult = excel.readDataByRow(Integer.valueOf(context.get(Constants.CASE_INDEX).toString()));
-                    test.info("断言内容：" + gson.toJson(exceptResult));
+                    test.info("断言内容：" + GsonUtils.getGson().toJson(exceptResult));
                 }
 
 

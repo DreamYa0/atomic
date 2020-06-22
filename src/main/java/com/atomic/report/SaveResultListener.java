@@ -7,8 +7,7 @@ import com.atomic.param.HandleMethodName;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.entity.AutoTestProject;
 import com.atomic.param.entity.AutoTestResult;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.atomic.util.GsonUtils;
 import io.restassured.response.Response;
 import org.springframework.util.StringUtils;
 import org.testng.ITestResult;
@@ -30,8 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @ThreadSafe
 public class SaveResultListener extends TestListenerAdapter {
-
-    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     /**
      * 项目ID
@@ -114,12 +111,12 @@ public class SaveResultListener extends TestListenerAdapter {
                 String jsonParam;
                 String jsonReturn;
                 try {
-                    jsonParam = gson.toJson(methodsParameter[0]);
+                    jsonParam = GsonUtils.getGson().toJson(methodsParameter[0]);
                 } catch (Exception e) {
                     jsonParam = JSON.toJSONString(methodsParameter[0]);
                 }
                 try {
-                    jsonReturn = gson.toJson(methodsReturn);
+                    jsonReturn = GsonUtils.getGson().toJson(methodsReturn);
                 } catch (Exception e) {
                     jsonReturn = JSON.toJSONString(methodsReturn);
                 }
@@ -129,7 +126,7 @@ public class SaveResultListener extends TestListenerAdapter {
 
             String jsonReturn;
             try {
-                jsonReturn = gson.toJson(methodsReturn);
+                jsonReturn = GsonUtils.getGson().toJson(methodsReturn);
             } catch (Exception e) {
                 jsonReturn = JSON.toJSONString(methodsReturn);
             }

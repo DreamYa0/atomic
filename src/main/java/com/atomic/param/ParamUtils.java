@@ -6,6 +6,7 @@ import com.atomic.exception.ParameterException;
 import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.parser.ExcelResolver;
+import com.atomic.util.GsonUtils;
 import com.atomic.util.ReflectionUtils;
 import com.g7.framework.common.dto.BaseRequest;
 import com.google.common.collect.Lists;
@@ -43,7 +44,6 @@ import java.util.stream.Collectors;
 public final class ParamUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ParamUtils.class);
-    private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     private ParamUtils() {
     }
@@ -349,7 +349,7 @@ public final class ParamUtils {
                     if (param.containsKey("data")) {
                         // 当Excel中data字段值为Json时
                         String dataJson = param.get("data").toString();
-                        data = StringUtils.json2Bean(new Gson(), dataJson, paramClass);
+                        data = StringUtils.json2Bean(GsonUtils.getGson(), dataJson, paramClass);
                     } else {
                         // 设置属性值
                         data = ReflectionUtils.initFromClass(paramClass);
@@ -545,7 +545,7 @@ public final class ParamUtils {
                     return jsonStr;
                 } else {
                     try {
-                        jsonStr = gson.toJson(obj);
+                        jsonStr = GsonUtils.getGson().toJson(obj);
                     } catch (Exception e) {
                         jsonStr = JSON.toJSONStringWithDateFormat(obj, dateFormat);
                     }

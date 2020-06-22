@@ -12,6 +12,7 @@ import com.atomic.report.SaveResultCache;
 import com.atomic.report.SaveRunTime;
 import com.atomic.rollback.RollBackListener;
 import com.atomic.rollback.ScenarioRollBackListener;
+import com.atomic.util.GsonUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
@@ -147,7 +148,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
 
             // 把Header json字符串反序列化为List<Header>
             String headerStr = newContext.get(HTTP_HEADER).toString();
-            List<Map<String, String>> headerMapList = gson.fromJson(headerStr, new TypeToken<List<Map<String, String>>>() {
+            List<Map<String, String>> headerMapList = GsonUtils.getGson().fromJson(headerStr, new TypeToken<List<Map<String, String>>>() {
             }.getType());
 
             List<Header> headerList = Lists.newArrayList();
@@ -197,7 +198,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
                 response = specification.body(request).when().post(uri);
                 newContext.put(Constants.PARAMETER_NAME_, parameters.get("request"));
 
-                parameters = gson.fromJson(request, new TypeToken<Map<String, Objects>>() {}.getType());
+                parameters = GsonUtils.getGson().fromJson(request, new TypeToken<Map<String, Objects>>() {}.getType());
 
             } else {
 

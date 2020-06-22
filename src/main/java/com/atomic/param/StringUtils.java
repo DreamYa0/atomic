@@ -6,10 +6,9 @@ import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.parser.ExcelResolver;
 import com.atomic.util.DataSourceUtils;
+import com.atomic.util.GsonUtils;
 import com.atomic.util.ReflectionUtils;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
 import org.springframework.util.CollectionUtils;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
@@ -35,10 +34,6 @@ import static java.util.stream.Collectors.toList;
  * @version 1.0 Created by dreamyao on 2017/5/9.
  */
 public final class StringUtils {
-
-    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Date.class,
-            (JsonDeserializer<Date>) (json, typeOfT, context) ->
-                    new Date(json.getAsJsonPrimitive().getAsLong())).setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
     private StringUtils() {
     }
@@ -99,7 +94,7 @@ public final class StringUtils {
             // 按照json解析
             // fastjson不能反序列化，如：en-SB等类型的字符串
             // return JSON.parseObject(value, type);
-            return gson.fromJson(value, type);
+            return GsonUtils.getGson().fromJson(value, type);
         }
     }
 
@@ -131,7 +126,7 @@ public final class StringUtils {
      * @return
      */
     private static <T> T json2Bean(String jsonString, Type type) {
-        return json2Bean(new Gson(), jsonString, type);
+        return json2Bean(GsonUtils.getGson(), jsonString, type);
     }
 
     /**

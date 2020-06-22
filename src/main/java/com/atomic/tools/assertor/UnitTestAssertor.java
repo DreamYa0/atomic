@@ -1,7 +1,7 @@
 package com.atomic.tools.assertor;
 
 import com.atomic.param.Constants;
-import com.google.gson.Gson;
+import com.atomic.util.GsonUtils;
 import io.restassured.path.json.JsonPath;
 import org.springframework.util.CollectionUtils;
 
@@ -22,7 +22,7 @@ public class UnitTestAssertor  extends AbstractAssertor {
 
         // 当有预期结果时执行详细断言
         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(excContext))) {
-            String jsonResult = gson.toJson(result);
+            String jsonResult = GsonUtils.getGson().toJson(result);
             JsonPath resultPath = JsonPath.from(jsonResult);
             assertJsonPath(excContext, resultPath);
         }
