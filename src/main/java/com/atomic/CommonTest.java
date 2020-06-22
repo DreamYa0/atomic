@@ -7,8 +7,6 @@ import com.atomic.enums.AutoTestMode;
 import com.atomic.exception.MethodMetaException;
 import com.atomic.exception.ParameterException;
 import com.atomic.exception.ThrowException;
-import com.atomic.rollback.IntegrationTestRollBackListener;
-import com.atomic.report.ReportListener;
 import com.atomic.param.AutoTest;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
@@ -17,6 +15,8 @@ import com.atomic.param.StringUtils;
 import com.atomic.param.TestNGUtils;
 import com.atomic.param.assertcheck.AssertCheckUtils;
 import com.atomic.param.entity.MethodMeta;
+import com.atomic.report.ReportListener;
+import com.atomic.rollback.IntegrationTestRollBackListener;
 import com.atomic.tools.mock.dto.MockData;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.util.FileUtils;
@@ -41,10 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -59,8 +56,6 @@ import java.util.concurrent.Executors;
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.exception.ExceptionUtils.isExceptionThrowsBySpecialMethod;
-import static com.atomic.report.SaveRunTime.endTestTime;
-import static com.atomic.report.SaveRunTime.startTestTime;
 import static com.atomic.param.AutoTest.generateAutoTestCases;
 import static com.atomic.param.Constants.EXCEL_DESC;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
@@ -75,10 +70,12 @@ import static com.atomic.param.ResultAssert.assertResult;
 import static com.atomic.param.ResultAssert.exceptionDeal;
 import static com.atomic.param.StringUtils.isExcelValueEmpty;
 import static com.atomic.param.TestNGUtils.injectResultAndParameters;
-import static com.atomic.tools.mock.data.MockContext.getContext;
-import static com.atomic.util.ApplicationUtils.getBean;
 import static com.atomic.report.SaveResultCache.saveTestRequestInCache;
 import static com.atomic.report.SaveResultCache.saveTestResultInCache;
+import static com.atomic.report.SaveRunTime.endTestTime;
+import static com.atomic.report.SaveRunTime.startTestTime;
+import static com.atomic.tools.mock.data.MockContext.getContext;
+import static com.atomic.util.ApplicationUtils.getBean;
 
 
 /**
@@ -152,11 +149,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
      * @return
      */
     private boolean isMultiThreads(Map<String, Object> context) {
-        if (!isExcelValueEmpty(context.get(THREAD_COUNT)) && Integer.valueOf(context.get(THREAD_COUNT).toString()) > 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return !isExcelValueEmpty(context.get(THREAD_COUNT)) &&
+                Integer.parseInt(context.get(THREAD_COUNT).toString()) > 1;
     }
 
     private void autoTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
@@ -167,7 +161,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
         long start = System.currentTimeMillis();
         List<Map<String, Object>> allTestCases = generateAutoTestCases(testResult, this);
-        System.out.println("------------------------------------------自动化测试开始，测试用例数量：" + allTestCases.size() + "------------------------------------------");
+        System.out.println("------------------------------------------自动化测试开始，测试用例数量："
+                + allTestCases.size() + "------------------------------------------");
         final Exception[] exception = {null};
         Map<String, List<Map<String, Object>>> exceptionMsgs = Maps.newHashMap();
         allTestCases.forEach(newParam -> {
@@ -183,14 +178,18 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             }
         });
         long end = System.currentTimeMillis();
-        System.out.println("------------------------------------------自动化测试结束，耗时：" + (end - start) / 1000 + "s------------------------------------------");
+        System.out.println("------------------------------------------自动化测试结束，耗时："
+                + (end - start) / 1000 + "s------------------------------------------");
         // 如果有异常则抛出，提醒测试未通过
         AutoTest.printExceptions(exception[0], exceptionMsgs);
     }
 
-    @SuppressWarnings("unchecked")
-    private void multiThreadTest(final Map<String, Object> context, final IHookCallBack callBack, final ITestResult testResult) throws Exception {
-        int threadCount = Integer.valueOf(context.get(THREAD_COUNT).toString());
+    @SuppressWarnings("all")
+    private void multiThreadTest(final Map<String, Object> context,
+                                 final IHookCallBack callBack,
+                                 final ITestResult testResult) throws Exception {
+
+        int threadCount = Integer.parseInt(context.get(THREAD_COUNT).toString());
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         // 构建完成服务
         CompletionService completionService = new ExecutorCompletionService(executor);
@@ -212,7 +211,9 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         executor.shutdown();
     }
 
-    private void startRunTest(Map<String, Object> context, IHookCallBack callBack, ITestResult testResult) throws Exception {
+    private void startRunTest(Map<String, Object> context,
+                              IHookCallBack callBack,
+                              ITestResult testResult) throws Exception {
         // 初始化DB
         initDb();
 
@@ -231,7 +232,11 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
     }
 
-    private void handleException(Exception e, Map<String, Object> context, IHookCallBack callBack, ITestResult testResult) {
+    private void handleException(Exception e,
+                                 Map<String, Object> context,
+                                 IHookCallBack callBack,
+                                 ITestResult testResult) {
+
         // 期望结果为 Y 直接抛异常 ；beforeTest里面的异常也直接抛出
         if (isExpectSuccess(context) || isExceptionThrowsBySpecialMethod(e, "beforeTest")) {
             Reporter.log("[ExceptionUtils#handleException()]:{} ---> beforeTest方法执行异常！");
@@ -241,13 +246,16 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         context.put(RESULT_NAME, exceptionDeal(e));
         try {
             MethodMeta methodMeta = getMethodMeta(context, testResult, this);
-            resultPrint(methodMeta.getInterfaceMethod().getName(), context.get(RESULT_NAME), context, context.get(PARAMETER_NAME_));
+            resultPrint(methodMeta.getInterfaceMethod().getName(), context.get(RESULT_NAME), context,
+                    context.get(PARAMETER_NAME_));
         } catch (Exception e1) {
             throw new MethodMetaException(e1);
         }
     }
 
-    private void execAssertMethod(Map<String, Object> context, IHookCallBack callBack, ITestResult testResult) throws Exception {
+    private void execAssertMethod(Map<String, Object> context,
+                                  IHookCallBack callBack,
+                                  ITestResult testResult) throws Exception {
         // 自动断言
         AssertCheckUtils.assertCheck(this, context);
         // 注入参数和结果，context 会去掉系统使用的一些数据
@@ -272,7 +280,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         final MethodMeta methodMeta = getMethodMeta(context, testResult, this);
         // 先判断是不是foreach循环，不是就只执行一次
         Object value = context.get(methodMeta.getMultiTimeField());
-        execMethodMulitTimes(value, paramValue -> prepareExecMethod(testResult, paramValue, context, methodMeta, callback));
+        execMethodMulitTimes(value, paramValue -> prepareExecMethod(testResult, paramValue, context,
+                methodMeta, callback));
     }
 
     private void execMethodMulitTimes(Object paramValue, ITestMethodMultiTimes testMethod) throws Exception {
@@ -287,7 +296,11 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
     }
 
-    private void prepareExecMethod(ITestResult testResult, Object paramValue, Map<String, Object> context, final MethodMeta methodMeta, ITestResultCallback callback) throws Exception {
+    private void prepareExecMethod(ITestResult testResult,
+                                   Object paramValue,
+                                   Map<String, Object> context,
+                                   final MethodMeta methodMeta,
+                                   ITestResultCallback callback) throws Exception {
 
         // 如果有新值，替换成新值
         Map<String, Object> newParam = Maps.newHashMap(context);
@@ -303,7 +316,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         // 构造请求入参对象
         final Object[] parameters = generateParametersNew(methodMeta, newParam);
 
-        if ((!isAutoTest(context) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) && isScenario(TestNGUtils.getTestMethod(testResult))) {
+        if ((!isAutoTest(context) && !AnnotationUtils.isAutoTest(TestNGUtils.getTestMethod(testResult))) &&
+                isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
             saveTestRequestInCache(parameters[0], testResult, context);
         }
@@ -317,7 +331,11 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         execMethod(testResult, methodMeta, context, callback, parameters);
     }
 
-    private void execMethod(ITestResult testResult, MethodMeta methodMeta, Map<String, Object> context, ITestResultCallback callback, Object... parameters) throws Exception {
+    private void execMethod(ITestResult testResult,
+                            MethodMeta methodMeta,
+                            Map<String, Object> context,
+                            ITestResultCallback callback,
+                            Object... parameters) throws Exception {
 
         Method method = methodMeta.getInterfaceMethod();
         Object interfaceObj = methodMeta.getInterfaceObj();
@@ -385,37 +403,12 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
     private void loadData() {
         try {
             File file = new File(MockFileHelper.getMockFile(getContext().getCaseIndex()));
-            String data = getFileString(file);
+            String data = MockFileHelper.getFileString(file);
             MockData mockData = JSON.parseObject(data, MockData.class);
             getContext().setMockData(mockData);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String getFileString(File file) {
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader reader = null;
-        try {
-            System.out.println("以行为单位读取文件内容，一次读一整行：");
-            reader = new BufferedReader(new FileReader(file));
-            String tempString = null;
-            // 一次读入一行，直到读入null为文件结束
-            while ((tempString = reader.readLine()) != null) {
-                stringBuilder.append(tempString);
-            }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e1) {
-                }
-            }
-        }
-        return stringBuilder.toString();
     }
 
     /**
@@ -433,7 +426,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             if (name.startsWith("data-") && name.endsWith(".sql")) {
                 String dataSource = name.replace("data-", "").replace(".sql", "");
                 try {
-                    executeSql(dataSource, Files.asCharSource(file, Charsets.UTF_8).read(), true);
+                    executeSql(dataSource, Files.asCharSource(file, Charsets.UTF_8).read(),
+                            true);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -450,7 +444,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
     private void executeSql(String dataSourceName, String sql, boolean isCheckEmbeddedDataSource) throws SQLException {
         DataSource dataSource = (DataSource) getBean(dataSourceName);
         // 不是内存数据库就不执行初始化
-        if (isCheckEmbeddedDataSource && !(dataSource instanceof SimpleDriverDataSource && ((SimpleDriverDataSource) dataSource).getUrl().startsWith("jdbc:h2"))) {
+        if (isCheckEmbeddedDataSource && !(dataSource instanceof SimpleDriverDataSource &&
+                ((SimpleDriverDataSource) dataSource).getUrl().startsWith("jdbc:h2"))) {
             return;
         }
         Connection conn = dataSource.getConnection();
