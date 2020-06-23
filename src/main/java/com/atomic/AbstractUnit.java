@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 // @ContextConfiguration(locations = {"/test-service.xml"})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, SoaMockListener.class})
-public abstract class AbstractUnitTest extends AbstractTestNGSpringContextTests {
+public abstract class AbstractUnit extends AbstractTestNGSpringContextTests {
 
     @DataProvider(name = "excel")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {

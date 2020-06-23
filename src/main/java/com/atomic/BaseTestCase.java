@@ -59,16 +59,9 @@ public abstract class BaseTestCase<T> extends CommonTest<T> {
         return 0;
     }
 
-    /**
-     * 数据库请求结果的封装，用于数据库端口
-     * <p>
-     * 例如：assertThat(getRequest(sql)).Row().value()
-     * </p>
-     *
-     * @param querySql 查询Sql语句
-     * @return 结果的封装
-     */
     protected final Request getRequest(String dbName, String querySql, Object... parameters) {
+        // 数据库请求结果的封装，用于数据库端口
+        // 例如：assertThat(getRequest(sql)).Row().value()
         DataSource dataSource = getDataSource(dbName);
         return new Request(dataSource, querySql, parameters);
     }

@@ -98,9 +98,6 @@ public final class Constants {
     /** testmethodmeta对象 */
     public static final String TESTMETHODMETA = "testmethodmeta";
 
-    /** ip和端口 */
-    public static final String EXCEL_IPANDPORT = "ipPort";
-
     /** 测试用例的序号 */
     public static final String CASE_INDEX = "CASE_INDEX";
 
@@ -128,35 +125,8 @@ public final class Constants {
     /** 运行指定测试方法 */
     public static final String RUN_TEST_CLASSES = "run.test.classes";
 
-    /** 数据库IP */
-    public static final String JDBC_IP = "jdbc.ip";
-
-    /** 数据库账号 */
-    public static final String JDBC_USER = "jdbc.user";
-
-    /** 数据库密码 */
-    public static final String JDBC_PASSWORD = "jdbc.password";
-
-    /** 数据库名称 */
-    public static final String JDBC_NAME = "jdbc.name";
-
-    /** MongoDB数据库IP */
-    public static final String MONGODB_IP = "mongodb.ip";
-
-    /** MongoDB数据库账号 */
-    public static final String MONGODB_USER = "mongodb.user";
-
-    /** MongoDB数据库密码 */
-    public static final String MONGODB_PASSWORD = "mongodb.password";
-
-    /** MySql驱动名称 */
-    public static final String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-
     /** zookeeper URL地址 */
     public static final String ZOOKEEPER = "zookeeper";
-
-    /** 预发布环境HTTP代理 */
-    public static final String HTTP_PROXY = "http.proxy";
 
     /** excel中表示身份证号标示 */
     public static final String ID_CARD = "${card}";
@@ -169,9 +139,6 @@ public final class Constants {
 
     /** excel中表示当前时间标示 */
     public static final String NOW_DAY = "${now()}";
-
-    /** 预防布环境 */
-    public static final String PROFILE_TESTING = "testing";
 
     /** 日期时间格式 */
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";

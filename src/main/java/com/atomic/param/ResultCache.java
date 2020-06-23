@@ -17,12 +17,12 @@ import static com.atomic.param.Constants.CASE_INDEX;
  * @version 1.0
  *          Created by dreamyao on 2017/5/29.
  */
-public final class SaveResultCache {
+public final class ResultCache {
 
     private static Cache<String, Object> testDataCache = CacheBuilder.newBuilder().build();
     private static Cache<String, Object> testRequestCache = CacheBuilder.newBuilder().build();
 
-    private SaveResultCache() {
+    private ResultCache() {
     }
 
     public static void saveTestResultInCache(Object result, ITestResult testResult, Map<String, Object> context) {

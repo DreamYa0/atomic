@@ -12,7 +12,7 @@ import java.util.Iterator;
  * @date 2019-12-27 13:03
  * @since 1.0.0
  */
-public abstract class AbstractDubboTest {
+public abstract class AbstractDubbo {
 
     @DataProvider(name = "excel")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {

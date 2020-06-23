@@ -61,9 +61,9 @@ import static org.apache.commons.lang3.reflect.FieldUtils.readField;
  * @version v2.0.0
  * @date 2018/05/30 10:48
  */
-public final class ResultAssert {
+public final class AssertResult {
 
-    private ResultAssert() {
+    private AssertResult() {
 
     }
 

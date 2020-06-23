@@ -7,7 +7,7 @@ import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
 import com.atomic.tools.report.ReportListener;
-import com.atomic.param.SaveResultCache;
+import com.atomic.param.ResultCache;
 import com.atomic.tools.report.SaveRunTime;
 import com.atomic.tools.rollback.RollBackListener;
 import com.atomic.tools.rollback.ScenarioRollBackListener;
@@ -45,10 +45,10 @@ import static com.atomic.param.ParamUtils.isContentTypeNoNull;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
-import static com.atomic.tools.assertcheck.ResultAssert.assertResultForRest;
+import static com.atomic.tools.assertcheck.AssertResult.assertResultForRest;
 import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
 import static com.atomic.tools.report.ParamPrint.resultPrint;
-import static com.atomic.param.SaveResultCache.saveTestRequestInCache;
+import static com.atomic.param.ResultCache.saveTestRequestInCache;
 import static com.atomic.util.TestNGUtils.injectResultAndParameters;
 import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
@@ -64,7 +64,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @date  2018/05/30 10:48
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
-public abstract class BaseRestful extends AbstractRestTest implements IHookable, ITestBase {
+public abstract class BaseRestful extends AbstractRest implements IHookable, ITestBase {
 
     @Override
     public void initDb() {
@@ -109,7 +109,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         //记录方法调用结束时间
         SaveRunTime.endTestTime(testResult);
         // 缓存入参和返回值
-        SaveResultCache.saveTestResultInCache(response, testResult, newContext);
+        ResultCache.saveTestResultInCache(response, testResult, newContext);
         execMethod(response, testResult, callBack, newContext);
     }
 

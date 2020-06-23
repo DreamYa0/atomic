@@ -22,7 +22,7 @@ import static com.atomic.param.ParamUtils.isValueTrue;
  * @date  2018/4/21 下午10:05
  * @since 1.0.0
  */
-public abstract class AbstractRestTest {
+public abstract class AbstractRest {
 
     @DataProvider(name = "excel")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {

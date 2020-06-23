@@ -43,9 +43,9 @@ import static com.atomic.annotations.AnnotationUtils.isServiceVersion;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.CASE_NAME;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
-import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
-import static com.atomic.param.SaveResultCache.saveTestRequestInCache;
-import static com.atomic.param.SaveResultCache.saveTestResultInCache;
+import static com.atomic.tools.assertcheck.AssertResult.assertResult;
+import static com.atomic.param.ResultCache.saveTestRequestInCache;
+import static com.atomic.param.ResultCache.saveTestResultInCache;
 import static com.atomic.tools.report.SaveRunTime.endTestTime;
 import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.TestNGUtils.getParamContext;
@@ -80,7 +80,7 @@ import static com.atomic.util.TestNGUtils.injectScenarioReturnResult;
  * @title dubbo接口测试基类
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
-public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookable, ITestBase {
+public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, ITestBase {
 
     protected final DubboServiceFactory dubboServiceFactory = new DubboServiceFactory();
 

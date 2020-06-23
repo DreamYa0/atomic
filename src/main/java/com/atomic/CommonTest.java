@@ -59,12 +59,12 @@ import static com.atomic.param.Constants.THREAD_COUNT;
 import static com.atomic.param.ParamUtils.isAutoTest;
 import static com.atomic.param.ParamUtils.isExpectSuccess;
 import static com.atomic.param.entity.MethodMetaUtils.getMethodMeta;
-import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
+import static com.atomic.tools.assertcheck.AssertResult.assertResult;
 import static com.atomic.tools.autotest.AutoTestManager.generateAutoTestCases;
 import static com.atomic.tools.mock.data.MockContext.getContext;
 import static com.atomic.tools.report.ParamPrint.resultPrint;
-import static com.atomic.param.SaveResultCache.saveTestRequestInCache;
-import static com.atomic.param.SaveResultCache.saveTestResultInCache;
+import static com.atomic.param.ResultCache.saveTestRequestInCache;
+import static com.atomic.param.ResultCache.saveTestResultInCache;
 import static com.atomic.tools.report.SaveRunTime.endTestTime;
 import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.ApplicationUtils.getBean;
@@ -79,7 +79,7 @@ import static com.atomic.util.TestNGUtils.injectResultAndParameters;
 @SqlConfig
 @Listeners({ReportListener.class, IntegrationTestRollBackListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
-public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBase {
+public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
 
     @Capturing
     protected HttpSession session;

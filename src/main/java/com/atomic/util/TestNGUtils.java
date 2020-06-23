@@ -3,7 +3,7 @@ package com.atomic.util;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.param.Constants;
 import com.atomic.param.ParamUtils;
-import com.atomic.param.SaveResultCache;
+import com.atomic.param.ResultCache;
 import org.testng.IClass;
 import org.testng.ITestResult;
 
@@ -94,10 +94,10 @@ public final class TestNGUtils {
             for (String dependsOnMethodName : dependsOnMethodNames) {
                 Object dependMethodReturn;
                 if (ParamUtils.isDependencyIndexNoNull(context)) {
-                    dependMethodReturn = SaveResultCache.getTestResultInCache(dependsOnMethodName,
+                    dependMethodReturn = ResultCache.getTestResultInCache(dependsOnMethodName,
                             context.get(Constants.DEPENDENCY_INDEX));
                 } else {
-                    dependMethodReturn = SaveResultCache.getTestResultInCache(dependsOnMethodName,
+                    dependMethodReturn = ResultCache.getTestResultInCache(dependsOnMethodName,
                             context.get(Constants.CASE_INDEX));
                 }
                 if (dependMethodReturn != null) {
