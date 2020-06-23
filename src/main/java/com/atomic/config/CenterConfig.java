@@ -23,21 +23,14 @@ import java.util.concurrent.ExecutionException;
 public class CenterConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(CenterConfig.class);
-    private static ThreadLocal<CenterConfig> config = new ThreadLocal<>();
+    private static final CenterConfig INSTANCE = new CenterConfig();
     private Cache<String, Map<String, String>> centerConfigCache = CacheBuilder.newBuilder().build();
 
     private CenterConfig() {
     }
 
     public static CenterConfig newInstance() {
-        CenterConfig centerConfig;
-        if (config.get() == null) {
-            centerConfig = new CenterConfig();
-            config.set(centerConfig);
-        } else {
-            centerConfig = config.get();
-        }
-        return centerConfig;
+        return INSTANCE;
     }
 
     /**
