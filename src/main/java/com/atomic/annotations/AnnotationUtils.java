@@ -167,7 +167,7 @@ public abstract class AnnotationUtils {
                     Component.class, Controller.class, Repository.class);
             for (Annotation annotation : annotations) {
                 if (serviceList.contains(annotation.annotationType())) {
-                    Method m = annotation.getClass().getDeclaredMethod("value", null);
+                    Method m = annotation.getClass().getDeclaredMethod("value");
                     return (String) m.invoke(annotation);
                 }
             }

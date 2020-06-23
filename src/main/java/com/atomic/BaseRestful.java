@@ -93,36 +93,27 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
     private void startTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
 
         Map<String, Object> context = TestNGUtils.getParamContext(testResult);
-
         //注入场景测试所需要的依赖方法的返回结果
         TestNGUtils.injectScenarioReturnResult(testResult, context);
-
         // 递归组合参数并转化为真实值
         Map<String, Object> newContext = ParamUtils.assemblyParamMap2RequestMap(testResult,
                 this, context);
-
         // 先执行beforeTest
         beforeTest(newContext);
-
         // 检查Http接口测试入参必填字段
         ParamUtils.checkKeyWord(newContext);
-
         //记录方法调用开始时间
         SaveRunTime.startTestTime(testResult);
-
         // 执行接口调用
         Response response = startRequest(testResult, newContext);
-
         //记录方法调用结束时间
         SaveRunTime.endTestTime(testResult);
-
         // 缓存入参和返回值
         SaveResultCache.saveTestResultInCache(response, testResult, newContext);
-
         execMethod(response, testResult, callBack, newContext);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all")
     private Response startRequest(ITestResult testResult, Map<String, Object> newContext) {
         Headers headers;
         String httpHost;
@@ -149,8 +140,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
             // 把Header json字符串反序列化为List<Header>
             String headerStr = newContext.get(HTTP_HEADER).toString();
             List<Map<String, String>> headerMapList = GsonUtils.getGson().fromJson(headerStr,
-                    new TypeToken<List<Map<String, String>>>() {
-            }.getType());
+                    new TypeToken<List<Map<String, String>>>() {}.getType());
 
             List<Header> headerList = Lists.newArrayList();
 
@@ -167,6 +157,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         return getResponse(testResult, specification, newContext);
     }
 
+    @SuppressWarnings("all")
     private Response getResponse(ITestResult testResult,
                                  RequestSpecification specification,
                                  Map<String, Object> newContext) {
@@ -195,7 +186,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
             }
         } else if (Constants.HTTP_POST.equalsIgnoreCase(httpMode) && isJsonContext(newContext)) {
             // POST Json请求
-            if (parameters.keySet().contains("request")) {
+            if (parameters.containsKey("request")) {
 
                 String request = parameters.get("request").toString();
 

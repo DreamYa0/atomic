@@ -1,5 +1,6 @@
 package com.atomic.tools.report;
 
+import cn.hutool.db.Entity;
 import com.alibaba.fastjson.JSON;
 import com.atomic.config.TesterConfig;
 import com.atomic.param.Constants;
@@ -149,22 +150,22 @@ public class SaveResultListener extends TestListenerAdapter {
         }
         String queryProject = "select * from autotest_project where project_name= ?";
         Object[] queryProjectParam = {projectName};
-        AutoTestProject autoTestProject = ReportDb.queryQaProjectValue(queryProject, queryProjectParam);
-        if (autoTestProject == null) {
+        Entity value = ReportDb.query(queryProject, queryProjectParam);
+        if (value == null) {
             String insertProject = "insert into autotest_project (project_name,project_status,author," +
                     "create_time,update_time) values (?,?,?,?,?)";
             Object[] insertProjectParam = {projectName, 1, runAuthor, new Date(), new Date()};
-            ReportDb.updateValue(insertProject, insertProjectParam);
-            AutoTestProject queryAutoTestProject = ReportDb.queryQaProjectValue(queryProject, queryProjectParam);
-            projectId = queryAutoTestProject.getId();
+            ReportDb.insert(insertProject, insertProjectParam);
+            Entity entity = ReportDb.query(queryProject, queryProjectParam);
+            projectId = entity.getInt("id");
         } else {
-            projectId = autoTestProject.getId();
+            projectId = value.getInt("id");
         }
         String sql = "select * from autotest_result where project_id= ? order by create_time desc";
         Object[] param = {projectId};
-        AutoTestResult qaMethod = ReportDb.queryQaMethodValue(sql, param);
-        if (Objects.nonNull(qaMethod) && Objects.equals(1, round.get())) {
-            round.set(round.get() + qaMethod.getRound());
+        Entity entity = ReportDb.query(sql, param);
+        if (Objects.nonNull(entity) && Objects.equals(1, round.get())) {
+            round.set(round.get() + entity.getInt("round"));
         }
     }
 
@@ -178,7 +179,7 @@ public class SaveResultListener extends TestListenerAdapter {
             Object[] params = {projectId, className, methodName, caseName
                     , methodsParameter, methodsReturn, expectedReturn
                     , testStatus, round, runAuthor, new Date()};
-            ReportDb.updateValue(sql, params);
+            ReportDb.insert(sql, params);
         }
     }
 

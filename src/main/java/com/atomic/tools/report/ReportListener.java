@@ -1,5 +1,6 @@
 package com.atomic.tools.report;
 
+import cn.hutool.db.Entity;
 import com.atomic.config.TesterConfig;
 import com.atomic.param.Constants;
 import com.atomic.util.TestNGUtils;
@@ -273,13 +274,13 @@ public class ReportListener implements IReporter {
         String sql = "SELECT * FROM autotest_result WHERE class_name=? AND methods_name=? AND case_name=? " +
                 "order by create_time desc";
         Object[] params = {className, methodName, caseName};
-        AutoTestResult result = ReportDb.queryQaMethodValue(sql, params);
+        Entity entity = ReportDb.query(sql, params);
         Map<String, String> resultMap = Maps.newHashMap();
-        if (result != null) {
-            resultMap.put("param", result.getMethods_parameter());
-            resultMap.put("returnValue", result.getMethods_return());
-            if (!"".equals(result.getExpected_return()) && result.getExpected_return() != null) {
-                resultMap.put("expected_return", result.getExpected_return());
+        if (entity != null) {
+            resultMap.put("param", entity.getStr("methods_parameter"));
+            resultMap.put("returnValue", entity.getStr("methods_return"));
+            if (!"".equals(entity.getStr("expected_return")) && entity.getStr("expected_return") != null) {
+                resultMap.put("expected_return", entity.getStr("expected_return"));
             } else {
                 resultMap.put("expected_return", null);
             }

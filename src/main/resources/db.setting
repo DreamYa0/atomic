@@ -8,6 +8,11 @@ url = jdbc:mysql://rm-2zep114yhnld70zcj.mysql.rds.aliyuncs.com:3306/ntocc_demo?u
 username = obill_rw
 password = Xs5VGMLrDUV4RcXm
 
+[atomic_autotest]
+url = jdbc:mysql://rm-2zep114yhnld70zcj.mysql.rds.aliyuncs.com:3306/atomic_autotest?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=round&useSSL=false
+username = obill_rw
+password = Xs5VGMLrDUV4RcXm
+
 ## 可选配置
 # 是否在日志中显示执行的SQL
 showSql = true

@@ -1,5 +1,6 @@
 package com.atomic.tools.report;
 
+import cn.hutool.db.Entity;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ResourceCDN;
 import com.aventstack.extentreports.Status;
@@ -85,9 +86,9 @@ final class ExtentManager {
         Integer projectId = getProjectId(projectName);
         String sql = "select * from autotest_result where project_id= ? order by create_time desc";
         Object[] param = {projectId};
-        AutoTestResult autoTestResult = ReportDb.queryQaMethodValue(sql, param);
-        if (autoTestResult != null) {
-            return autoTestResult.getRound().toString();
+        Entity entity = ReportDb.query(sql, param);
+        if (entity != null) {
+            return entity.getStr("round");
         }
         return "1";
     }
@@ -96,11 +97,7 @@ final class ExtentManager {
         // 从数据库中获取对应项目的ID
         String queryProject = "select * from autotest_project where project_name= ?";
         Object[] queryProjectParam = {projectName};
-        AutoTestProject autoTestProject = ReportDb.queryQaProjectValue(queryProject, queryProjectParam);
-        Integer projectId = null;
-        if (autoTestProject != null) {
-            projectId = autoTestProject.getId();
-        }
-        return projectId;
+        Entity entity = ReportDb.query(queryProject, queryProjectParam);
+        return entity.getInt("id");
     }
 }
