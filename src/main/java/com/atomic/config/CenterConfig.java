@@ -1,6 +1,6 @@
 package com.atomic.config;
 
-import com.atomic.exception.CenterConfigException;
+import com.atomic.exception.ParameterException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
@@ -81,7 +81,7 @@ public class CenterConfig {
     public String getHttpHost() {
         String httpHost = GlobalConfig.getHttpHost();
         if (httpHost == null || "".equals(httpHost)) {
-            throw new CenterConfigException("从配置中获取Http请求的域名或IP地址失败！");
+            throw new ParameterException("从配置中获取Http请求的域名或IP地址失败！");
         }
         return httpHost;
     }

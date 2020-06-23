@@ -29,11 +29,7 @@ public class ExceptionManager {
 
     private static final String MSG_SPLIT = " |- ";
 
-    /**
-     * 异常处理
-     * @param exception
-     * @return
-     */
+    @SuppressWarnings("all")
     public static Result exceptionDeal(Exception exception) {
         String msg;
         if (exception instanceof InvocationTargetException) {
@@ -44,6 +40,7 @@ public class ExceptionManager {
         return getResultObj(false, "500", msg);
     }
 
+    @SuppressWarnings("all")
     private static Result getResultObj(Boolean success, String code, String message) {
         Result result = Result.create();
         result.setSuccess(success);
@@ -98,22 +95,14 @@ public class ExceptionManager {
         }
     }
 
-    /**
-     * 对象转json
-     * @param obj
-     * @return
-     */
     private static String getJSONStringWithDateFormat(Object obj) {
         return ParamUtils.getJSONStringWithDateFormat(obj, true, Constants.DATE_FORMAT);
     }
 
-    /**
-     * 获取精简过的错误信息，(错误类型+错误描述)，默认截取440个字符（前320个+后120个）
-     * @param e
-     * @return
-     */
     public static String getExceptionProfile(Throwable e) {
-        return getExceptionProfile(e, null, 440); // 默认440个字符
+        // 获取精简过的错误信息，(错误类型+错误描述)，默认截取440个字符（前320个+后120个）
+        // 默认440个字符
+        return getExceptionProfile(e, null, 440);
     }
 
     public static boolean isExceptionThrowsBySpecialMethod(Exception e, String methodName) {
@@ -126,28 +115,19 @@ public class ExceptionManager {
         return false;
     }
 
-    /**
-     * 获取精简过的错误信息，(错误类型+错误描述)，默认截取440个字符（前320个+后120个）
-     * @param prompt 附加提示，可为 null
-     */
     public static String getExceptionProfile(Throwable e, String prompt) {
-        return getExceptionProfile(e, prompt, 440); // 默认440个字符
+        // 获取精简过的错误信息，(错误类型+错误描述)，默认截取440个字符（前320个+后120个）
+        // 默认440个字符
+        return getExceptionProfile(e, prompt, 440);
     }
 
-    /**
-     * 获取精简过的错误信息，(错误类型+错误描述)，默认截取440个字符（前320个+后120个）
-     * @param errorLen 截取错误字符串的最大长度，比如 500
-     */
     public static String getExceptionProfile(Throwable e, int errorLen) {
+        // 获取精简过的错误信息，(错误类型+错误描述)，默认截取440个字符（前320个+后120个）
         return getExceptionProfile(e, null, errorLen);
     }
 
-    /**
-     * 获取精简过的错误信息，(错误类型+错误描述)，截取 errorLen 个字符。
-     * @param prompt   附加提示，可为 null
-     * @param errorLen 截取错误字符串的最大长度，比如 500
-     */
     public static String getExceptionProfile(Throwable e, String prompt, int errorLen) {
+        // 获取精简过的错误信息，(错误类型+错误描述)，截取 errorLen 个字符。
         // 如果error过长,则精简到errorLen个字符
         String msg = e.toString();
         if (e.getMessage() != null) {
@@ -165,15 +145,11 @@ public class ExceptionManager {
         return sb.toString();
     }
 
-    /**
-     * 裁剪错误信息，最多只取 maxLen 个字符(maxLen>=200)，规则如下： <br>
-     * 【只保留前面8/11的字符+后面3/11的字符】 <br>
-     * 例如一个数据库的errorMessage长度可达1000个字符，用此方法裁剪后, <br>
-     * 假设maxLen=550，那就只保留前400个字符+后150个字符。
-     * @param maxLen 截取错误字符串的最大长度，比如500
-     * @return 精简后的错误信息字符串
-     */
     public static String errorMsgCut(String errorMsg, int maxLen) {
+        // 裁剪错误信息，最多只取 maxLen 个字符(maxLen>=200)，规则如下：
+        //【只保留前面8/11的字符+后面3/11的字符】 <br>
+        // 例如一个数据库的errorMessage长度可达1000个字符，用此方法裁剪后,
+        // 假设maxLen=550，那就只保留前400个字符+后150个字符。
         if (errorMsg == null) {
             return null;
         }
@@ -186,13 +162,6 @@ public class ExceptionManager {
         return errorMsg;
     }
 
-    /**
-     * 异常处理
-     * @param clazz
-     * @param testMethodName
-     * @param e
-     * @param param
-     */
     public static void handleException(ITestResult iTestResult,
                                        Class<?> clazz,
                                        String testMethodName,
@@ -229,11 +198,8 @@ public class ExceptionManager {
         throw new RuntimeException(e);
     }
 
-    /**
-     * 判断异常具体类型,方便数据展示平台统计
-     * @param e
-     */
     public static void throwNewException(Exception e) {
+        // 判断异常具体类型,方便数据展示平台统计
         if (e instanceof NullPointerException) {
             throw new NullPointerException(e.getMessage());
         } else if (e instanceof AnnotationException) {
@@ -254,34 +220,26 @@ public class ExceptionManager {
             throw new GenericException(e);
         } else if (e instanceof AssertJDBException) {
             throw new AssertJDBException(e);
-        } else if (e instanceof JSONCheckException) {
-            throw new JSONCheckException(e.getMessage());
-        } else if (e instanceof HttpInterfaceException) {
-            throw new HttpInterfaceException(e.getMessage());
         } else if (e instanceof DubboServiceException) {
             throw new DubboServiceException(e);
         } else if (e instanceof AutoTestException) {
             throw new AutoTestException(e);
         } else if (e instanceof InjectResultException) {
             throw new InjectResultException(e);
-        } else if (e instanceof AssertCheckException) {
-            throw new AssertCheckException(e);
         } else if (e instanceof IllegalStateException) {
             throw new IllegalStateException(e);
         } else if (e instanceof QueryDataException) {
             throw new QueryDataException(e);
         } else if (e instanceof TestTimeException) {
             throw new TestTimeException(e);
-        } else if (e instanceof UserKeyException) {
-            throw new UserKeyException(e);
-        } else if (e instanceof DatabaseException) {
-            throw new DatabaseException(e);
         } else if (e instanceof InvokeException) {
             throw new InvokeException(e);
         } else if (e instanceof GetBeanException) {
             throw new GetBeanException(e);
-        } else if (e instanceof CenterConfigException) {
-            throw new CenterConfigException(e);
+        } else if (e instanceof RollBackException) {
+            throw new RollBackException(e);
+        } else if (e instanceof ParameterException) {
+            throw new ParameterException(e);
         } else {
             throw new RuntimeException(e);
         }
