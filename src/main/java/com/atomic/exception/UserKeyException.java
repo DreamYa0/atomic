@@ -4,7 +4,7 @@ package com.atomic.exception;
  * @author dreamyao
  * @version 1.0.0
  * @title
- * @Data 2017/7/30 22:20
+ * @date  2017/7/30 22:20
  */
 public class UserKeyException extends RuntimeException {
 

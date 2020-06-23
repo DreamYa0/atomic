@@ -3,9 +3,9 @@ package com.atomic.tools.mock.data;
 import com.atomic.tools.mock.dto.MockData;
 
 /**
- * @author jsy.
+ * @author dreamyao
  * @title
- * @time 16/8/11.
+ * @date  16/8/11.
  */
 public class MockContext {
 

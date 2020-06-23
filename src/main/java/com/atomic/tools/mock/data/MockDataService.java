@@ -1,9 +1,9 @@
 package com.atomic.tools.mock.data;
 
 /**
- * @author jsy.
+ * @author dreamyao
  * @title 做个接口，这样以后可以扩展为其他存储方式
- * @time 16/8/8.
+ * @date  16/8/8.
  */
 public interface MockDataService<T, F> {
 

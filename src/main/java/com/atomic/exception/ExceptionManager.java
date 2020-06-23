@@ -172,7 +172,6 @@ public class ExceptionManager {
      * 假设maxLen=550，那就只保留前400个字符+后150个字符。
      * @param maxLen 截取错误字符串的最大长度，比如500
      * @return 精简后的错误信息字符串
-     * @author zollty 2013-7-27
      */
     public static String errorMsgCut(String errorMsg, int maxLen) {
         if (errorMsg == null) {

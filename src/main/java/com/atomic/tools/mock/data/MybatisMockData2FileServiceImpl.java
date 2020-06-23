@@ -10,9 +10,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * @author jsy.
+ * @author dreamyao
  * @title
- * @time 16/10/11.
+ * @date  16/10/11.
  */
 public class MybatisMockData2FileServiceImpl implements MockDataService<MockData4Db, Invocation> {
 

@@ -19,7 +19,7 @@ import static com.atomic.param.ParamUtils.isValueTrue;
 /**
  * @author dreamyao
  * @title
- * @Data 2018/4/21 下午10:05
+ * @date  2018/4/21 下午10:05
  * @since 1.0.0
  */
 public abstract class AbstractRestTest {

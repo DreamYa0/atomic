@@ -4,7 +4,7 @@ package com.atomic.exception;
  * @author dreamyao
  * @version 1.0.0
  * @title
- * @Data 2017/8/30 13:56
+ * @date  2017/8/30 13:56
  */
 public class GetBeanException extends RuntimeException {
 

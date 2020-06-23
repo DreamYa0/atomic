@@ -4,7 +4,7 @@ package com.atomic.tools.assertcheck.enums;
  * 断言方式，旧值是执行接口前的数据库值，还是执行接口后的数据库值
  * @author dreamyao
  * @title xxx
- * @Data 2018/05/30 10:48
+ * @date 2018/05/30 10:48
  * @since v1.0.0
  */
 public enum AssertType {

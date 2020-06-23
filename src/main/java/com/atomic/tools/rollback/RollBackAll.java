@@ -9,7 +9,7 @@ import static java.lang.annotation.ElementType.METHOD;
  * 多库多表数据回滚注解
  * @author dreamyao
  * @version 1.0
- * @Data 2018/05/30 10:48
+ * @date 2018/05/30 10:48
  */
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 @Target({METHOD})

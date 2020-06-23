@@ -6,7 +6,7 @@ import java.util.Map;
  * @author dreamyao
  * @version 1.0.0
  * @title 函数式接口
- * @Data 2018/05/30 10:48
+ * @date  2018/05/30 10:48
  */
 @FunctionalInterface
 public interface ITestResultCallback {

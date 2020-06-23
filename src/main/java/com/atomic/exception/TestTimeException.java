@@ -4,7 +4,7 @@ package com.atomic.exception;
  * @author dreamyao
  * @version 1.0.0
  * @title 通用测试时间相关异常类
- * @Data 2017/7/30 17:35
+ * @date  2017/7/30 17:35
  */
 public class TestTimeException extends RuntimeException {
 

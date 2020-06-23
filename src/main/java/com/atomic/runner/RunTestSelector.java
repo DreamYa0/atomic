@@ -10,7 +10,7 @@ import java.util.List;
  * @author dreamyao
  * @version 1.0.0
  * @title 测试方法运行规则选择器
- * @Data 2017/9/11 22:11
+ * @date 2017/9/11 22:11
  */
 public class RunTestSelector implements IMethodSelector {
 

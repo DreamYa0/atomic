@@ -3,8 +3,8 @@ package com.atomic.exception;
 /**
  * @author dreamyao
  * @version 1.0.0
- * @description
- * @Data 2018/05/30 10:48
+ * @title
+ * @date  2018/05/30 10:48
  */
 public class MongoDbException extends RuntimeException {
 

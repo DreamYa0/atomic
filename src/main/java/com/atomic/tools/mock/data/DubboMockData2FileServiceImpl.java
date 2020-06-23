@@ -12,9 +12,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * @author jsy.
+ * @author dreamyao
  * @title
- * @time 16/9/28.
+ * @date  16/9/28.
  */
 public class DubboMockData2FileServiceImpl implements MockDataService<MockData4Rpc, Invocation> {
 

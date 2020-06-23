@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * @author dreamyao
- * @Data 2017/5/9
+ * @date 2017/5/9
  */
 public final class TestNGUtils {
 

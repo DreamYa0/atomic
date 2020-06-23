@@ -4,7 +4,7 @@ package com.atomic.param;
  * @author dreamyao
  * @version 1.0.0
  * @title 函数式接口
- * @Data 2017-8-24
+ * @date  2017-8-24
  */
 @FunctionalInterface
 public interface ITestMethodMultiTimes {

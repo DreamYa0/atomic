@@ -4,7 +4,7 @@ package com.atomic.exception;
  * @author dreamyao
  * @version 1.0.0
  * @title
- * @Data 2018/05/30 10:48
+ * @date  2018/05/30 10:48
  */
 public class CenterConfigException extends RuntimeException {
 

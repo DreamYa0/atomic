@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author dreamyao
  * @version 1.2.0
  * @title 测试数据入库监听器
- * @Data 2018/05/30 10:48
+ * @date 2018/05/30 10:48
  */
 @ThreadSafe
 public class SaveResultListener extends TestListenerAdapter {

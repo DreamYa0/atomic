@@ -23,7 +23,7 @@ import java.util.Set;
  * @author dreamyao
  * @version 1.0.0
  * @title
- * @Data 2017/8/25 22:28
+ * @date 2017/8/25 22:28
  */
 public class IntegrationTestRollBackListener extends TestListenerAdapter {
 

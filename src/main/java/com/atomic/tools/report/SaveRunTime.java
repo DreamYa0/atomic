@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
  * @author dreamyao
  * @version 1.0.0
  * @title 通用测试时间记录工具类
- * @Data 2018/05/30 10:48
+ * @date 2018/05/30 10:48
  */
 public final class SaveRunTime {
 

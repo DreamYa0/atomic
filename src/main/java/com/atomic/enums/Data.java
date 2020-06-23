@@ -4,7 +4,7 @@ package com.atomic.enums;
  * @author dreamyao
  * @version 1.0.0
  * @title
- * @Data 2017/8/1 09:30
+ * @date  2017/8/1 09:30
  */
 public class Data {
 
