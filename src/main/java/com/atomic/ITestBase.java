@@ -14,6 +14,4 @@ public interface ITestBase {
      * @param context 入参excel
      */
     void beforeTest(Map<String, Object> context);
-
-
 }

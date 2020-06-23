@@ -1,18 +1,18 @@
 package com.atomic;
 
 import com.atomic.config.CenterConfig;
+import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.param.Constants;
-import com.atomic.param.excel.ExcelParamConverter;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
-import com.atomic.util.TestNGUtils;
 import com.atomic.tools.report.ReportListener;
-import com.atomic.tools.report.SaveResultCache;
+import com.atomic.param.SaveResultCache;
 import com.atomic.tools.report.SaveRunTime;
 import com.atomic.tools.rollback.RollBackListener;
 import com.atomic.tools.rollback.ScenarioRollBackListener;
 import com.atomic.util.GsonUtils;
+import com.atomic.util.TestNGUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
@@ -35,22 +35,21 @@ import java.util.Set;
 
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
-import static com.atomic.exception.ThrowException.throwNewException;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.HTTP_HEADER;
 import static com.atomic.param.Constants.HTTP_HOST;
 import static com.atomic.param.Constants.HTTP_METHOD;
 import static com.atomic.param.Constants.HTTP_MODE;
 import static com.atomic.param.Constants.LOGIN_URL;
-import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
-import static com.atomic.tools.report.ParamPrint.resultPrint;
 import static com.atomic.param.ParamUtils.isContentTypeNoNull;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
 import static com.atomic.tools.assertcheck.ResultAssert.assertResultForRest;
+import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
+import static com.atomic.tools.report.ParamPrint.resultPrint;
+import static com.atomic.param.SaveResultCache.saveTestRequestInCache;
 import static com.atomic.util.TestNGUtils.injectResultAndParameters;
-import static com.atomic.tools.report.SaveResultCache.saveTestRequestInCache;
 import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.EncoderConfig.encoderConfig;
@@ -62,7 +61,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @author dreamyao
  * @version 1.0.0
  * @title REST风格接口测试基类
- * @Data 2018/05/30 10:48
+ * @date  2018/05/30 10:48
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
 public abstract class BaseRestful extends AbstractRestTest implements IHookable, ITestBase {
@@ -87,7 +86,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         try {
             startTest(callBack, testResult);
         } catch (Exception e) {
-            throwNewException(e);
+            ExceptionManager.throwNewException(e);
         }
     }
 
@@ -99,7 +98,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         TestNGUtils.injectScenarioReturnResult(testResult, context);
 
         // 递归组合参数并转化为真实值
-        Map<String, Object> newContext = ExcelParamConverter.assemblyParamMap2RequestMap(testResult,
+        Map<String, Object> newContext = ParamUtils.assemblyParamMap2RequestMap(testResult,
                 this, context);
 
         // 先执行beforeTest
@@ -241,12 +240,8 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         return response;
     }
 
-    /**
-     * 判断 ContentType 是否为 application/json
-     * @param context 入参 map 集合
-     * @return boolean
-     */
     private boolean isJsonContext(Map<String, Object> context) {
+        // 判断 ContentType 是否为 application/json
         return Objects.nonNull(context.get(Constants.CONTENT_TYPE)) &&
                 Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(context.get(Constants.CONTENT_TYPE).toString());
     }
@@ -266,13 +261,9 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         testCallBack(callBack, testResult);
     }
 
-    /**
-     * 测试方法回调
-     * @param callBack   回调函数
-     * @param testResult 结果上下文
-     */
     @SuppressWarnings("unchecked")
     private void testCallBack(IHookCallBack callBack, ITestResult testResult) {
+        // 测试方法回调
         Map<String, Object> context = (Map<String, Object>) testResult.getParameters()[0];
         try {
             // 注入参数和结果，param 会去掉系统使用的一些数据

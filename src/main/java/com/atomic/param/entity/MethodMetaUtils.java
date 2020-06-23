@@ -38,13 +38,9 @@ public final class MethodMetaUtils {
     private MethodMetaUtils() {
     }
 
-    /**
-     * 获取要调用的接口对象
-     * @param testInstance 对象实例
-     * @return 范型对象<T> 中的T对象
-     */
     @SuppressWarnings("unchecked")
     public static <T> Class<? extends T> getInterfaceClass(Object testInstance) {
+        // 获取要调用的接口对象
         Type superType = testInstance.getClass().getGenericSuperclass();
         if (superType instanceof ParameterizedType) {
             return (Class<? extends T>) ((ParameterizedType) superType).getActualTypeArguments()[0];
@@ -53,20 +49,12 @@ public final class MethodMetaUtils {
         throw new RuntimeException(testInstance.getClass().getName() + "继承 XXX<T>缺少类定义T");
     }
 
-    /**
-     * 获取测试所需的属性
-     * @param interfaceType  接口的定义
-     * @param testMethodName 接口中的方法名
-     * @param context        测试入参
-     * @return 方法属性对象
-     * @throws Exception
-     */
     public static MethodMeta getMethodMeta(ITestResult testResult,
                                            Class<?> interfaceType,
                                            String testMethodName,
                                            Map<String, Object> context,
                                            CompletableFuture<Object> future) throws Exception {
-
+        // 获取测试所需的属性
         MethodMeta methodMeta = new MethodMeta();
         Type[] types = generateMethodMeta(interfaceType, testMethodName);
         String multiTimeField = getMultiTimeField(context);
@@ -100,15 +88,10 @@ public final class MethodMetaUtils {
         return declaredInterfaceMethod != null ? declaredInterfaceMethod.getGenericParameterTypes() : new Type[0];
     }
 
-    /**
-     * 获取测试所需的一些属性
-     * @return 方法属性集合
-     * @throws Exception
-     */
     public static MethodMeta getMethodMeta(Map<String, Object> context,
                                            ITestResult testResult,
                                            Object testInstance) throws Exception {
-
+        // 获取测试所需的一些属性
         Object object = context.get(Constants.TESTMETHODMETA);
         if (object != null) {
             return (MethodMeta) object;
@@ -118,27 +101,16 @@ public final class MethodMetaUtils {
         return methodMeta;
     }
 
-    /**
-     * 获取测试所需的一些属性
-     * @param param        入参
-     * @param testInstance 测试类实例
-     * @return 方法属性集合
-     * @throws Exception
-     */
     public static MethodMeta generateMethodMeta(Map<String, Object> param, Object testInstance) throws Exception {
+        // 获取测试所需的一些属性
         // 得到 TestContextManager.testContext 属性值
         TestContext testContext = getTestContext(testInstance);
         Class testClass = testContext.getTestClass();
         return generateMethodMeta(param, testContext.getTestInstance(), testClass, testInstance);
     }
 
-    /**
-     * 得到 TestContextManager.testContext 属性值
-     * @param testInstance 测试类实例
-     * @return TestContext
-     * @throws Exception
-     */
     private static TestContext getTestContext(Object testInstance) throws Exception {
+        // 得到 TestContextManager.testContext 属性值
         TestContextManager testContextManager = getTestContextManager(testInstance);
         TestContext testContext = (TestContext) getFieldValue(testContextManager, TestContextManager.class,
                 "testContext");
@@ -146,27 +118,14 @@ public final class MethodMetaUtils {
         return testContext;
     }
 
-    /**
-     * 得到 AbstractTestNGSpringContextTests.testContextManager 属性值
-     * @param testInstance 测试类实例
-     * @return TestContextManager
-     * @throws Exception
-     */
     private static TestContextManager getTestContextManager(Object testInstance) throws Exception {
+        // 得到 AbstractTestNGSpringContextTests.testContextManager 属性值
         TestContextManager testContextManager = (TestContextManager) getFieldValue(testInstance,
                 AbstractTestNGSpringContextTests.class, "testContextManager");
         Assert.assertNotNull(testContextManager, "cannot get testContextManager");
         return testContextManager;
     }
 
-    /**
-     * 获取属性值
-     * @param bean        实例
-     * @param targetClass 属性所属class
-     * @param fieldName   属性名
-     * @return Object
-     * @throws IllegalAccessException .{@link IllegalAccessException}
-     */
     private static Object getFieldValue(Object bean,
                                         Class<?> targetClass,
                                         String fieldName) throws IllegalAccessException {
@@ -227,13 +186,8 @@ public final class MethodMetaUtils {
         return methodMeta;
     }
 
-    /**
-     * 获取循环遍历的属性名或者单参数的属性名
-     * @param param excel入参
-     * @return 字段名称
-     * @throws Exception 异常
-     */
     private static String getMultiTimeField(Map<String, Object> param) throws Exception {
+        // 获取循环遍历的属性名或者单参数的属性名
         for (String key : param.keySet()) {
             ObjUtils.ForEachClass forEachClass = ObjUtils.getForEachClass(param.get(key));
             if (forEachClass != null) {

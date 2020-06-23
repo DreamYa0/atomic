@@ -2,23 +2,24 @@ package com.atomic;
 
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.config.GlobalConfig;
-import com.atomic.tools.autotest.AutoTestMode;
+import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.InvokeException;
 import com.atomic.exception.ParameterException;
+import com.atomic.param.ITestMethodMultiTimes;
+import com.atomic.param.ITestResultCallback;
+import com.atomic.param.ObjUtils;
+import com.atomic.param.ParamUtils;
+import com.atomic.param.entity.MethodMeta;
+import com.atomic.param.entity.MethodMetaUtils;
+import com.atomic.tools.autotest.AutoTestManager;
+import com.atomic.tools.autotest.AutoTestMode;
+import com.atomic.tools.dubbo.DubboServiceFactory;
+import com.atomic.tools.report.HandleMethodName;
+import com.atomic.tools.report.ParamPrint;
 import com.atomic.tools.report.ReportListener;
 import com.atomic.tools.rollback.RollBackListener;
 import com.atomic.tools.rollback.ScenarioRollBackListener;
-import com.atomic.tools.autotest.AutoTestManager;
-import com.atomic.tools.report.HandleMethodName;
-import com.atomic.param.ITestMethodMultiTimes;
-import com.atomic.param.ITestResultCallback;
-import com.atomic.param.entity.MethodMetaUtils;
-import com.atomic.tools.report.ParamPrint;
-import com.atomic.param.ParamUtils;
-import com.atomic.param.ObjUtils;
-import com.atomic.param.entity.MethodMeta;
-import com.atomic.tools.dubbo.DubboServiceFactory;
 import com.atomic.util.MapUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -39,22 +40,18 @@ import static com.atomic.annotations.AnnotationUtils.isAutoTest;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.annotations.AnnotationUtils.isServiceVersion;
-import static com.atomic.exception.ExceptionUtils.handleException;
-import static com.atomic.tools.report.SaveRunTime.endTestTime;
-import static com.atomic.tools.report.SaveRunTime.startTestTime;
-import static com.atomic.tools.autotest.AutoTestManager.generateAutoTestCases;
-import static com.atomic.tools.autotest.AutoTestManager.printExceptions;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.CASE_NAME;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
-import static com.atomic.param.excel.ExcelParamConverter.getDataBeforeTest;
 import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
+import static com.atomic.param.SaveResultCache.saveTestRequestInCache;
+import static com.atomic.param.SaveResultCache.saveTestResultInCache;
+import static com.atomic.tools.report.SaveRunTime.endTestTime;
+import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.TestNGUtils.getParamContext;
 import static com.atomic.util.TestNGUtils.getTestMethod;
 import static com.atomic.util.TestNGUtils.injectResultAndParameters;
 import static com.atomic.util.TestNGUtils.injectScenarioReturnResult;
-import static com.atomic.tools.report.SaveResultCache.saveTestRequestInCache;
-import static com.atomic.tools.report.SaveResultCache.saveTestResultInCache;
 
 
 /**
@@ -87,12 +84,9 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
 
     protected final DubboServiceFactory dubboServiceFactory = new DubboServiceFactory();
 
-    /**
-     * db初始化,此方法中初始化的数据无法自动回滚
-     */
     @Override
     public void initDb() {
-
+        // db初始化,此方法中初始化的数据无法自动回滚
     }
 
     @AfterClass(alwaysRun = true)
@@ -144,18 +138,10 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
             // 测试方法回调
             testCallBack(callBack, testResult);
         } catch (Exception e) {
-            handleException(testResult, clazz, testMethodName, context, e, future);
+            ExceptionManager.handleException(testResult, clazz, testMethodName, context, e, future);
         }
     }
 
-    /**
-     * 自动化测试
-     * @param testResult     测试返回内容视图
-     * @param clazz          接口class对象
-     * @param future         接口实例
-     * @param testMethodName 被测方法名
-     * @throws Exception
-     */
     private void autoTest(ITestResult testResult,
                           Class<? extends T> clazz,
                           CompletableFuture<Object> future,
@@ -167,7 +153,7 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
             return;
         }
         long start = System.currentTimeMillis();
-        List<Map<String, Object>> allTestCases = generateAutoTestCases(testResult, clazz, testMethodName, future);
+        List<Map<String, Object>> allTestCases = AutoTestManager.generateAutoTestCases(testResult, clazz, testMethodName, future);
         final Exception[] exception = {null};
         Map<String, List<Map<String, Object>>> exceptionMsgs = Maps.newHashMap();
         Map<String, Object> paramMap = getParamContext(testResult);
@@ -192,21 +178,18 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
                     exception[0] = e;
                 }
                 // 这里不抛异常，全部自动测试跑一遍，暴露问题，跑完再处理
-                AutoTestManager.handleException(e, exceptionMsgs, testResult, paramMap);
+                ExceptionManager.handleException(e, exceptionMsgs, testResult, paramMap);
             }
         });
         long end = System.currentTimeMillis();
         System.out.println("----------------------------------------自动化测试结束，耗时：" +
                 (end - start) / 1000 + "s----------------------------------------");
         // 如果有异常则抛出，提醒测试未通过
-        printExceptions(exception[0], exceptionMsgs);
+        ExceptionManager.printExceptions(exception[0], exceptionMsgs);
     }
 
-    /**
-     * 去除List中重复的Map,此方法效率有点低，后续重新实现
-     * @param allTestCases 待去重待 List<Map<String, Object>> 结合
-     */
     private void toHeavy4ListMap(List<Map<String, Object>> allTestCases) {
+        // 去除List中重复的Map,此方法效率有点低，后续重新实现
         for (int i = 0; i < allTestCases.size(); i++) {
             for (int j = i + 1; j < allTestCases.size(); j++) {
                 boolean isNoEqual = false;
@@ -224,22 +207,11 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         }
     }
 
-    /**
-     * 根据key集合移除值
-     * @param map  map集合
-     * @param keys keys
-     */
     private void removeValueByKeys(Map<String, Object> map, List<String> keys) {
+        // 根据key集合移除值
         keys.forEach(map::remove);
     }
 
-    /**
-     * 运行测试
-     * @param clazz          接口class对象
-     * @param context        入参
-     * @param testMethodName 测试方法名称
-     * @throws Exception
-     */
     private void startRunTest(ITestResult testResult,
                               Class<? extends T> clazz,
                               Map<String, Object> context,
@@ -250,23 +222,17 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         // 先执行beforeTest
         beforeTest(context);
         // 如果excel中字段的值为SQL则把SQL语句变为对应的真实值
-        getDataBeforeTest(context);
+        ParamUtils.getDataBeforeTest(context);
         // 获取测试所需要的属性
         MethodMeta methodMeta = MethodMetaUtils.getMethodMeta(testResult, clazz, testMethodName, context, future);
         // execMethod(parameters,methodMeta, context);
         runForEachTest(testResult, context, methodMeta);
     }
 
-    /**
-     * 解析excel中foreach关键字
-     * @param context
-     * @param methodMeta
-     * @throws Exception
-     */
     private void runForEachTest(final ITestResult testResult,
                                 final Map<String, Object> context,
                                 final MethodMeta methodMeta) throws Exception {
-
+        // 解析excel中foreach关键字
         // 先判断是不是foreach循环，不是就只执行一次
         Object param = context.get(methodMeta.getMultiTimeField());
         execMethodMulitTimes(param, paramValue -> prepareExecMethod(testResult, paramValue, context, methodMeta));
@@ -309,18 +275,11 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         execMethod(testResult, parameters, methodMeta, param);
     }
 
-    /**
-     * 调用测试方法、出入参数打印、结果断言
-     * @param parameters 入参
-     * @param methodMeta 测试所需要的属性
-     * @param context    入参
-     * @throws Exception
-     */
     private void execMethod(ITestResult testResult,
                             final Object[] parameters,
                             MethodMeta methodMeta,
                             Map<String, Object> context) throws Exception {
-
+        // 调用测试方法、出入参数打印、结果断言
         //记录方法调用开始时间
         startTestTime(testResult);
         //通过反射调用方法
@@ -349,13 +308,9 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         assertResult(result, testResult, this, context, callback, parameters);
     }
 
-    /**
-     * 测试方法回调
-     * @param callBack
-     * @param testResult
-     */
     @SuppressWarnings("unchecked")
     private void testCallBack(IHookCallBack callBack, ITestResult testResult) {
+        // 测试方法回调
         try {
             Map<String, Object> context = getParamContext(testResult);
             if (ParamUtils.isExpectSuccess(context)) {

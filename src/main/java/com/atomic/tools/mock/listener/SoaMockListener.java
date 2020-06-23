@@ -115,23 +115,15 @@ public class SoaMockListener implements TestExecutionListener {
         }
     }
 
-    /**
-     * 普通写文件
-     * @param file    文件名
-     * @param context 内容
-     * @throws IOException
-     */
     private void appendFile(File file, String context) throws IOException {
+        // 普通写文件
         FileWriter writer = new FileWriter(file);
         writer.append(context);
         writer.close();
     }
 
-    /**
-     * 文件不存在时，创建文件
-     * @param fileName
-     */
     private File checkAndCreateFile(String fileName) {
+        // 文件不存在时，创建文件
         File file = new File(fileName);
         if (file.exists()) {
             return file;
@@ -148,6 +140,7 @@ public class SoaMockListener implements TestExecutionListener {
 
     @Override
     public void afterTestClass(TestContext testContext) throws Exception {
+
     }
 }
 

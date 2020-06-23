@@ -8,52 +8,42 @@ import java.util.Date;
  */
 public class AutoTestResult implements Serializable {
 
+    private static final long serialVersionUID = -4386363791236166269L;
     private Integer id;
-
     /**
      * 项目Id
      */
     private Integer project_id;
-
     /**
      * 被测类名
      */
     private String class_name;
-
     /**
      * 被测方法名
      */
     private String methods_name;
-
     private String case_name;
-
     /**
      * 入参
      */
     private String methods_parameter;
-
     /**
      * 返回值
      */
     private String methods_return;
-
     /**
      * 预期返回值，值来至于excel中
      */
     private String expected_return;
-
     /**
      * 测试结果
      */
     private Integer is_pass;
-
     /**
      * 测试轮次数
      */
     private Integer round;
-
     private String run_author;
-
     /**
      * 创建时间
      */

@@ -11,13 +11,9 @@ import java.lang.reflect.Field;
  * @version 1.0 Created by dreamyao on 2017/5/29.
  */
 public class AopTargetUtils {
-    /**
-     * 获取 目标对象
-     * @param proxy 代理对象
-     * @return
-     * @throws Exception
-     */
+
     public static Object getTarget(Object proxy) throws Exception {
+        // 获取 目标对象
         if (!AopUtils.isAopProxy(proxy)) {
             // 不是代理对象
             return proxy;

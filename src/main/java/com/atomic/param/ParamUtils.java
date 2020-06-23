@@ -11,11 +11,13 @@ import com.atomic.param.excel.handler.IHandler;
 import com.atomic.param.excel.handler.IdCardHandler;
 import com.atomic.param.excel.handler.PhoneNoHandler;
 import com.atomic.param.excel.handler.RandomParamHandler;
+import com.atomic.param.excel.parser.ExcelResolver;
 import com.atomic.tools.assertcheck.AssertCheckUtils;
 import com.atomic.tools.assertcheck.entity.AssertItem;
 import com.atomic.tools.assertcheck.enums.AssertType;
 import com.atomic.util.DataSourceUtils;
 import com.atomic.util.GsonUtils;
+import com.atomic.util.TestNGUtils;
 import com.g7.framework.common.dto.BaseRequest;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.testng.ITestResult;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
@@ -37,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
@@ -54,12 +58,8 @@ public final class ParamUtils {
 
     }
 
-    /**
-     * 断言前需要获取数据库的值
-     * @param context excel入参
-     * @param testInstance 入参对象实例
-     */
     public static void getDataBeforeTest(Map<String, Object> context, Object testInstance) throws Exception {
+        // 断言前需要获取数据库的值
         List<AssertItem> assertItemList = AssertCheckUtils.getAssertItemList(testInstance, true);
         if (!CollectionUtils.isEmpty(assertItemList)) {
             for (int i = 0; i < assertItemList.size(); i++) {
@@ -116,14 +116,85 @@ public final class ParamUtils {
         return value;
     }
 
-    /**
-     * excel 支持sql语句，格式：sql:dataSourceName:select XXX
-     * @param value
-     * @param type
-     * @return
-     * @throws SQLException
-     */
+    public static Map<String, Object> assemblyParamMap2RequestMap(ITestResult testResult,
+                                                                  Object instance,
+                                                                  Map<String, Object> context) {
+        // 把excel入参中多个sheet，组合为真正入参的map集合
+        if (Boolean.FALSE.equals(CollectionUtils.isEmpty(context))) {
+            Set<String> keys = context.keySet();
+            for (String key : keys) {
+                Object value = context.get(key);
+                if (Objects.isNull(value) || "".equals(value)) {
+
+                    String className = TestNGUtils.getTestCaseClassName(testResult);
+                    String resource = instance.getClass().getResource("").getPath();
+                    String filePath = resource + className + ".xls";
+
+                    ExcelResolver excel = new ExcelResolver(filePath,key);
+                    try {
+                        List<Map<String, Object>> maps = excel.readDataByRow();
+                        if (Boolean.FALSE.equals(CollectionUtils.isEmpty(maps))) {
+                            Map<String, Object> map = maps.get(Integer.parseInt(
+                                    context.get(Constants.CASE_INDEX).toString()) - 1);
+                            // 把excel中的值转换为真实值
+                            getDataBeforeTest(map);
+                            Map<String, Object> assemblyMap = assemblyParamMap2RequestMap(testResult, instance, map);
+                            assemblyMap.remove(Constants.CASE_INDEX);
+                            context.put(key, assemblyMap);
+                        }
+                    } catch (Exception e) {
+                        // 如果Sheet不存在，则按照原逻辑处理
+                    }
+                }
+            }
+        }
+        return context;
+    }
+
+    public static void getDataBeforeTest(Map<String, Object> param) {
+
+        // 执行测试之前替换excel中的特殊字段为真实的值
+        // 把入参的 sql 设置为真实的值
+        param.forEach((paramKey, paramValue) -> {
+
+            if (Objects.nonNull(paramValue)) {
+                param.put(paramKey, getRealValue(paramValue));
+            }
+
+        });
+
+        IHandler randomParamHandler = new RandomParamHandler();
+        IHandler cardHandler = new IdCardHandler();
+        IHandler phoneNoHandler = new PhoneNoHandler();
+        IHandler emailHandler = new EmailHandler();
+        IHandler dateHandler = new DateParamHandler();
+
+        randomParamHandler.setHandler(cardHandler);
+        cardHandler.setHandler(phoneNoHandler);
+        phoneNoHandler.setHandler(emailHandler);
+        emailHandler.setHandler(dateHandler);
+        randomParamHandler.handle(param);
+    }
+
+    private static Object getRealValue(Object paramValue) {
+        // 获取SQL语句对应的真实值
+        Object newParamValue = null;
+
+        try {
+            if (paramValue instanceof String) {
+                newParamValue = getSqlValue(paramValue.toString(), String.class);
+            }else {
+                // 如果值不满足处理条件，则保留原值
+                newParamValue = paramValue;
+            }
+        } catch (SQLException e) {
+            logger.error("数据库连接失败！", e);
+        }
+        return newParamValue;
+    }
+
     public static String getSqlValue(String value, Type type) throws SQLException {
+        // excel 支持sql语句，格式：sql:dataSourceName:select XXX
         // 格式：sql:dataBaseName:select XXX
         if (value.startsWith("sql:")) {
             value = value.substring(4);
@@ -138,67 +209,34 @@ public final class ParamUtils {
         return value;
     }
 
-    /**
-     * 只有 1 或 Y 返回true
-     * @param value 值
-     * @return 1 或 Y 返回true
-     */
     public static boolean isValueTrue(Object value) {
+        // 只有 1 或 Y 返回true
         return value != null && ("1".equalsIgnoreCase(value.toString()) ||
                 Constants.EXCEL_YES.equalsIgnoreCase(value.toString()));
     }
 
-    /**
-     * 是否期望结果为Y
-     * @param param 入参
-     * @return
-     */
     public static boolean isExpectSuccess(Map<String, Object> param) {
+        // 是否期望结果为Y
         return isValueTrue(param.get(Constants.ASSERT_RESULT));
     }
 
-    /**
-     * 是否需要自动化测试
-     * @param param 入参
-     * @return
-     */
     public static boolean isAutoTest(Map<String, Object> param) {
+        // 是否需要自动化测试
         return isValueTrue(param.get(Constants.AUTO_TEST));
     }
 
-    /**
-     * 判断excel中是否存在autoAssert字段
-     * @param param 入参
-     * @return
-     */
-    public static boolean isAutoAssert(Map<String, Object> param) {
-        return isValueTrue(param.get(Constants.AUTO_ASSERT));
-    }
-
-    /**
-     * 当请求类型不为空是返回true
-     * @param param 入参
-     * @return
-     */
     public static boolean isHttpModeNoNull(Map<String, Object> param) {
+        // 当请求类型不为空是返回true
         return !(param.get(Constants.HTTP_MODE) == null || "".equals(param.get(Constants.HTTP_MODE)));
     }
 
-    /**
-     * 当请求IP地址或域名不为空时返回true
-     * @param param 入参
-     * @return
-     */
     public static boolean isHttpHostNoNull(Map<String, Object> param) {
+        // 当请求IP地址或域名不为空时返回true
         return !(param.get(Constants.HTTP_HOST) == null || "".equals(param.get(Constants.HTTP_HOST)));
     }
 
-    /**
-     * 当请求URI路径不为空时返回true
-     * @param param 入参
-     * @return
-     */
     public static boolean isHttpMethodNoNull(Map<String, Object> param) {
+        // 当请求URI路径不为空时返回true
         return !(param.get(Constants.HTTP_METHOD) == null || "".equals(param.get(Constants.HTTP_METHOD)));
     }
 
@@ -214,40 +252,23 @@ public final class ParamUtils {
         return !(param.get(Constants.LOGIN_URL) == null || "".equals(param.get(Constants.LOGIN_URL)));
     }
 
-    /**
-     * 判断 excel 中是否有预期断言值
-     * @param param excel 入参
-     * @return 是否存在
-     */
     public static boolean isExpectedResultNoNull(Map<String, Object> param) {
+        // 判断 excel 中是否有预期断言值
         return !(param.get(Constants.EXPECTED_RESULT) == null || "".equals(param.get(Constants.EXPECTED_RESULT)));
     }
 
-    /**
-     * excel入参中是否包含sid参数
-     * @param param 入参 map 集合
-     * @return 是否有
-     */
     public static boolean isSidParam(Map<String, Object> param) {
+        // excel入参中是否包含sid参数
         return param.get("sid") != null && !"".equals(param.get("sid"));
     }
 
-    /**
-     * excel入参中是否包含 actionInfo 参数
-     * @param param 入参 map 集合
-     * @return 是否有
-     */
     public static boolean isActionInfoParam(Map<String, Object> param) {
+        // excel入参中是否包含 actionInfo 参数
         return param.get("actionInfo") != null && !"".equals(param.get("actionInfo"));
     }
 
-    /**
-     * 获取参数名称
-     * @param methodMeta 测试方法信息
-     * @param index      序号
-     * @return
-     */
     public static String getParamName(MethodMeta methodMeta, int index) {
+        // 获取参数名称
         if (methodMeta.getParamTypes().length == 1) {
             return methodMeta.getMultiTimeField();
         } else {
@@ -256,15 +277,18 @@ public final class ParamUtils {
         }
     }
 
-    /**
-     * 处理查询出的结果集
-     * @param datalist
-     * @param value
-     * @param type
-     * @param sql
-     * @return
-     */
+    public static String getJSONString(Object obj) {
+        // 对象转json
+        return getJSONString(obj, true);
+    }
+
+    private static String getJSONString(Object obj, boolean prettyFormat) {
+        // 对象转json
+        return getJSONStringWithDateFormat(obj, prettyFormat, null);
+    }
+
     public static String handleDataList(List<Map<Integer, Object>> datalist, String value, Type type, String sql) {
+        // 处理查询出的结果集
         if (!CollectionUtils.isEmpty(datalist)) {
             if (type instanceof ParameterizedTypeImpl && ((ParameterizedTypeImpl) type).getRawType() == List.class) {
                 List<String> list = new ArrayList<>(datalist.size());
@@ -281,34 +305,22 @@ public final class ParamUtils {
         return value;
     }
 
-    /**
-     * 判断excel中的值是否为空
-     * @param value
-     * @return
-     */
     public static boolean isExcelValueEmpty(Object value) {
+        // 判断excel中的值是否为空
         return value == null || org.apache.commons.lang3.StringUtils.isEmpty(value.toString()) ||
                 Constants.EXCEL_NULL.equalsIgnoreCase(value.toString());
     }
 
-    /**
-     * 拼接boolean字段方法
-     * @param fieldName
-     * @return
-     */
     public static String parIsSetName(String fieldName) {
+        // 拼接boolean字段方法
         if (null == fieldName || "".equals(fieldName)) {
             return null;
         }
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
-    /**
-     * 拼接在某属性的 set方法
-     * @param fieldName
-     * @return String
-     */
     public static String parSetName(String fieldName, String fieldType) {
+        // 拼接在某属性的 set方法
         if (null == fieldName || "".equals(fieldName)) {
             return null;
         }
@@ -318,26 +330,16 @@ public final class ParamUtils {
         return "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
-    /**
-     * 把首字母转为小写
-     * @param str
-     * @return
-     */
     public static String lowerFirst(String str) {
+        // 把首字母转为小写
         if (Objects.isNull(str)||str.length()==0) {
             return str;
         }
         return str.replaceFirst(str.substring(0, 1), str.substring(0, 1).toLowerCase());
     }
 
-    /**
-     * 判断入参是否是继承的 BaseRequest 类
-     * @param method
-     * @param paramIndex
-     * @return
-     * @throws Exception
-     */
     public static boolean isParamTypeExtendsBaseRequest(Method method, int paramIndex) throws Exception {
+        // 判断入参是否是继承的 BaseRequest 类
         if (method.getGenericParameterTypes()[paramIndex] instanceof ParameterizedType) {
             Type rawType = ((ParameterizedType) (method.getGenericParameterTypes()[paramIndex])).getRawType();
             if (BaseRequest.class.isAssignableFrom((Class<?>) rawType)) {
@@ -347,12 +349,8 @@ public final class ParamUtils {
         return false;
     }
 
-    /**
-     * 移除excel入参中的关键字字段
-     * @param param excel入参
-     * @return 集合
-     */
     public static Map<String, Object> getParamContextWithoutExtraInfo(Map<String, Object> param) {
+        // 移除excel入参中的关键字字段
         Map<String, Object> newParam = Maps.newHashMap(param);
         newParam.remove(Constants.TESTMETHODMETA);
         // newParam.remove(PARAMETER_NAME_);
@@ -368,13 +366,8 @@ public final class ParamUtils {
         return newParam;
     }
 
-    /**
-     * 获取Key对应Value，并转换成String
-     * @param map
-     * @param key
-     * @return
-     */
     public static String getString(Map<?, ?> map, Object key) {
+        // 获取Key对应Value，并转换成String
         if (map.get(key) == null || "".equals(map.get(key).toString())) {
             return null;
         } else {
@@ -382,37 +375,18 @@ public final class ParamUtils {
         }
     }
 
-    /**
-     * excel入参中是否包含language参数
-     * @param param 入参 map 集合
-     * @return 是否有
-     */
     private static boolean isLanguageParam(Map<String, Object> param) {
-        if (param.get("language") != null && !"".equals(param.get("language"))) {
-            return true;
-        }
-        return false;
+        // excel入参中是否包含language参数
+        return param.get("language") != null && !"".equals(param.get("language"));
     }
 
-    /**
-     * 判断excel测试用例中是否存在dependencyIndex字段
-     * @param param 入参
-     * @return
-     */
     public static boolean isDependencyIndexNoNull(Map<String, Object> param) {
-        if (param.get(Constants.DEPENDENCY_INDEX) == null || "".equals(param.get(Constants.DEPENDENCY_INDEX))) {
-            return false;
-        }
-        return true;
+        // 判断excel测试用例中是否存在dependencyIndex字段
+        return param.get(Constants.DEPENDENCY_INDEX) != null && !"".equals(param.get(Constants.DEPENDENCY_INDEX));
     }
 
-    /**
-     * 对象转json,并格式化输出
-     * @param obj
-     * @param prettyFormat
-     * @return
-     */
     public static String getJSONStringWithDateFormat(Object obj, boolean prettyFormat, String dateFormat) {
+        // 对象转json,并格式化输出
         try {
             if (org.apache.commons.lang3.StringUtils.isEmpty(dateFormat)) {
                 return JSON.toJSONString(obj, prettyFormat);
@@ -440,12 +414,8 @@ public final class ParamUtils {
         }
     }
 
-    /**
-     * 获取请求需要的入参
-     * @param context
-     * @return
-     */
     public static Map<String, Object> getParameters(Map<String, Object> context) {
+        // 获取请求需要的入参
         Assert.notNull(context, "入参字段不能为空！");
         if (!context.isEmpty()) {
             List<String> removeKey = getRemoveKey();
@@ -468,10 +438,8 @@ public final class ParamUtils {
         }
     }
 
-    /**
-     * 非Http请求入参字段清单,移除框架关键字
-     */
     private static List<String> getRemoveKey() {
+        // 非Http请求入参字段清单,移除框架关键字
         List<String> removeKey = new ArrayList<>();
         removeKey.add(Constants.CASE_NAME);
         // removeKey.add(Constants.CASE_INDEX);
@@ -492,12 +460,8 @@ public final class ParamUtils {
         return removeKey;
     }
 
-    /**
-     * Http接口入参字段检查
-     * @param context excel入参
-     * @return
-     */
     public static void checkKeyWord(Map<String, Object> context) {
+        // Http接口入参字段检查
         if (!ParamUtils.isHttpModeNoNull(context)) {
             Reporter.log("接口请求类型不能为空！例如：POST、GET！");
             throw new ParameterException("接口请求类型不能为空！例如：POST、GET！");

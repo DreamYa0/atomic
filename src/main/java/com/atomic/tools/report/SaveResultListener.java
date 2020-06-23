@@ -55,11 +55,8 @@ public class SaveResultListener extends TestListenerAdapter {
         testResultIntoDatabase(result);
     }
 
-    /**
-     * 把测试结果写入数据库中
-     * @param result
-     */
     private void testResultIntoDatabase(ITestResult result) {
+        // 把测试结果写入数据库中
         init();
         String methodName = null;
         String className = null;

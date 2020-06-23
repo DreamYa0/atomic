@@ -13,10 +13,8 @@ import static com.atomic.tools.mock.data.MockContext.getContext;
 
 public class MockFileHelper {
 
-    /**
-     * 保存Mock数据
-     */
     public static void loadData() {
+        // 保存Mock数据
         try {
             File file = new File(getMockFile(getContext().getCaseIndex()));
             String data = getFileString(file);
@@ -27,19 +25,13 @@ public class MockFileHelper {
         }
     }
 
-    /**
-     * 删除Mock数据
-     */
     public static void deleteData() {
+        // 删除Mock数据
         removeDir(getMockFile(getContext().getCaseIndex()));
     }
 
-    /**
-     * 功 能: 删除文件夹 参 数: strDir 要删除的文件夹名称 返回值: 如果成功true;否则false
-     * @param strDir
-     * @return
-     */
-    public static boolean removeDir(String strDir) {
+    public static void removeDir(String strDir) {
+        // 功 能: 删除文件夹 参 数: strDir 要删除的文件夹名称 返回值: 如果成功true;否则false
         File rmDir = new File(strDir);
         if (rmDir.isDirectory() && rmDir.exists()) {
             String[] fileList = rmDir.list();
@@ -55,14 +47,11 @@ public class MockFileHelper {
                 }
             }
             rmDir.delete();
-        } else {
-            return false;
         }
-        return true;
     }
 
-    //获取mock数据路径
     public static String getMockFile(int caseIndex) {
+        // 获取mock数据路径
         String testPath = getTestResourcesPath(getContext().getTestClass());
         return testPath + getContext().getTestClass().replace(".", File.separator) +
                 "_" + caseIndex + ".mock";

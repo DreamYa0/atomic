@@ -1,18 +1,16 @@
 package com.atomic.tools.assertcheck;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
-import com.atomic.param.ParamUtils;
 import com.atomic.param.ObjUtils;
+import com.atomic.param.ParamUtils;
 import com.atomic.tools.assertcheck.assertor.Assertor;
 import com.atomic.tools.assertcheck.assertor.AssertorFactory;
 import com.atomic.tools.assertcheck.assertor.RestfulAssertor;
 import com.atomic.tools.assertcheck.assertor.UnitTestAssertor;
-import com.atomic.exception.ExceptionUtils;
 import com.atomic.util.ReflectionUtils;
 import com.g7.framework.common.dto.BaseResult;
 import com.g7.framework.common.dto.PagedResult;
@@ -27,18 +25,11 @@ import org.testng.Reporter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.reflect.FieldUtils.readField;
@@ -68,11 +59,12 @@ import static org.apache.commons.lang3.reflect.FieldUtils.readField;
  * 通用结果断言类
  * @author dreamyao
  * @version v2.0.0
- * @Data 2018/05/30 10:48
+ * @date 2018/05/30 10:48
  */
 public final class ResultAssert {
 
     private ResultAssert() {
+
     }
 
     /**
@@ -83,6 +75,7 @@ public final class ResultAssert {
      * @param parameters 入参对象
      * @throws Exception 异常
      */
+    @SuppressWarnings("all")
     public static void assertResult(Object result,
                                     ITestResult testResult,
                                     Object instance,
@@ -119,12 +112,13 @@ public final class ResultAssert {
         }
     }
 
-    /**
-     * 执行初步基本断言，断言内容包括Success、Code、Description
-     * @param result 返回结果对象
-     * @param context  入参excel集合
-     */
-    private static void assertCheck(Result result, Map<String, Object> context, ITestResult testResult, Object instance) {
+    @SuppressWarnings("all")
+    private static void assertCheck(Result result,
+                                    Map<String, Object> context,
+                                    ITestResult testResult,
+                                    Object instance) {
+
+        // 执行初步基本断言，断言内容包括Success、Code、Description
         if (ParamUtils.isExpectSuccess(context)) {
             Assert.assertTrue(result.isSuccess());
             //自动断言excel中expectedResult字段当值
@@ -140,12 +134,8 @@ public final class ResultAssert {
         }
     }
 
-    /**
-     * 异常流程不进行expectedResult断言
-     * @param result 返回值对象
-     * @param context  入参
-     */
     private static void assertCheck(BaseResult result, Map<String, Object> context) {
+        // 异常流程不进行expectedResult断言
         if (ParamUtils.isExpectSuccess(context)) {
             Assert.assertTrue(result.isSuccess());
         } else if (isExpectFalse(context)) {
@@ -153,22 +143,14 @@ public final class ResultAssert {
         }
     }
 
-    /**
-     * 是否期望结果为N
-     * @param context 入参
-     * @return
-     */
     public static boolean isExpectFalse(Map<String, Object> context) {
+        // 是否期望结果为N
         return Constants.EXCEL_NO.equals(context.get(Constants.ASSERT_RESULT));
     }
 
-    /**
-     * 针对 PagedResult 返回值对象进行断言
-     * @param result 返回值对象
-     * @param context  入参
-     */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all")
     private static void assertCheck(PagedResult result, Map<String, Object> context) {
+        // 针对 PagedResult 返回值对象进行断言
         assertCheck((BaseResult) result, context);
         if (isExpectedResultNoNull(context)) {
             //自动断言excel中expectedResult字段当值
@@ -180,12 +162,8 @@ public final class ResultAssert {
         }
     }
 
-    /**
-     * 异常流程断言Code和Description
-     * @param result 返回结果对象
-     * @param context  入参excel集合
-     */
     private static void assertCodeAndDec(BaseResult result, Map<String, Object> context) {
+        // 异常流程断言Code和Description
         Assert.assertFalse(result.isSuccess());
         //增加期望为 N 时对Code和Description的断言
         if (isCodeNoNull(context)) {
@@ -196,243 +174,19 @@ public final class ResultAssert {
         }
     }
 
-    /**
-     * 当期望Description不为空时返回true
-     * @param context 入参
-     * @return
-     */
     private static boolean isDescriptionNoNull(Map<String, Object> context) {
-        if (context.get(Constants.ASSERT_MSG) == null || "".equals(context.get(Constants.ASSERT_MSG))) {
-            return false;
-        }
-        return true;
+        // 当期望Description不为空时返回true
+        return context.get(Constants.ASSERT_MSG) != null && !"".equals(context.get(Constants.ASSERT_MSG));
     }
 
-    /**
-     * 当期望Code不为空时返回true
-     * @param context 入参
-     * @return
-     */
     private static boolean isCodeNoNull(Map<String, Object> context) {
-        if (context.get(Constants.ASSERT_CODE) == null || "".equals(context.get(Constants.ASSERT_CODE))) {
-            return false;
-        }
-        return true;
+        // 当期望Code不为空时返回true
+        return context.get(Constants.ASSERT_CODE) != null && !"".equals(context.get(Constants.ASSERT_CODE));
     }
 
-    /**
-     * 当预期断言内容不为空时，进行自动断言
-     * @param context 入参
-     * @return
-     */
     private static boolean isExpectedResultNoNull(Map<String, Object> context) {
-        if (context.get(Constants.EXPECTED_RESULT) == null || "".equals(context.get(Constants.EXPECTED_RESULT))) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 执行预期expectedResult内容断言，完成智能化断言
-     * @param result 返回结果对象
-     * @param param  入参excel集合
-     * @return True or False
-     */
-    @Deprecated
-    private static boolean assertExpectedResult(Result result, Map<String, Object> param, Type returnType) {
-        String expectedData = (String) param.get(Constants.EXPECTED_RESULT);
-        if (returnType instanceof ParameterizedType) {
-            Type returnDataType = ((ParameterizedType) returnType).getActualTypeArguments()[0];
-            if (returnDataType instanceof ParameterizedType) {
-                //当data为List时 具体功能待实现
-                String jsonActualData = JSON.toJSONString(result.getData());
-                String jsonExpecData = JSON.toJSONString(expectedData);
-                if (jsonActualData.contains(jsonExpecData)) {
-                    return true;
-                }
-                System.out.println("------------------------返回值Result中的data值为List数据，" +
-                        "请自行实现手动断言！----------------------");
-                return true;
-            } else if (returnDataType instanceof Class) {
-                if (ObjUtils.isBasicType((Class<?>) returnDataType)) {
-                    //当data为基本类型时
-                    if (!expectedData.equals(result.getData().toString())) {
-                        return false;
-                    }
-                } else {
-                    //当data为对象时
-                    Map<String, String> expecDataMap = JSON.parseObject(expectedData,
-                            new TypeReference<Map<String, String>>() {
-                    });
-                    Field[] fields = ((Class<?>) returnDataType).getDeclaredFields();
-                    for (Field field : fields) {
-                        try {
-                            Type type = field.getGenericType();
-                            String fieldGetName = parGetName(field.getName(), field.getType().getSimpleName());
-                            String fieldIsGetName = parIsGetName(field.getName());
-                            Method fieldGetMethod;
-                            if (ReflectionUtils.getMethod(result.getData().getClass(), fieldGetName) != null) {
-                                fieldGetMethod = ReflectionUtils.getMethod(result.getData().getClass(), fieldGetName);
-                            } else if (ReflectionUtils.getMethod(result.getData().getClass(),
-                                    fieldIsGetName) != null) {
-
-                                fieldGetMethod = ReflectionUtils.getMethod(result.getData().getClass(),
-                                        fieldIsGetName);
-                            } else {
-                                continue;
-                            }
-                            Object actualValue = fieldGetMethod.invoke(result.getData());
-                            if (ObjUtils.isBasicType(field.getType())) {
-                                String expecValue = expecDataMap.get(field.getName());
-                                if (expecValue == null || "".equals(expecValue)) {
-                                    continue;
-                                }
-                                if (!expecValue.equals(actualValue.toString())) {
-                                    return false;
-                                }
-                            } else if (type instanceof Class) {
-                                String fieldName = field.getName();
-                                String value = expecDataMap.get(fieldName);
-                                Map<String, String> expecMap = JSON.parseObject(value,
-                                        new TypeReference<Map<String, String>>() {
-                                });
-                                Field[] fields1 = ((Class<?>) type).getDeclaredFields();
-                                for (Field field1 : fields1) {
-                                    Type type1 = field1.getGenericType();
-                                    String fieldGetName1 = parGetName(field1.getName(),
-                                            field.getType().getSimpleName());
-                                    String fieldIsGetName1 = parIsGetName(field1.getName());
-                                    Method fieldGetMethod1;
-                                    if (ReflectionUtils.getMethod(actualValue.getClass(), fieldGetName1) != null) {
-                                        fieldGetMethod1 = ReflectionUtils.getMethod(actualValue.getClass(),
-                                                fieldGetName1);
-                                    } else if (ReflectionUtils.getMethod(actualValue.getClass(),
-                                            fieldIsGetName1) != null) {
-                                        fieldGetMethod1 = ReflectionUtils.getMethod(actualValue.getClass(),
-                                                fieldIsGetName1);
-                                    } else {
-                                        continue;
-                                    }
-                                    Object actualValue1 = fieldGetMethod1.invoke(actualValue);
-                                    if (ObjUtils.isBasicType(field1.getType())) {
-                                        String expecValue1 = expecMap.get(field1.getName());
-                                        if (expecValue1 == null || "".equals(expecValue1)) {
-                                            continue;
-                                        }
-                                        if (!expecValue1.equals(actualValue1.toString())) {
-                                            return false;
-                                        }
-                                    } else if (type1 instanceof Class) {
-                                        String fieldName1 = field1.getName();
-                                        String value1 = expecMap.get(fieldName1);
-                                        Map<String, String> expecMap1 = JSON.parseObject(value1,
-                                                new TypeReference<Map<String, String>>() {
-                                        });
-                                        Field[] fields2 = ((Class<?>) type1).getDeclaredFields();
-                                        for (Field field2 : fields2) {
-                                            String fieldGetName2 = parGetName(field2.getName(),
-                                                    field.getType().getSimpleName());
-                                            String fieldIsGetName2 = parIsGetName(field2.getName());
-                                            Method fieldGetMethod2;
-                                            if (ReflectionUtils.getMethod(actualValue1.getClass(),
-                                                    fieldGetName2) != null) {
-                                                fieldGetMethod2 = ReflectionUtils.getMethod(actualValue1.getClass(),
-                                                        fieldGetName2);
-                                            } else if (ReflectionUtils.getMethod(actualValue1.getClass(),
-                                                    fieldIsGetName2) != null) {
-                                                fieldGetMethod2 = ReflectionUtils.getMethod(actualValue1.getClass(),
-                                                        fieldIsGetName2);
-                                            } else {
-                                                continue;
-                                            }
-                                            Object actualValue2 = fieldGetMethod2.invoke(actualValue1);
-                                            if (ObjUtils.isBasicType(field2.getType())) {
-                                                String expecValue2 = expecMap1.get(field2.getName());
-                                                if (expecValue2 == null || "".equals(expecValue2)) {
-                                                    continue;
-                                                }
-                                                if (!expecValue2.equals(actualValue2.toString())) {
-                                                    return false;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (Exception e) {
-                            Reporter.log("获取返回实际值异常！",
-                                    true);
-                        }
-                    }
-                }
-                return true;
-            }
-        } else {
-            Reporter.log("方法返回值不是Result<T>类型！");
-            throw new RuntimeException("方法返回值不是Result<T>类型");
-        }
-        return false;
-    }
-
-    /**
-     * 拼接boolean字段方法
-     * @param fieldName
-     * @return
-     */
-    private static String parIsGetName(String fieldName) {
-        if (null == fieldName || "".equals(fieldName)) {
-            return null;
-        }
-        return "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
-
-    /**
-     * 拼接在某属性的 get方法
-     * @param fieldName
-     * @return
-     */
-    private static String parGetName(String fieldName, String fieldType) {
-        if (null == fieldName || "".equals(fieldName)) {
-            return null;
-        }
-        if (("Boolean".equals(fieldType) || "boolean".equals(fieldType)) && fieldName.startsWith("is")) {
-            fieldName = fieldName.substring(2);
-        }
-        return "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    }
-
-    /**
-     * 自动断言excel中expectedResult字段当值
-     * @param result     实际返回值
-     * @param param      入参
-     * @param returnType 返回值对象的Type属性
-     */
-    private static void autoAssertResult(Result result, Map<String, Object> param, Type returnType) {
-        if (isExpectedResultNoNull(param)) {
-            String expectedData = (String) param.get(Constants.EXPECTED_RESULT);
-            Object actualData = result.getData();
-            //获取Result<T> 中的类型 T的Type类型
-            Type returnDataType = ((ParameterizedType) returnType).getActualTypeArguments()[0];
-            if (ObjUtils.isBasicType(actualData.getClass())) {
-                Assert.assertEquals(expectedData, actualData.toString());
-            } else if (returnDataType instanceof Class) {
-                Object expecData = JSON.parseObject(expectedData, returnDataType);
-                List<Field> expecFields = ReflectionUtils.getAllFieldsList(expecData.getClass());
-                List<Field> basicExpecFields = expecFields.stream().filter(
-                        field -> ObjUtils.isBasicType(field.getType())).collect(toList());
-                basicExpecFields.forEach(field -> assertBasicTypeParam(field, actualData, expecData));
-            }
-        }
-    }
-
-    private static void assertBasicTypeParam(Field field, Object actualData, Object expecData) {
-        try {
-            boolean result = Objects.deepEquals(readField(field, actualData, true), readField(field,
-                    expecData, true));
-            Assert.assertTrue(result);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        // 当预期断言内容不为空时，进行自动断言
+        return context.get(Constants.EXPECTED_RESULT) != null && !"".equals(context.get(Constants.EXPECTED_RESULT));
     }
 
     /**
@@ -732,31 +486,6 @@ public final class ResultAssert {
     }
 
     /**
-     * JSONObject对象断言目前不支持嵌套JSONObject,JSONArray的场景
-     * @param expResult 预期结果
-     * @param actResult 实际结果
-     */
-    private static void assertJSON(JSONObject expResult, JSONObject actResult) {
-        boolean autoAssertStatus = true;
-        Set<Map.Entry<String, Object>> jsonSet = actResult.entrySet();
-        Iterator<Map.Entry<String, Object>> iterator = jsonSet.iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, Object> jsonElements = iterator.next();
-            jsonElements.getKey();
-            if (jsonElements.getValue() instanceof JSONObject) {
-                autoAssertStatus = false;
-            }
-            if (jsonElements.getValue() instanceof JSONArray) {
-                autoAssertStatus = false;
-            }
-        }
-        // 非嵌套JSONObject断言
-        if (autoAssertStatus) {
-            Assert.assertEquals(expResult, actResult);
-        }
-    }
-
-    /**
      * REST 风格接口自动断言
      * @param response   rest请求响应结果
      * @param context    入参上下文
@@ -832,7 +561,7 @@ public final class ResultAssert {
                         actualDataMap.put(expectKeys.get(i), actualMap.get(expectKeys.get(i)));
                     }
                 }
-                Assert.assertTrue(expectDataMap.size() == actualDataMap.size());
+                Assert.assertEquals(actualDataMap.size(), expectDataMap.size());
                 assertMapForRest(expectDataMap, actualDataMap);
             } catch (Exception e) {
                 try {
@@ -859,7 +588,7 @@ public final class ResultAssert {
                                 actualMap.put(expectKeys.get(j), actualJsonObject.get(actualKeys.get(j)));
                             }
                         }
-                        Assert.assertTrue(expectMap.size() == actualMap.size());
+                        Assert.assertEquals(actualMap.size(), expectMap.size());
                         assertMapForRest(expectMap, actualMap);
                         /*Assert.assertTrue(jsonEquals(o.toString(), actObject.toString()));*/
                     }
@@ -882,159 +611,5 @@ public final class ResultAssert {
                 }
             }
         });
-    }
-
-    /**
-     * 比较两个json串是否相同
-     * @param j1 第一个json串(json串中不能有换行)
-     * @param j2 第二个json串(json串中不能有换行)
-     * @return 布尔型比较结果
-     */
-    public static boolean jsonEquals(String j1, String j2) {
-        //将json中表示list的[]替换成{}。思想：只保留层次结构，不区分类型
-        //这样直接替换，可能会导致某些value中的符号也被替换，但是不影响结果，因为j1、j2的变化是相对的
-        j1 = j1.replaceAll("\\[", "{");
-        j1 = j1.replaceAll("]", "}");
-        j2 = j2.replaceAll("\\[", "{");
-        j2 = j2.replaceAll("]", "}");
-        //将json中，字符串型的value中的{},字符替换掉，防止干扰(并没有去除key中的，因为不可能存在那样的变量名)
-        //未转义regex：(?<=:")(([^"]*\{[^"]*)|([^"]*\}[^"]*)|([^"]*,[^"]*))(?=")
-        Pattern pattern = Pattern.compile("(?<=:\")(([^\"]*\\{[^\"]*)|([^\"]*\\}[^\"]*)|([^\"]*,[^\"]*))(?=\")");
-        j1 = cleanStr4Special(j1, pattern.matcher(j1));
-        j2 = cleanStr4Special(j2, pattern.matcher(j2));
-        //转义字符串value中的空格
-        //未转义regex:"[^",]*?\s+?[^",]*?"
-        pattern = Pattern.compile("\"[^\",]*?\\s+?[^\",]*?\"");
-        j1 = cleanStr4Space(j1, pattern.matcher(j1));
-        j2 = cleanStr4Space(j2, pattern.matcher(j2));
-        //现在可以安全的全局性去掉空格
-        j1 = j1.replaceAll(" ", "");
-        j2 = j2.replaceAll(" ", "");
-        //调用递归方法
-        return compareAtom(j1, j2);
-    }
-
-    /**
-     * 比较字符串核心递归方法
-     * @param j1 Json字符串
-     * @param j2 Json字符串
-     * @return True or False
-     */
-    private static boolean compareAtom(String j1, String j2) {
-        if (!j1.equals("?:\"?\"")) {
-            //取出最深层原子
-            String a1 = j1.split("\\{", -1)[j1.split("\\{", -1).length - 1]
-                    .split("}", -1)[0];
-            String a2 = j2.split("\\{", -1)[j2.split("\\{", -1).length - 1]
-                    .split("}", -1)[0];
-            String j2_ = j2;
-            String a2_ = a2;
-            //转换成原子项
-            String i1[] = a1.split(",");
-            //在同级原子中寻找相同的原子
-            while (!a2.startsWith(",") && !a2.endsWith(",") && !a2.contains(":,") && !a2.contains(",,")) {
-                //遍历消除
-                for (String s : i1) {
-                    a2_ = a2_.replace(s, "");
-                }
-                //此时a2_剩下的全是逗号，如果长度正好等于i1的长度-1，说明相等
-                if (a2_.length() == i1.length - 1) {
-                    //相等则从j1、j2中消除，消除不能简单的替换，因为其他位置可能有相同的结构，必须从当前位置上消除
-                    int index = 0;
-                    index = j1.lastIndexOf("{" + a1 + "}");
-                    j1 = j1.substring(0, index) + j1.substring(index).replace("{" + a1 +
-                            "}", "?:\"?\"");
-                    index = j2.lastIndexOf("{" + a2 + "}");
-                    j2 = j2.substring(0, index) + j2.substring(index).replace("{" + a2 +
-                            "}", "?:\"?\"");
-                    //递归
-                    return compareAtom(j1, j2);
-                } else {
-                    //寻找下一个同级原子
-                    j2_ = j2_.replace("{" + a2 + "}", "");
-                    a2 = j2_.split("\\{", -1)[j2_.split("\\{", -1).length - 1]
-                            .split("}", -1)[0];
-                    a2_ = a2;
-                }
-            }
-            return false;
-        } else {
-            //比较是否相同
-            return j1.equals(j2);
-        }
-    }
-
-    /**
-     * json字符串特殊字符清理辅助方法
-     * @param j       需要清理的json字符串
-     * @param matcher 正则表达式匹配对象
-     * @return 净化的json串
-     */
-    private static String cleanStr4Special(String j, Matcher matcher) {
-        String group;
-        String groupNew;
-        while (matcher.find()) {
-            group = matcher.group();
-            groupNew = group.replaceAll("\\{", "A");
-            groupNew = groupNew.replaceAll("}", "B");
-            groupNew = groupNew.replaceAll(",", "C");
-            j = j.replace(group, groupNew);
-        }
-        return j;
-    }
-
-    /**
-     * json串字符串类型的value中的空格清理辅助方法
-     * @param j       需要清理的json字符串
-     * @param matcher 正则表达式匹配对象
-     * @return 净化的json串
-     */
-    private static String cleanStr4Space(String j, Matcher matcher) {
-        String group;
-        String groupNew;
-        while (matcher.find()) {
-            group = matcher.group();
-            groupNew = group.replaceAll(" ", "S");
-            j = j.replace(group, groupNew);
-        }
-        return j;
-    }
-
-    /**
-     * 用于断言录制、回放模式时把result写入param中
-     * @param result   返回结果对象
-     * @param context  入参excel集合
-     * @param callback 回调函数
-     * @throws Exception 异常
-     */
-    public static void resultCallBack(Object result,
-                                      Map<String, Object> context,
-                                      ITestResultCallback callback) throws Exception {
-
-        // 把入参和执行结果写入param中
-        callback.afterTestMethod(context, result, context.get(Constants.PARAMETER_NAME_));
-    }
-
-    /**
-     * 异常处理
-     * @param exception
-     * @return
-     */
-    public static Result exceptionDeal(Exception exception) {
-        String msg;
-        if (exception instanceof InvocationTargetException) {
-            msg = ExceptionUtils.getExceptionProfile(((InvocationTargetException) exception).getTargetException());
-        } else {
-            msg = ExceptionUtils.getExceptionProfile(exception);
-        }
-        return getResultObj(false, "500", msg);
-    }
-
-    private static Result getResultObj(Boolean success, String code, String message) {
-        Result result = Result.create();
-        result.setSuccess(success);
-        result.setCode(code);
-        result.setDescription(message);
-        return result;
     }
 }

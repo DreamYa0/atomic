@@ -8,25 +8,21 @@ import java.util.Date;
  */
 public class AutoTestProject implements Serializable {
 
+    private static final long serialVersionUID = -570193932470844513L;
     private Integer id;
-
     /**
      * 项目名称
      */
     private String project_name;
-
     /**
      * 项目状态 0：禁用 1：启用
      */
     private Integer project_status;
-
     private String author;
-
     /**
      * 项目创建时间
      */
     private Date create_time;
-
     /**
      * 项目更新时间
      */

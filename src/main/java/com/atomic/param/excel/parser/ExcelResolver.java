@@ -54,11 +54,8 @@ public class ExcelResolver {
         this.sheetName = sheetName;
     }
 
-    /**
-     * 按竖行方式读取数据
-     * @return
-     */
     public List<Map<String, Object>> readDataByRow() {
+        // 按竖行方式读取数据
         Assert.notNull(filePath, "Excel 文件地址不能为空.");
         Assert.notNull(sheetName, "Excel sheet页名称不能为空.");
         List<Map<String, Object>> datas = Lists.newArrayList();
@@ -120,14 +117,8 @@ public class ExcelResolver {
         return mList;
     }
 
-    /**
-     * 所有属性都是空串才不算测试用例
-     * @param lists
-     * @param i
-     * @param listTitleSize
-     * @return
-     */
     private boolean isEmptyTestCase(List<List<String>> lists, int i, int listTitleSize) {
+        // 所有属性都是空串才不算测试用例
         for (int k = 0; k < listTitleSize; k++) {
             if (!StringUtils.isEmpty(lists.get(k).get(i))) {
                 return false;

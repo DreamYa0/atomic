@@ -16,12 +16,8 @@ public final class HandleMethodName {
     private HandleMethodName() {
     }
 
-    /**
-     * 获取调用接口里的被测方法名
-     * @param iTestResult 测试结果上下文
-     * @return
-     */
     public static String getTestMethodName(ITestResult iTestResult) {
+        // 获取调用接口里的被测方法名
         IClass iClass = iTestResult.getTestClass();
         String testClassName = iClass.getName();
         String[] names = testClassName.split("\\.");
@@ -29,21 +25,13 @@ public final class HandleMethodName {
         return cutTestMethodName(slempClassName);
     }
 
-    /**
-     * 获取方法名称
-     * @param methodName 方法名
-     * @return
-     */
     private static String cutTestMethodName(String methodName) {
+        // 获取方法名称
         return ParamUtils.lowerFirst(methodName.substring(4));
     }
 
-    /**
-     * 从ITestResult中获取被测接口的Class名称
-     * @param testResult 测试结果上下文
-     * @return
-     */
     public static String getTestClassName(ITestResult testResult) {
+        // 从ITestResult中获取被测接口的Class名称
         IClass iClass = testResult.getTestClass();
         Class<?> superClass = iClass.getRealClass();
         Type superType = superClass.getGenericSuperclass();

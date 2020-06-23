@@ -32,12 +32,9 @@ public class RollBackListener extends TestListenerAdapter {
 
     }
 
-    /**
-     * 开启数据回滚监听
-     * @param testResult
-     */
     @Override
     public void onTestStart(ITestResult testResult) {
+        // 开启数据回滚监听
         //实现单库多表数据回滚
         if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) &&
                 !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
@@ -71,11 +68,8 @@ public class RollBackListener extends TestListenerAdapter {
         finishRollBack();
     }
 
-    /**
-     * 当为@RollBack注解时执行单库,多表数据回滚
-     * @param testResult
-     */
     private void startRollBack(ITestResult testResult) {
+        // 当为@RollBack注解时执行单库,多表数据回滚
         String dbName = AnnotationUtils.getDbName(TestNGUtils.getTestMethod(testResult));
         String[] tableNames = AnnotationUtils.getTableName(TestNGUtils.getTestMethod(testResult));
         //开启监听
@@ -87,11 +81,8 @@ public class RollBackListener extends TestListenerAdapter {
 
     }
 
-    /**
-     * 当为@RollBackAll注解时执行多库,多表数据回滚
-     * @param testResult
-     */
     private void startRollBackAll(ITestResult testResult) throws RollBackException {
+        // 当为@RollBackAll注解时执行多库,多表数据回滚
         //实现多数据库数据回滚
         try {
             Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(
@@ -120,10 +111,8 @@ public class RollBackListener extends TestListenerAdapter {
         }
     }
 
-    /**
-     * 关闭数据回滚监听并执行数据回滚
-     */
     private void finishRollBack() {
+        // 关闭数据回滚监听并执行数据回滚
         if (!CollectionUtils.isEmpty(dbNameAndChanges)) {
             Set<Map.Entry<String, Changes>> entries = dbNameAndChanges.entrySet();
             for (Map.Entry<String, Changes> map : entries) {

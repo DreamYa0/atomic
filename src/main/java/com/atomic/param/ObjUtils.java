@@ -469,15 +469,8 @@ public final class ObjUtils {
         }
     }
 
-    /**
-     * 反序列化成Bean
-     *
-     * @param jsonString json字符串
-     * @param type       类型
-     * @param <T>        实例
-     * @return 实例
-     */
     public static <T> T json2Bean(Gson gson, String jsonString, Class<T> type) {
+        // 反序列化成Bean
         return gson.fromJson(jsonString, type);
     }
 
@@ -509,13 +502,8 @@ public final class ObjUtils {
         });
     }
 
-    /**
-     * 是否基础类或者其包装类，String、Date类型
-     *
-     * @param clz clazz
-     * @return 是或否
-     */
     public static boolean isBasicType(Class<?> clz) {
+        // 是否基础类或者其包装类，String、Date类型
         try {
             return clz.isPrimitive() || Arrays.asList("String", "Date", "BigDecimal").contains(clz.getSimpleName()) ||
                     ((Class<?>) clz.getField("TYPE").get(null)).isPrimitive();
@@ -524,13 +512,8 @@ public final class ObjUtils {
         }
     }
 
-    /**
-     * 是否基础类或者其包装类，String、Date类型
-     *
-     * @param type 类型
-     * @return 是或否
-     */
     public static boolean isBasicType(String type) {
+        // 是否基础类或者其包装类，String、Date类型
         // char 没判断
         return Arrays.asList("String", "Date", "Integer", "int", "Long", "long", "Double", "double", "Boolean",
                 "boolean", "Byte", "byte", "BigDecimal", "Short", "short", "Float", "float").contains(type);
@@ -595,14 +578,8 @@ public final class ObjUtils {
         }
     }
 
-    /**
-     * 解析测试用例中的for循环字段
-     *
-     * @param object
-     * @return
-     * @throws Exception
-     */
     public static ForEachClass getForEachClass(Object object) throws Exception {
+        // 解析测试用例中的for循环字段
         if (object == null)
             return null;
         String splits = object.toString();
@@ -620,11 +597,8 @@ public final class ObjUtils {
         return forEachClass;
     }
 
-    /**
-     * 解析测试用例中的for循环字段
-     * 嵌套类
-     */
     public static class ForEachClass {
+        // 解析测试用例中的for循环字段
         private int start;
         private int end;
 

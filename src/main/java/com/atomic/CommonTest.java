@@ -1,9 +1,9 @@
 package com.atomic;
 
 import com.atomic.annotations.AnnotationUtils;
+import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.MethodMetaException;
 import com.atomic.exception.ParameterException;
-import com.atomic.exception.ThrowException;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
 import com.atomic.param.ITestResultCallback;
@@ -11,7 +11,6 @@ import com.atomic.param.ObjUtils;
 import com.atomic.param.ParamUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.tools.assertcheck.AssertCheckUtils;
-import com.atomic.tools.autotest.AutoTestManager;
 import com.atomic.tools.autotest.AutoTestMode;
 import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.helper.MockFileHelper;
@@ -53,7 +52,6 @@ import java.util.concurrent.Executors;
 
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
-import static com.atomic.exception.ExceptionUtils.isExceptionThrowsBySpecialMethod;
 import static com.atomic.param.Constants.EXCEL_DESC;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
 import static com.atomic.param.Constants.RESULT_NAME;
@@ -62,12 +60,11 @@ import static com.atomic.param.ParamUtils.isAutoTest;
 import static com.atomic.param.ParamUtils.isExpectSuccess;
 import static com.atomic.param.entity.MethodMetaUtils.getMethodMeta;
 import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
-import static com.atomic.tools.assertcheck.ResultAssert.exceptionDeal;
 import static com.atomic.tools.autotest.AutoTestManager.generateAutoTestCases;
 import static com.atomic.tools.mock.data.MockContext.getContext;
 import static com.atomic.tools.report.ParamPrint.resultPrint;
-import static com.atomic.tools.report.SaveResultCache.saveTestRequestInCache;
-import static com.atomic.tools.report.SaveResultCache.saveTestResultInCache;
+import static com.atomic.param.SaveResultCache.saveTestRequestInCache;
+import static com.atomic.param.SaveResultCache.saveTestResultInCache;
 import static com.atomic.tools.report.SaveRunTime.endTestTime;
 import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.ApplicationUtils.getBean;
@@ -148,12 +145,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
     }
 
-    /**
-     * 是否需要多线程测试
-     * @param context 入参
-     * @return
-     */
     private boolean isMultiThreads(Map<String, Object> context) {
+        // 是否需要多线程测试
         return !ParamUtils.isExcelValueEmpty(context.get(THREAD_COUNT)) &&
                 Integer.parseInt(context.get(THREAD_COUNT).toString()) > 1;
     }
@@ -179,14 +172,14 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
                     exception[0] = e;
                 }
                 // 这里不抛异常，全部自动测试跑一遍，暴露问题，跑完再处理
-                AutoTestManager.handleException(e, exceptionMsgs, testResult, newParam);
+                ExceptionManager.handleException(e, exceptionMsgs, testResult, newParam);
             }
         });
         long end = System.currentTimeMillis();
         System.out.println("------------------------------------------自动化测试结束，耗时："
                 + (end - start) / 1000 + "s------------------------------------------");
         // 如果有异常则抛出，提醒测试未通过
-        AutoTestManager.printExceptions(exception[0], exceptionMsgs);
+        ExceptionManager.printExceptions(exception[0], exceptionMsgs);
     }
 
     @SuppressWarnings("all")
@@ -243,12 +236,12 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
                                  ITestResult testResult) {
 
         // 期望结果为 Y 直接抛异常 ；beforeTest里面的异常也直接抛出
-        if (isExpectSuccess(context) || isExceptionThrowsBySpecialMethod(e, "beforeTest")) {
+        if (isExpectSuccess(context) || ExceptionManager.isExceptionThrowsBySpecialMethod(e, "beforeTest")) {
             Reporter.log("beforeTest方法执行异常！");
-            ThrowException.throwNewException(e);
+            ExceptionManager.throwNewException(e);
             throw new RuntimeException(e);
         }
-        context.put(RESULT_NAME, exceptionDeal(e));
+        context.put(RESULT_NAME, ExceptionManager.exceptionDeal(e));
         try {
             MethodMeta methodMeta = getMethodMeta(context, testResult, this);
             resultPrint(methodMeta.getInterfaceMethod().getName(), context.get(RESULT_NAME), context,
@@ -371,10 +364,8 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         assertResult(result, testResult, this, context, callback, parameters);
     }
 
-    /**
-     * 初始化h2内存数据库
-     */
     private void initEmbeddedDataSource() {
+        // 初始化h2内存数据库
         String resource = this.getClass().getResource("").getPath();
         File[] files = new File(resource).listFiles();
         if (ArrayUtils.isEmpty(files)) {
@@ -395,12 +386,6 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         }
     }
 
-    /**
-     * @param dataSourceName            数据源名称
-     * @param sql                       SQL语句
-     * @param isCheckEmbeddedDataSource true 表示 内存数据库 才能调用
-     * @throws SQLException
-     */
     private void executeSql(String dataSourceName, String sql, boolean isCheckEmbeddedDataSource) throws SQLException {
         DataSource dataSource = (DataSource) getBean(dataSourceName);
         // 不是内存数据库就不执行初始化

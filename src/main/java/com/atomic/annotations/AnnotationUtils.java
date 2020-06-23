@@ -31,12 +31,8 @@ import java.util.List;
  */
 public abstract class AnnotationUtils {
 
-    /**
-     * 判断测试方法是否添加回滚注解
-     * @param testMethod
-     * @return
-     */
     public static boolean isRollBackMethod(Method testMethod) throws AnnotationException {
+        // 判断测试方法是否添加回滚注解
         Annotation[] annotations = testMethod.getAnnotations();
         if (annotations != null) {
             RollBack rollBack = testMethod.getAnnotation(RollBack.class);
@@ -58,12 +54,8 @@ public abstract class AnnotationUtils {
         return false;
     }
 
-    /**
-     * 检查方法上是否有RollBackAll注解和注解是否开启
-     * @param method
-     * @return
-     */
     public static boolean isRollBackAllMethod(Method method) throws AnnotationException {
+        // 检查方法上是否有RollBackAll注解和注解是否开启
         Annotation[] annotations = method.getAnnotations();
         if (annotations != null) {
             RollBack rollBack = method.getAnnotation(RollBack.class);
@@ -81,12 +73,8 @@ public abstract class AnnotationUtils {
         return false;
     }
 
-    /**
-     * 处理多库多表时，表名和库名,参数示例：zhubajie_market.mk_service
-     * @param method
-     * @return
-     */
     public static Multimap<String, String> getDbNameAndTableName(Method method) throws AnnotationException {
+        // 处理多库多表时，表名和库名,参数示例：zhubajie_market.mk_service
         RollBackAll rollBackAll = method.getAnnotation(RollBackAll.class);
         String[] dbAndTable = rollBackAll.dbAndTable();
         Multimap<String, String> multimap = ArrayListMultimap.create();
@@ -101,32 +89,20 @@ public abstract class AnnotationUtils {
         return multimap;
     }
 
-    /**
-     * 从注解中获取数据库名
-     * @param testMethod
-     * @return
-     */
     public static String getDbName(Method testMethod) {
+        // 从注解中获取数据库名
         RollBack annotation = testMethod.getAnnotation(RollBack.class);
         return annotation.dbName();
     }
 
-    /**
-     * 从注解中获取表名
-     * @param testMethod
-     * @return
-     */
     public static String[] getTableName(Method testMethod) {
+        // 从注解中获取表名
         RollBack annotation = testMethod.getAnnotation(RollBack.class);
         return annotation.tableName();
     }
 
-    /**
-     * 判断@AutoTest注解是否存在
-     * @param method
-     * @return
-     */
     public static boolean isAutoTest(Method method) {
+        // 判断@AutoTest注解是否存在
         Annotation[] annotations = method.getAnnotations();
         if (annotations != null) {
             AutoTest autoTest = method.getAnnotation(AutoTest.class);
@@ -137,12 +113,8 @@ public abstract class AnnotationUtils {
         return true;
     }
 
-    /**
-     * 获取自动化测试最大用例限制数
-     * @param testMethod
-     * @return
-     */
     public static int getMaxTestCases(Method testMethod) {
+        // 获取自动化测试最大用例限制数
         AutoTest annotation = testMethod.getAnnotation(AutoTest.class);
         if (annotation != null) {
             return annotation.maxTestCases();
@@ -150,12 +122,8 @@ public abstract class AnnotationUtils {
         return Constants.MAX_TEST_CASES;
     }
 
-    /**
-     * 自动化测试，属性组合模式，默认单属性模式
-     * @param testMethod
-     * @return
-     */
     public static AutoTestMode getAutoTestMode(Method testMethod) {
+        // 自动化测试，属性组合模式，默认单属性模式
         AutoTest annotation = testMethod.getAnnotation(AutoTest.class);
         if (annotation != null) {
             return annotation.autoTestMode();
@@ -163,22 +131,14 @@ public abstract class AnnotationUtils {
         return AutoTestMode.SINGLE;
     }
 
-    /**
-     * 是否打印入参和出参
-     * @param testMethod
-     * @return
-     */
     public static boolean isPrintResult(Method testMethod) {
+        // 是否打印入参和出参
         AutoTest annotation = testMethod.getAnnotation(AutoTest.class);
         return annotation == null || annotation.autoTestPrintResult();
     }
 
-    /**
-     * 判断是否是场景测试
-     * @param method
-     * @return
-     */
     public static boolean isScenario(Method method) {
+        // 判断是否是场景测试
         Annotation[] annotations = method.getAnnotations();
         if (annotations != null) {
             Scenario scenario = method.getAnnotation(Scenario.class);
@@ -198,14 +158,9 @@ public abstract class AnnotationUtils {
         return false;
     }
 
-    /**
-     * 根据名称获取Bean
-     * @param interfaceClass 接口的Class对象
-     * @return 接口名称
-     */
     public static String getBeanName(Class<?> interfaceClass) throws NoSuchMethodException,
             InvocationTargetException, IllegalAccessException {
-
+        // 根据名称获取Bean
         Annotation[] annotations = interfaceClass.getAnnotations();
         if (!ArrayUtils.isEmpty(annotations)) {
             List<Class<? extends Annotation>> serviceList = Arrays.asList(Service.class,
@@ -220,12 +175,8 @@ public abstract class AnnotationUtils {
         return null;
     }
 
-    /**
-     * 获取@Test中的依赖方法名称
-     * @param testResult
-     * @return
-     */
     public static String[] getDependsOnMethods(ITestResult testResult) {
+        // 获取@Test中的依赖方法名称
         Method method = TestNGUtils.getTestMethod(testResult);
         Test test = method.getAnnotation(Test.class);
         String[] testNames = test.dependsOnMethods();
@@ -240,12 +191,8 @@ public abstract class AnnotationUtils {
         return null;
     }
 
-    /**
-     * 判断@ServicesVersion注解是否存在
-     * @param method
-     * @return
-     */
     public static boolean isServiceVersion(Method method) {
+        // 判断@ServicesVersion注解是否存在
         Annotation[] annotations = method.getAnnotations();
         if (annotations != null) {
             ServiceVersion serviceVersion = method.getAnnotation(ServiceVersion.class);
@@ -260,12 +207,8 @@ public abstract class AnnotationUtils {
         return true;
     }
 
-    /**
-     * 获取dubbo版本号
-     * @param method
-     * @return
-     */
     public static String getServiceVersion(Method method) {
+        // 获取dubbo版本号
         ServiceVersion serviceVersion = method.getAnnotation(ServiceVersion.class);
         return serviceVersion.version();
     }

@@ -114,13 +114,8 @@ public class DubboServiceFactory {
         return reference.get();
     }
 
-    /**
-     * 获取服务的泛化调用
-     *
-     * @param clazz clazz
-     * @return 泛化调用
-     */
     public GenericService getGenericService(Class<?> clazz) {
+        // 获取服务的泛化调用
         String interfaceName = clazz.getSimpleName();
         GenericService genericService;
         try {
@@ -142,13 +137,8 @@ public class DubboServiceFactory {
         return genericService;
     }
 
-    /**
-     * 获取服务的泛化调用
-     *
-     * @param interfaceName 接口名称
-     * @return 泛化调用
-     */
     public GenericService getGenericService(String interfaceName) {
+        // 获取服务的泛化调用
         GenericService genericService;
         try {
             // 引用远程服务

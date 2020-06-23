@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class JacksonUtils {
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     static {

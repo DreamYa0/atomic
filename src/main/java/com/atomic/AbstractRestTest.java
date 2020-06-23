@@ -24,25 +24,15 @@ import static com.atomic.param.ParamUtils.isValueTrue;
  */
 public abstract class AbstractRestTest {
 
-    /**
-     * 接口数据驱动
-     * @param method
-     * @return
-     * @throws Exception
-     */
     @DataProvider(name = "excel")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {
+        // 接口数据驱动
         return readDataForTest(method);
     }
 
-    /**
-     * 接口数据驱动-并行
-     * @param method
-     * @return
-     * @throws Exception
-     */
     @DataProvider(name = "parallelExcel", parallel = true)
     public Iterator<Object[]> parallelDataProvider(Method method) throws Exception {
+        // 接口数据驱动-并行
         return readDataForTest(method);
     }
 

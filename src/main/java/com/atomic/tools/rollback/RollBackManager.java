@@ -40,22 +40,13 @@ public final class RollBackManager {
         return INSTANCE;
     }
 
-    /**
-     * 开启监听
-     *
-     * @param changes    Changes对象
-     * @param tableNames 数据库表名
-     */
     void setStartPoint(String dbName, Changes changes, String... tableNames) {
+        // 开启监听
         createStartPoint(dbName, changes, tableNames);
     }
 
-    /**
-     * 关闭监听并进行数据回滚
-     *
-     * @param changes Changes对象
-     */
     void setEndPoint(String dbName, Changes changes) {
+        // 关闭监听并进行数据回滚
         changes.setEndPointNow();
         runRollback(dbName, changes);
     }
@@ -134,13 +125,8 @@ public final class RollBackManager {
         return "";
     }
 
-    /**
-     * 获取监控的数据库表名
-     * @param testNGMethods 测试方法
-     * @param changesMap    数据库名称集合
-     * @return 监控的数据库表名
-     */
     Map<String, String[]> getTableNames4Scenario(ITestNGMethod[] testNGMethods, Map<String, Changes> changesMap) {
+        // 获取监控的数据库表名
         Map<String, String[]> tableNameList = Maps.newHashMap();
         for (ITestNGMethod testNGMethod : testNGMethods) {
             Method method = testNGMethod.getConstructorOrMethod().getMethod();

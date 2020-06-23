@@ -80,12 +80,8 @@ final class ExtentManager {
         return extentx;
     }
 
-    /**
-     * 根据项目名称统计项目构建次数
-     * @param projectName
-     * @return
-     */
     String countBuild(String projectName) {
+        // 根据项目名称统计项目构建次数
         Integer projectId = getProjectId(projectName);
         String sql = "select * from autotest_result where project_id= ? order by create_time desc";
         Object[] param = {projectId};
@@ -96,12 +92,8 @@ final class ExtentManager {
         return "1";
     }
 
-    /**
-     * 从数据库中获取对应项目的ID
-     * @param projectName
-     * @return
-     */
     private Integer getProjectId(String projectName) {
+        // 从数据库中获取对应项目的ID
         String queryProject = "select * from autotest_project where project_name= ?";
         Object[] queryProjectParam = {projectName};
         AutoTestProject autoTestProject = ReportDb.queryQaProjectValue(queryProject, queryProjectParam);

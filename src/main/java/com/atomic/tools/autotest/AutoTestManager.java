@@ -26,7 +26,6 @@ import org.testng.ITestResult;
 import org.testng.Reporter;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -40,11 +39,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
-import static com.atomic.exception.ThrowException.throwNewException;
-import static com.atomic.param.Constants.DATE_FORMAT;
 import static com.atomic.param.ObjUtils.getValue;
 import static com.atomic.param.ObjUtils.isBasicType;
-import static com.atomic.param.ParamUtils.getParamContextWithoutExtraInfo;
 import static com.atomic.param.ParamUtils.getParamName;
 import static com.atomic.param.entity.MethodMetaUtils.getMethodMeta;
 import static java.util.Comparator.comparing;
@@ -54,84 +50,11 @@ import static java.util.Comparator.comparing;
  */
 public class AutoTestManager {
 
-    public static void handleException(Exception e,
-                                       Map<String, List<Map<String, Object>>> exceptionMsgs,
-                                       ITestResult testResult,
-                                       Map<String, Object> param) {
-
-        String methodName = testResult.getTestClass().getRealClass().getName();
-        Map<String, Object> newParam = getParamContextWithoutExtraInfo(param);
-        String error = String.format("方法执行自动化测试时发生错误！, 方法名是：%s, 入参是：%s",
-                methodName, getJSONStringWithDateFormat(newParam));
-        Reporter.log(error);
-
-        String errorMsg = e.getMessage() != null ? e.getMessage() :
-                ((InvocationTargetException) e).getTargetException() != null ?
-                        (((InvocationTargetException) e).getTargetException()).getMessage() : null;
-
-        errorMsg = "(" + methodName + ")" + errorMsg;
-        List<Map<String, Object>> exceptions = exceptionMsgs.get(errorMsg);
-        if (exceptions == null) {
-            exceptions = Lists.newArrayList();
-        }
-        if (!exceptionMsgs.containsKey(errorMsg)) {
-            exceptionMsgs.put(errorMsg, exceptions);
-        }
-        exceptions.add(newParam);
-    }
-
-    public static void printExceptions(Exception exception,
-                                       Map<String, List<Map<String, Object>>> exceptionMsgs) throws Exception {
-        if (exception != null) {
-            System.out.println("-----------------------下面打印所有异常信息：" +
-                    "-----------------------------------------------");
-            // 打印所有遇到的异常
-            for (String msg : exceptionMsgs.keySet()) {
-                System.out.println("-----------------------------------我是分割线-----------------------------------");
-                System.err.println("异常：" + msg);
-                System.err.println("测试用例列表：" + getJSONString(exceptionMsgs.get(msg)));
-            }
-            System.out.println("---------------------- -异常信息打印完毕，下面抛出异常 " +
-                    "-----------------------------------------------");
-            //先判断异常具体类型
-            throwNewException(exception);
-            // 抛出异常，提醒测试未通过
-            throw exception;
-        }
-    }
-
-    /**
-     * 对象转json
-     * @param obj
-     * @return
-     */
-    private static String getJSONStringWithDateFormat(Object obj) {
-        return ParamUtils.getJSONStringWithDateFormat(obj, true, DATE_FORMAT);
-    }
-
-    /**
-     * 对象转json
-     * @param obj
-     * @return
-     */
-    private static String getJSONString(Object obj) {
-        return getJSONString(obj, true);
-    }
-
-    /**
-     * 对象转json
-     * @param obj          对象
-     * @param prettyFormat 是否格式化Json字符串
-     * @return 格式化后的Json字符串
-     */
-    private static String getJSONString(Object obj, boolean prettyFormat) {
-        return ParamUtils.getJSONStringWithDateFormat(obj, prettyFormat, null);
-    }
-
     /**
      * 生成自动化测试所需的数据
-     * @param testResult
-     * @return
+     * @param testResult 测试结果
+     * @param testInstance test case 实例
+     * @return 测试用例
      */
     public static List<Map<String, Object>> generateAutoTestCases(ITestResult testResult,
                                                                   Object testInstance) throws Exception {
@@ -151,16 +74,11 @@ public class AutoTestManager {
         }
     }
 
-    /**
-     * 生成自动化测试所需的数据
-     * @param testResult
-     * @return
-     */
     public static List<Map<String, Object>> generateAutoTestCases(ITestResult testResult,
                                                                   Class<?> interfaceType,
                                                                   String testMethodName,
                                                                   CompletableFuture<Object> future) throws Exception {
-
+        // 生成自动化测试所需的数据
         Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         MethodMeta methodMeta = getMethodMeta(testResult, interfaceType, testMethodName, param, future);
         Type[] parameterTypes = methodMeta.getParamTypes();
@@ -222,20 +140,12 @@ public class AutoTestManager {
         }
     }
 
-    /**
-     * 生成XXX<T> 中 T 参数的值
-     * @param methodMeta          测试属性
-     * @param autoTestItemList    属性以及对应生成的值
-     * @param autoTestValuesLevel 等级
-     * @param i                   循环
-     * @param paramClass          T 的 Class 类型
-     * @throws ClassNotFoundException Class不存在
-     */
     private static void generateAutoTestParamClass(MethodMeta methodMeta,
                                                    List<AutoTestItem> autoTestItemList,
                                                    int autoTestValuesLevel, int i,
                                                    Class<?> paramClass) throws ClassNotFoundException {
 
+        // 生成XXX<T> 中 T 参数的值
         if (Number.class.isAssignableFrom(paramClass)) {
             // Request<? extend Number>
             // 单参数
@@ -252,14 +162,8 @@ public class AutoTestManager {
         }
     }
 
-    /**
-     * 获取参数类型，如果是继承的 BaseRequest ，则获取泛型的实际类型
-     * @param method     方法
-     * @param paramIndex 参数序号
-     * @return 参数类型
-     * @throws Exception 异常
-     */
     private static Type getParamType(Method method, int paramIndex) throws Exception {
+        // 获取参数类型，如果是继承的 BaseRequest ，则获取泛型的实际类型
         if (method.getGenericParameterTypes()[paramIndex] instanceof ParameterizedType) {
             if (ArrayUtils.isEmpty(((ParameterizedType) (method.getGenericParameterTypes()[paramIndex]))
                     .getActualTypeArguments())) {
@@ -281,16 +185,11 @@ public class AutoTestManager {
         return method.getGenericParameterTypes()[paramIndex];
     }
 
-    /**
-     * 获取自动化测试值
-     * @param paramClass
-     * @param paramName
-     * @return
-     * @throws ClassNotFoundException
-     */
     private static AutoTestItem getAutoTestValues(Class<?> paramClass,
                                                   String paramName,
                                                   int autoTestValuesLevel) throws ClassNotFoundException {
+
+        // 获取自动化测试值
         AutoTestItem item = new AutoTestItem(paramName);
         item.setParamClass(paramClass);
         IAutoTestValues autoTestValues;
@@ -339,15 +238,10 @@ public class AutoTestManager {
         return item;
     }
 
-    /**
-     * 获取自动化测试值
-     * @param clazz
-     * @param autoTestValuesLevel
-     * @return
-     * @throws ClassNotFoundException
-     */
     private static List<AutoTestItem> getAutoTestValues(Class<?> clazz,
                                                         int autoTestValuesLevel) throws ClassNotFoundException {
+
+        // 获取自动化测试值
         List<AutoTestItem> list = Lists.newArrayList();
         Optional<Field[]> optionalFields = Optional.of(clazz.getDeclaredFields());
         optionalFields.ifPresent(fields -> Arrays.stream(fields).forEach(
@@ -355,15 +249,11 @@ public class AutoTestManager {
         return list;
     }
 
-    /**
-     * 递归的为对象嵌套对象的所有Field设值
-     * @param field         field
-     * @param autoTestItems 属性和生成的值
-     */
     private static void generateNestingAutoTestValues(Field field,
                                                       List<AutoTestItem> autoTestItems,
                                                       int autoTestValuesLevel) {
 
+        // 递归的为对象嵌套对象的所有Field设值
         try {
             if (isBasicType(field.getType().getSimpleName())) {
                 autoTestItems.add(getAutoTestValues(field.getType(), field.getName(), autoTestValuesLevel));
@@ -379,14 +269,9 @@ public class AutoTestManager {
         }
     }
 
-
-    /**
-     * 对 XXX<T> 中的XXX 中的公共字段设值
-     * @param clazz               入参对象Class
-     * @param autoTestValuesLevel 等级
-     * @return 属性和生成的值
-     */
     private static List<AutoTestItem> getAutoTestCommonValues(Class<?> clazz, int autoTestValuesLevel) {
+
+        // 对 XXX<T> 中的XXX 中的公共字段设值
         List<AutoTestItem> list = Lists.newArrayList();
         List<Field> fields = ReflectionUtils.getAllFieldsList(clazz);
         // 必须要排除data 因为data为泛型，否则field.getGenericType()会报错
@@ -401,13 +286,8 @@ public class AutoTestManager {
         return list;
     }
 
-    /**
-     * 步入下一个循环
-     * @param index
-     * @param counts
-     * @return 变化参数的下标
-     */
     private static int increaseByMulti(int[] index, int[] counts) {
+        // 步入下一个循环
         for (int i = counts.length - 1; i >= 0; i--) {
             // 下标最大值
             if (index[i] < counts[i] - 1) {
@@ -419,16 +299,14 @@ public class AutoTestManager {
                 return i;
             }
         }
+
+        // 变化参数的下标
         return -1;
     }
 
-    /**
-     * 步入下一个循环
-     * @param index
-     * @param counts
-     * @return 变化参数的下标
-     */
     private static int increaseBySingle(int[] index, int[] counts) {
+
+        // 步入下一个循环
         for (int i = counts.length - 1; i >= 0; i--) {
             // 下标最大值
             if (index[i] < counts[i] - 1) {
@@ -436,15 +314,14 @@ public class AutoTestManager {
                 return i;
             }
         }
+
+        // 变化参数的下标
         return -1;
     }
 
-    /**
-     * 计算自动测试实例总数
-     * @param counts
-     * @return
-     */
     private static long getAutoTestCounts(int[] counts) {
+
+        // 计算自动测试实例总数
         int allTests = 1;
         for (int i = counts.length - 1; i >= 0; i--) {
             allTests *= counts[i];
@@ -452,19 +329,12 @@ public class AutoTestManager {
         return allTests;
     }
 
-    /**
-     * 测试用例太多，内存不够用，减少实例
-     * @param param
-     * @param autoTestItemList
-     * @param counts
-     * @param autoTestValuesLevel
-     * @throws ClassNotFoundException
-     */
     private static void resetAutoTestValues(Map<String, Object> param,
                                             List<AutoTestItem> autoTestItemList,
                                             int[] counts,
                                             int autoTestValuesLevel) throws Exception {
 
+        // 测试用例太多，内存不够用，减少实例
         for (AutoTestItem item : autoTestItemList) {
             item.setAutoTestValues(getAutoTestValues(item.getParamClass(), item.getParamName(),
                     autoTestValuesLevel).getAutoTestValues());
@@ -475,15 +345,11 @@ public class AutoTestManager {
         resetCounts(counts, autoTestItemList);
     }
 
-    /**
-     * 通过excel传入正常的入参值
-     * @param param
-     * @param autoTestItemList
-     */
     @SuppressWarnings("unchecked")
     private static void insertNormalTestValues(Map<String, Object> param,
                                                List<AutoTestItem> autoTestItemList) throws Exception {
 
+        // 通过excel传入正常的入参值
         for (AutoTestItem item : autoTestItemList) {
             String normalValue = getValue(param.get(item.getParamName()));
             if (!ParamUtils.isExcelValueEmpty(normalValue)) {
@@ -509,16 +375,11 @@ public class AutoTestManager {
         }
     }
 
-    /**
-     * 遍历多维列表，生成测试用例，多属性模式
-     * @param param
-     * @param autoTestItemList
-     * @return
-     */
     private static List<Map<String, Object>> generateAutoTestCasesByMultiple(Map<String, Object> param,
                                                                              List<AutoTestItem> autoTestItemList,
                                                                              Method testMethod) throws Exception {
 
+        // 遍历多维列表，生成测试用例，多属性模式
         int[] index = new int[autoTestItemList.size()];
         // 每个参数的自动测试值的个数
         // int[] counts = new int[autoTestItemList.size()];
@@ -539,7 +400,7 @@ public class AutoTestManager {
                 Reporter.log("自动化测试用例过多！");
                 throw new AutoTestException(String.format("auto test cases are too many to start, " +
                         "the max is %s, the combination number is %s, params is %s", maxTestCases,
-                        totalAutoTestCount, getJSONString(autoTestItemList)));
+                        totalAutoTestCount, ParamUtils.getJSONString(autoTestItemList)));
             }
             // 减少各属性的测试值
             resetAutoTestValues(param, autoTestItemList, counts, autoTestValuesLevel);
@@ -565,16 +426,11 @@ public class AutoTestManager {
         Arrays.fill(index, value);
     }
 
-    /**
-     * 遍历多维列表，生成测试用例，单属性模式，每次一个属性变化，其他属性使用正常值
-     * @param param
-     * @param autoTestItemList
-     * @return
-     */
     private static List<Map<String, Object>> generateAutoTestCasesBySingle(Map<String, Object> param,
                                                                            List<AutoTestItem> autoTestItemList)
             throws Exception {
 
+        // 遍历多维列表，生成测试用例，单属性模式，每次一个属性变化，其他属性使用正常值
         int[] index = new int[autoTestItemList.size()];
         // 设置默认-1
         setArray(index, -1);

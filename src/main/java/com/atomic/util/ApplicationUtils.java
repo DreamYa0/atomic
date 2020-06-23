@@ -30,17 +30,9 @@ public class ApplicationUtils implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    /**
-     * 根据class获取bean的实例
-     * @param interfaceType
-     * @return Object
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
     public static Object getBean(Class<?> interfaceType) throws NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
-
+        // 根据class获取bean的实例
         try {
             return applicationContext.getBean(interfaceType);
         } catch (Exception e) {
@@ -72,12 +64,8 @@ public class ApplicationUtils implements ApplicationContextAware {
         throw new GetBeanException("bean not found : " + interfaceType.getName());
     }
 
-    /**
-     * 根据bean的名称获取bean的实例
-     * @param beanName
-     * @return
-     */
     public static Object getBean(String beanName) {
+        // 根据bean的名称获取bean的实例
         return applicationContext.getBean(beanName);
     }
 }

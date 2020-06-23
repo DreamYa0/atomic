@@ -39,13 +39,8 @@ public abstract class BaseTestCase<T> extends CommonTest<T> {
         }
     }
 
-    /**
-     * 初始化数据并返回初始化数据的主键ID
-     *
-     * @param insertSql SQL语句
-     * @param pkName    主键名称
-     */
     protected final long insert(String dbName, String insertSql, String... pkName) {
+        // 初始化数据并返回初始化数据的主键ID
         String dbTableName = insertSql.substring(insertSql.indexOf("INSERT INTO") + 12, insertSql.indexOf("(") - 1);
         String primaryKey = insertSql.substring(insertSql.indexOf("(") + 1, insertSql.indexOf(","));
         String primaryValue = insertSql.substring(insertSql.indexOf("VALUES (") + 8, insertSql.indexOf(",",
@@ -78,13 +73,8 @@ public abstract class BaseTestCase<T> extends CommonTest<T> {
         return new Request(dataSource, querySql, parameters);
     }
 
-    /**
-     * Sql 语句获取数据
-     *
-     * @param querySql 查询Sql语句
-     * @return 结果集
-     */
     protected final List<Map<String, Object>> query(String dbName, String querySql) {
+        // sql 语句获取数据
         DataSource dataSource = getDataSource(dbName);
         return query(dataSource, querySql);
     }

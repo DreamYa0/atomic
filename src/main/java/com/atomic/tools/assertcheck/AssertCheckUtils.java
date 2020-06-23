@@ -112,13 +112,8 @@ public final class AssertCheckUtils {
         compare(item.getCompareType(), oldValue, newValue, item.getFixedValue(), oldSql, newSql);
     }
 
-    /**
-     * 格式化字符串 字符串中使用{key}表示占位符
-     * @param sourStr
-     * @param param
-     * @return
-     */
     private static String stringFormat(String sourStr, Map<String, Object> param) throws SQLException {
+        // 格式化字符串 字符串中使用{key}表示占位符
         if (CollectionUtils.isEmpty(param))
             return sourStr;
         Matcher matcher = Pattern.compile("\\{(.*?)\\}").matcher(sourStr);

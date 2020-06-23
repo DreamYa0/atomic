@@ -250,24 +250,17 @@ public class ReportListener implements IReporter {
         return calendar.getTime();
     }
 
-    /**
-     * 把首字母转为大写
-     * @param str
-     * @return
-     */
     private String upperFirst(String str) {
+        // 把首字母转为大写
         if (org.apache.commons.lang3.StringUtils.isEmpty(str)) {
             return str;
         }
         return str.replaceFirst(str.substring(0, 1), str.substring(0, 1).toUpperCase());
     }
 
-    /**
-     * 从zhubajie_qa_dubbo库中获取对应测试的入参和返回值
-     * @param testResult 返回结果
-     * @return 集合
-     */
     private Map<String, String> getParamAndReturn(ITestResult testResult) {
+
+        // 从库中获取对应测试的入参和返回值
         Map<String, Object> param = TestNGUtils.getParamContext(testResult);
         String className = HandleMethodName.getTestClassName(testResult);
         String methodName = HandleMethodName.getTestMethodName(testResult);
@@ -295,12 +288,8 @@ public class ReportListener implements IReporter {
         return null;
     }
 
-    /**
-     * 创建报告用例标题名称
-     * @param result 测试结果上下文
-     * @return
-     */
     private String createCaseName(ITestResult result) {
+        // 创建报告用例标题名称
         String className = HandleMethodName.getTestClassName(result);
         String methodName = HandleMethodName.getTestMethodName(result);
         StringBuilder sb = new StringBuilder();

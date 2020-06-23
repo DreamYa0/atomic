@@ -30,14 +30,8 @@ public final class DataSourceUtils {
 
     }
 
-    /**
-     * 根据数据库名称查询数据
-     *
-     * @param sql SQL语句
-     * @return 结果集
-     * @throws SQLException
-     */
     public static List<Map<Integer, Object>> queryData(String dbName, String sql) throws SQLException {
+        // 根据数据库名称查询数据
         ResultSet resultSet = getResult(dbName, sql);
         // select value1,value2
         List<Map<Integer, Object>> list = Lists.newArrayList();
@@ -59,13 +53,8 @@ public final class DataSourceUtils {
         return rs;
     }
 
-    /**
-     * 处理ResultSet结果集
-     * @param resultSet 结果集
-     * @param list      List集合
-     * @throws SQLException
-     */
     private static void handleResultSet(ResultSet resultSet, List<Map<Integer, Object>> list) throws SQLException {
+        // 处理ResultSet结果集
         int size = resultSet.getMetaData().getColumnCount();
         while (resultSet.next()) {
             Map<Integer, Object> map = Maps.newHashMap();
@@ -77,12 +66,8 @@ public final class DataSourceUtils {
         }
     }
 
-    /**
-     * 获取数据源
-     *
-     * @return 获取dataSource
-     */
     public static DataSource getDataSource(String dbName) {
+        // 获取数据源
         try {
             DataSource source = DATA_SOURCE_CONCURRENT_MAP.get(dbName);
             if (Objects.nonNull(source)) {

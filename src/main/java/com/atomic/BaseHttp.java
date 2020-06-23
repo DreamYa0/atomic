@@ -6,18 +6,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.atomic.config.CenterConfig;
 import com.atomic.config.GlobalConfig;
+import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.ParameterException;
-import com.atomic.tools.report.ReportListener;
-import com.atomic.tools.rollback.RollBackListener;
-import com.atomic.tools.rollback.ScenarioRollBackListener;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
-import com.atomic.util.TestNGUtils;
 import com.atomic.tools.http.GetHandler;
 import com.atomic.tools.http.IHandler;
 import com.atomic.tools.http.PostHandler;
+import com.atomic.tools.report.ReportListener;
+import com.atomic.tools.rollback.RollBackListener;
+import com.atomic.tools.rollback.ScenarioRollBackListener;
+import com.atomic.util.TestNGUtils;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
@@ -31,46 +32,30 @@ import java.util.List;
 import java.util.Map;
 
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
-import static com.atomic.exception.ThrowException.throwNewException;
-import static com.atomic.tools.report.SaveRunTime.endTestTime;
-import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.HTTP_HEADER;
 import static com.atomic.param.Constants.HTTP_HOST;
 import static com.atomic.param.Constants.HTTP_PROXY;
-import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
-import static com.atomic.tools.report.ParamPrint.resultPrint;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
+import static com.atomic.param.SaveResultCache.saveTestResultInCache;
 import static com.atomic.tools.assertcheck.ResultAssert.assertResult;
+import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
+import static com.atomic.tools.report.ParamPrint.resultPrint;
+import static com.atomic.tools.report.SaveRunTime.endTestTime;
+import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.TestNGUtils.injectResultAndParameters;
-import static com.atomic.tools.report.SaveResultCache.saveTestResultInCache;
 
 
 /**
  * @author dreamyao
  * @version 1.0.0
- * @description 新的 HTTP 请求基类
- * @Data 2018/05/30 10:48
+ * @title 新的 HTTP 请求基类
+ * @date 2018/05/30 10:48
  */
 @Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
 public abstract class BaseHttp extends AbstractRestTest implements IHookable, ITestBase {
-
-    /**
-     * Http接口入参字段检查
-     * @param context excel入参
-     */
-    private static void checkHttpKeyWord(Map<String, Object> context) {
-        if (!ParamUtils.isHttpModeNoNull(context)) {
-            Reporter.log("Http Mode not be empty");
-            throw new ParameterException("Http Mode not be empty.");
-        }
-        if (!ParamUtils.isHttpMethodNoNull(context)) {
-            Reporter.log("Http Method not be null");
-            throw new ParameterException("Http Method not be null.");
-        }
-    }
 
     @Override
     public void initDb() {
@@ -87,7 +72,7 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
         try {
             prepareTest(callBack, testResult);
         } catch (Exception e) {
-            throwNewException(e);
+            ExceptionManager.throwNewException(e);
         }
     }
 
@@ -134,7 +119,7 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
             String headerString = context.get(HTTP_HEADER).toString();
             Map<String, String> headerMap = JSON.parseObject(headerString,
                     new TypeReference<Map<String, String>>() {
-            });
+                    });
             headerMap.forEach(request::header);
         }
         execute(context, callBack, testResult, request);
@@ -180,13 +165,9 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
 
     }
 
-    /**
-     * 测试方法回调
-     * @param callBack   回调函数
-     * @param testResult 结果上下文
-     */
     @SuppressWarnings("unchecked")
     private void testCallBack(IHookCallBack callBack, ITestResult testResult) {
+        // 测试方法回调
         Map<String, Object> context = (Map<String, Object>) testResult.getParameters()[0];
         try {
             // 注入参数和结果，param 会去掉系统使用的一些数据
@@ -197,5 +178,17 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
         }
         //回调测试方法
         callBack.runTestMethod(testResult);
+    }
+
+    private static void checkHttpKeyWord(Map<String, Object> context) {
+        // Http接口入参字段检查
+        if (!ParamUtils.isHttpModeNoNull(context)) {
+            Reporter.log("Http Mode not be empty");
+            throw new ParameterException("Http Mode not be empty.");
+        }
+        if (!ParamUtils.isHttpMethodNoNull(context)) {
+            Reporter.log("Http Method not be null");
+            throw new ParameterException("Http Method not be null.");
+        }
     }
 }

@@ -10,11 +10,8 @@ public final class CallBack {
 
     }
 
-    /**
-     * 回调函数，为testCase方法传入，入参和返回结果
-     * @return
-     */
     public static ITestResultCallback paramAndResultCallBack() {
+        // 回调函数，为testCase方法传入，入参和返回结果
         return (param, result, parameters) -> {
             if (parameters != null) {
                 for (int i = 0; i < parameters.length; i++) {

@@ -15,13 +15,9 @@ public final class MapUtils {
     private MapUtils() {
     }
 
-    /**
-     * 把source覆盖到target里面去
-     * @param target
-     * @param source
-     */
     @SuppressWarnings("unchecked")
     public static void mergeMap(Map target, Map source) {
+        // 把source覆盖到target里面去
         if (source == null || target == null)
             return;
         for (Object key : source.keySet()) {
@@ -29,13 +25,8 @@ public final class MapUtils {
         }
     }
 
-    /**
-     * 获取Key对应Value，并转换成Integer
-     * @param map
-     * @param key
-     * @return
-     */
     private static Integer getInt(Map<?, ?> map, Object key) {
+        // 获取Key对应Value，并转换成Integer
         try {
             Object val = map.get(key);
             if (val instanceof Number) {
@@ -48,14 +39,8 @@ public final class MapUtils {
         return null;
     }
 
-    /**
-     * 获取Key对应Value，并转换成Integer
-     * @param map
-     * @param key
-     * @param defaultValue value不存在或者转换失败时，返回该默认值
-     * @return
-     */
     public static Integer getInt(Map<?, ?> map, Object key, Integer defaultValue) {
+        // 获取Key对应Value，并转换成Integer
         Integer ret = getInt(map, key);
         if (ret == null) {
             return defaultValue;
@@ -63,13 +48,8 @@ public final class MapUtils {
         return ret;
     }
 
-    /**
-     * 获取Key对应Value，并转换成String
-     * @param map
-     * @param key
-     * @return
-     */
     private static String getString(Map<?, ?> map, Object key) {
+        // 获取Key对应Value，并转换成String
         if (map.get(key) == null) {
             return null;
         } else {
@@ -77,14 +57,8 @@ public final class MapUtils {
         }
     }
 
-    /**
-     * 获取Key对应Value，并转换成String
-     * @param map
-     * @param key
-     * @param defaultValue value不存在或者转换失败时，返回该默认值
-     * @return
-     */
     public static String getString(Map<?, ?> map, Object key, String defaultValue) {
+        // 获取Key对应Value，并转换成String
         String ret = getString(map, key);
         if (ret == null) {
             return defaultValue;
@@ -92,13 +66,8 @@ public final class MapUtils {
         return ret;
     }
 
-    /**
-     * 获取Key对应Value，并转换成BigDecimal
-     * @param map
-     * @param key
-     * @return
-     */
     public static BigDecimal getBigDecimal(Map<?, ?> map, Object key) {
+        // 获取Key对应Value，并转换成BigDecimal
         try {
             return new BigDecimal(map.get(key).toString());
         } catch (Exception e) {
@@ -107,14 +76,8 @@ public final class MapUtils {
         return null;
     }
 
-    /**
-     * 获取Key对应Value，并转换成BigDecimal
-     * @param map
-     * @param key
-     * @param defaultValue value不存在或者转换失败时，返回该默认值
-     * @return
-     */
     public static BigDecimal getBigDecimal(Map<?, ?> map, Object key, BigDecimal defaultValue) {
+        // 获取Key对应Value，并转换成BigDecimal
         BigDecimal ret = getBigDecimal(map, key);
         if (ret == null) {
             return defaultValue;
@@ -122,13 +85,8 @@ public final class MapUtils {
         return ret;
     }
 
-    /**
-     * 获取Key对应Value，并转换成Map
-     * @param map
-     * @param key
-     * @return
-     */
     public static Map<?, ?> getMap(Map<?, ?> map, Object key) {
+        // 获取Key对应Value，并转换成Map
         try {
             return (Map<?, ?>) map.get(key);
         } catch (Exception e) {
@@ -138,14 +96,8 @@ public final class MapUtils {
         return null;
     }
 
-    /**
-     * 获取Key对应Value，并转换成Map
-     * @param map
-     * @param key
-     * @param defaultValue value不存在或者转换失败时，返回该默认值
-     * @return
-     */
     public static Map<?, ?> getMap(Map<?, ?> map, Object key, Map<?, ?> defaultValue) {
+        // 获取Key对应Value，并转换成Map
         Map<?, ?> ret = getMap(map, key);
         if (ret == null) {
             return defaultValue;

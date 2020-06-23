@@ -32,13 +32,8 @@ public final class ReflectionUtils {
     private ReflectionUtils() {
     }
 
-    /**
-     * 实例化Class对象
-     * @param cls Class对象
-     * @param <T> T
-     * @return T
-     */
     public static <T> T initFromClass(Class<? extends T> cls) {
+        // 实例化Class对象
         try {
             return cls.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
@@ -46,11 +41,8 @@ public final class ReflectionUtils {
         }
     }
 
-    /**
-     * 实例化Class对象
-     * @param classes Class对象
-     */
     public static <T> void initializeClass(Class<? extends T>... classes) {
+        // 实例化Class对象
         for (Class<?> clazz : classes) {
             try {
                 Class.forName(clazz.getName(), true, clazz.getClassLoader());
@@ -60,18 +52,10 @@ public final class ReflectionUtils {
         }
     }
 
-    /**
-     * 获取属性值
-     * @param bean        实例
-     * @param targetClass 属性所属class
-     * @param fieldName   属性名
-     * @return Field
-     * @throws IllegalAccessException .{@link IllegalAccessException}
-     */
     public static Field getField(Object bean,
                                  Class<?> targetClass,
                                  String fieldName) throws IllegalAccessException {
-
+        // 获取属性值
         List<Field> fields = Lists.newArrayList();
         getAllFields(bean.getClass(), fields);
         // 第一次类型和属性名都满足才返回
@@ -85,22 +69,15 @@ public final class ReflectionUtils {
         return oneNewFields.orElseGet(() -> twoNewFields.orElse(null));
     }
 
-    /**
-     * 获取所有属性，包括父类对象的属性
-     * @param clazz  Class对象
-     * @param fields Field对象
-     */
     public static void getAllFields(Class<?> clazz, List<Field> fields) {
+        // 获取所有属性，包括父类对象的属性
         if (clazz == null || fields == null || clazz == Object.class)
             return;
         fields.addAll(getAllFieldsList(clazz));
     }
 
-    /**
-     * 获取所有属性，包括父类对象的属性
-     * @param clazz Class对象
-     */
     public static List<Field> getAllFieldsList(final Class<?> clazz) {
+        // 获取所有属性，包括父类对象的属性
         Class<?> currentClass = clazz;
         final List<Field> allFields = new ArrayList<Field>();
         while (currentClass != null) {
@@ -111,12 +88,8 @@ public final class ReflectionUtils {
         return allFields;
     }
 
-    /**
-     * 获取单个类的属性
-     * @param clazz
-     * @param fields
-     */
     public static void getFields(Class<?> clazz, List<Field> fields) {
+        // 获取单个类的属性
         if (clazz == null || fields == null || clazz == Object.class) {
             return;
         }
@@ -124,18 +97,10 @@ public final class ReflectionUtils {
         fields.addAll(Lists.newArrayList(newFields));
     }
 
-    /**
-     * 获取属性值
-     * @param bean           实例
-     * @param targetClass    属性所属class
-     * @param fieldClassName 属性名或属性所属类名
-     * @return
-     * @throws IllegalAccessException .{@link IllegalAccessException}
-     */
     public static Object getFieldInstance(Object bean,
                                           Class<?> targetClass,
                                           String fieldClassName) throws IllegalAccessException {
-
+        // 获取属性值
         Field[] fields = targetClass.getDeclaredFields();
         Optional<Field> filterField = Arrays.stream(fields)
                 .filter(field -> field.getName().equals(fieldClassName) ||
@@ -148,26 +113,16 @@ public final class ReflectionUtils {
         return null;
     }
 
-    /**
-     * 只根据方法名称来获取method，有重载函数的不要调用
-     * @param clazz      Class对象
-     * @param methodName 方法名称
-     * @return
-     */
     public static Method getMethod(Class<?> clazz, String methodName) {
+        // 只根据方法名称来获取method，有重载函数的不要调用
         Optional<Method> method = Arrays.stream(clazz.getMethods())
                 .filter(m -> m.getName().equalsIgnoreCase(methodName))
                 .findFirst();
         return method.orElse(null);
     }
 
-    /**
-     * 比较参数类型是否一致
-     * @param types   asm的类型({@link Type})
-     * @param clazzes java 类型({@link Class})
-     * @return true or false
-     */
     private static boolean sameType(Type[] types, Class<?>[] clazzes) {
+        // 比较参数类型是否一致
         // 个数不同
         if (types.length != clazzes.length) {
             return false;
@@ -180,24 +135,14 @@ public final class ReflectionUtils {
         return true;
     }
 
-    /**
-     * 获取方法的参数名
-     * @param method 方法
-     * @return 方法名称数组
-     */
     public static String[] getParamNames(Method method) {
+        // 获取方法的参数名
         LocalVariableTableParameterNameDiscoverer u = new LocalVariableTableParameterNameDiscoverer();
         return u.getParameterNames(method);
     }
 
-    /**
-     * 获取方法的参数名
-     * @param clazz  类
-     * @param method 方法
-     * @return 方法名称数组
-     * @throws NotFoundException .{@link NotFoundException}
-     */
     public static String[] getParamNames(Class<?> clazz, String method) throws NotFoundException {
+        // 获取方法的参数名
         ClassPool pool = ClassPool.getDefault();
         CtClass cc = pool.get(clazz.getName());
         CtMethod cm = cc.getDeclaredMethod(method);
@@ -216,12 +161,8 @@ public final class ReflectionUtils {
         return paramNames;
     }
 
-    /**
-     * 获取方法的参数名
-     * @param m 方法
-     * @return 方法名称数组
-     */
     public static String[] getMethodParamNames(final Method m) throws IOException {
+        // 获取方法的参数名
         final String[] paramNames = new String[m.getParameterTypes().length];
         final String n = m.getDeclaringClass().getName();
         final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
