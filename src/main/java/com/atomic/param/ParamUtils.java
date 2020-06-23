@@ -5,6 +5,15 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.atomic.exception.ParameterException;
 import com.atomic.exception.QueryDataException;
 import com.atomic.param.entity.MethodMeta;
+import com.atomic.param.excel.handler.DateParamHandler;
+import com.atomic.param.excel.handler.EmailHandler;
+import com.atomic.param.excel.handler.IHandler;
+import com.atomic.param.excel.handler.IdCardHandler;
+import com.atomic.param.excel.handler.PhoneNoHandler;
+import com.atomic.param.excel.handler.RandomParamHandler;
+import com.atomic.tools.assertcheck.AssertCheckUtils;
+import com.atomic.tools.assertcheck.entity.AssertItem;
+import com.atomic.tools.assertcheck.enums.AssertType;
 import com.atomic.util.DataSourceUtils;
 import com.atomic.util.GsonUtils;
 import com.g7.framework.common.dto.BaseRequest;
@@ -46,9 +55,93 @@ public final class ParamUtils {
     }
 
     /**
-     * 只有 1 或 Y 返回true
+     * 断言前需要获取数据库的值
+     * @param context excel入参
+     * @param testInstance 入参对象实例
+     */
+    public static void getDataBeforeTest(Map<String, Object> context, Object testInstance) throws Exception {
+        List<AssertItem> assertItemList = AssertCheckUtils.getAssertItemList(testInstance, true);
+        if (!CollectionUtils.isEmpty(assertItemList)) {
+            for (int i = 0; i < assertItemList.size(); i++) {
+                // 断言前获取数据
+                if (assertItemList.get(i).getAssertType() == AssertType.OLD_VALUE_BEFORE_TEST.getCode()) {
+                    context.put(Constants.ASSERT_ITEM_ + i, getOldValue(assertItemList.get(i), context));
+                    if (org.apache.commons.lang3.StringUtils.isEmpty(assertItemList.get(i).getOldValue())) {
+                        context.put(Constants.OLD_SQL_ + i, assertItemList.get(i).getOldSqlEntity().getSql());
+                    }
+                }
+            }
+        }
+        // 把入参的 sql 设置为真实的值
+        context.keySet().stream().filter(key -> context.get(key) != null).forEach(key -> {
+            try {
+                context.put(key, getRealValue(context, key));
+                // context.put(key, randomParamValue(context.get(key)));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            // handleUserKey(key, context);
+        });
+
+        IHandler randomParamHandler = new RandomParamHandler();
+        IHandler cardHandler = new IdCardHandler();
+        IHandler phoneNoHandler = new PhoneNoHandler();
+        IHandler emailHandler = new EmailHandler();
+        IHandler dateParamHandler = new DateParamHandler();
+
+        randomParamHandler.setHandler(cardHandler);
+        cardHandler.setHandler(phoneNoHandler);
+        phoneNoHandler.setHandler(emailHandler);
+        emailHandler.setHandler(dateParamHandler);
+        randomParamHandler.handle(context);
+    }
+
+    private static Object getOldValue(AssertItem item, Map<String, Object> context) throws Exception {
+        // 通过数据库获取断言前的值
+        Object oldValue = item.getOldValue();
+        if (org.apache.commons.lang3.StringUtils.isEmpty(item.getOldValue())) {
+            oldValue = AssertCheckUtils.getSqlValue(item.getOldSqlEntity(), context);
+        }
+        return oldValue;
+    }
+
+    private static Object getRealValue(Map<String, Object> param, String field) throws SQLException {
+        // 获取SQL语句对应的真实值
+        Object value = param.get(field);
+        if (value instanceof String) {
+            value = ParamUtils.getSqlValue(value.toString(), String.class);
+            // 把入参里面的 sql 语句改成真实的值
+            param.put(field, value);
+        }
+        return value;
+    }
+
+    /**
+     * excel 支持sql语句，格式：sql:dataSourceName:select XXX
      * @param value
+     * @param type
      * @return
+     * @throws SQLException
+     */
+    public static String getSqlValue(String value, Type type) throws SQLException {
+        // 格式：sql:dataBaseName:select XXX
+        if (value.startsWith("sql:")) {
+            value = value.substring(4);
+            int index = value.indexOf(":");
+            if (index > -1) {
+                String dataSourceName = value.substring(0, index);
+                String sql = value.substring(index + 1);
+                List<Map<Integer, Object>> datalist = DataSourceUtils.queryData(dataSourceName, sql);
+                value = handleDataList(datalist, value, type, sql);
+            }
+        }
+        return value;
+    }
+
+    /**
+     * 只有 1 或 Y 返回true
+     * @param value 值
+     * @return 1 或 Y 返回true
      */
     public static boolean isValueTrue(Object value) {
         return value != null && ("1".equalsIgnoreCase(value.toString()) ||
@@ -161,28 +254,6 @@ public final class ParamUtils {
             // 多个入参，其中一个入参类似Request<Integer>
             return methodMeta.getParamNames()[index];
         }
-    }
-
-    /**
-     * excel 支持sql语句，格式：sql:dataSourceName:select XXX
-     * @param value
-     * @param type
-     * @return
-     * @throws SQLException
-     */
-    public static String getSqlValue(String value, Type type) throws SQLException {
-        // 格式：sql:dataBaseName:select XXX
-        if (value.startsWith("sql:")) {
-            value = value.substring(4);
-            int index = value.indexOf(":");
-            if (index > -1) {
-                String dataSourceName = value.substring(0, index);
-                String sql = value.substring(index + 1);
-                List<Map<Integer, Object>> datalist = DataSourceUtils.queryData(dataSourceName, sql);
-                value = handleDataList(datalist, value, type, sql);
-            }
-        }
-        return value;
     }
 
     /**

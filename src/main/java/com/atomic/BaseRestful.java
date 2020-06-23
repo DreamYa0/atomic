@@ -261,29 +261,6 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         resultPrint(getTestMethodName(testResult), response, context);
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
-        //返回result为String，则检测是否需要录制回放和自动断言
-        /*if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
-
-            if (AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
-
-                recMode(context.get(Constants.PARAMETER_NAME_), result, TestNGUtils.getHttpMethod(testResult));
-                System.out.println("-----------------------执行智能化断言录制模式成功！-------------------------");
-                ResultAssert.resultCallBack(response, context, callback);
-
-            } else if (AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
-
-                replayMode(result, TestNGUtils.getHttpMethod(testResult), context, callback);
-                System.out.println("-----------------------执行智能化断言回放模式成功！-------------------------");
-                ResultAssert.resultCallBack(response, context, callback);
-
-            } else {
-                // 自动断言
-                assertResultForRest(response, testResult, this, context, callback);
-            }
-        } else {
-            // 自动断言
-            assertResultForRest(response, testResult, this, context, callback);
-        }*/
         // 自动断言
         assertResultForRest(response, testResult, this, context, callback);
         testCallBack(callBack, testResult);

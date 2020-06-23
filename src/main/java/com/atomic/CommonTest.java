@@ -226,7 +226,7 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
         beforeTest(context);
 
         // 自动断言前获取数据库数据，以及把入参的sql值赋值成真实的值
-        AssertCheckUtils.getDataBeforeTest(context, this);
+        ParamUtils.getDataBeforeTest(context, this);
 
         // 调用方法
         commonTest(testResult);
@@ -367,31 +367,6 @@ public abstract class CommonTest<T> extends AbstractUnitTest implements ITestBas
             // parameters 可能被接口改变，打印出来看起来就像有问题
             resultPrint(method.getName(), result, context, parameters);
         }
-
-        /*if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
-
-            if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
-
-                // 断言录制模式
-                recMode(parameters[0], result, methodMeta);
-
-                System.out.println("-----------------------------执行智能化断言录制模式成功！-----------------------------");
-                resultCallBack(result, context, callback);
-
-            } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
-
-                // 断言回放模式
-                replayMode(parameters[0], result, methodMeta);
-
-                System.out.println("-----------------------------执行智能化断言回放模式成功！-----------------------------");
-                resultCallBack(result, context, callback);
-
-            } else {
-                assertResult(result, testResult, this, context, callback, parameters);
-            }
-        } else {
-            assertResult(result, testResult, this, context, callback, parameters);
-        }*/
 
         assertResult(result, testResult, this, context, callback, parameters);
     }

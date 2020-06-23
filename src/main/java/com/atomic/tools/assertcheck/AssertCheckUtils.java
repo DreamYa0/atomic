@@ -2,13 +2,6 @@ package com.atomic.tools.assertcheck;
 
 import com.alibaba.fastjson.JSON;
 import com.atomic.param.Constants;
-import com.atomic.param.ParamUtils;
-import com.atomic.param.excel.handler.DateParamHandler;
-import com.atomic.param.excel.handler.EmailHandler;
-import com.atomic.param.excel.handler.IHandler;
-import com.atomic.param.excel.handler.IdCardHandler;
-import com.atomic.param.excel.handler.PhoneNoHandler;
-import com.atomic.param.excel.handler.RandomParamHandler;
 import com.atomic.tools.assertcheck.entity.AssertItem;
 import com.atomic.tools.assertcheck.entity.SqlEntity;
 import com.atomic.tools.assertcheck.enums.AssertType;
@@ -22,7 +15,6 @@ import org.testng.Assert;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -41,70 +33,7 @@ import java.util.regex.Pattern;
 public final class AssertCheckUtils {
 
     private AssertCheckUtils() {
-    }
 
-    /**
-     * 断言前需要获取数据库的值
-     * @param context
-     * @param testInstance
-     * @throws IOException
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws SQLException
-     * @throws InvocationTargetException
-     */
-    public static void getDataBeforeTest(Map<String, Object> context, Object testInstance) throws Exception {
-        List<AssertItem> assertItemList = getAssertItemList(testInstance, true);
-        if (!CollectionUtils.isEmpty(assertItemList)) {
-            for (int i = 0; i < assertItemList.size(); i++) {
-                // 断言前获取数据
-                if (assertItemList.get(i).getAssertType() == AssertType.OLD_VALUE_BEFORE_TEST.getCode()) {
-                    context.put(Constants.ASSERT_ITEM_ + i, getOldValue(assertItemList.get(i), context));
-                    if (org.apache.commons.lang3.StringUtils.isEmpty(assertItemList.get(i).getOldValue())) {
-                        context.put(Constants.OLD_SQL_ + i, assertItemList.get(i).getOldSqlEntity().getSql());
-                    }
-                }
-            }
-        }
-        // 把入参的 sql 设置为真实的值
-        context.keySet().stream().filter(key -> context.get(key) != null).forEach(key -> {
-            try {
-                context.put(key, getRealValue(context, key));
-                // context.put(key, randomParamValue(context.get(key)));
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            // handleUserKey(key, context);
-        });
-
-        IHandler randomParamHandler = new RandomParamHandler();
-        IHandler cardHandler = new IdCardHandler();
-        IHandler phoneNoHandler = new PhoneNoHandler();
-        IHandler emailHandler = new EmailHandler();
-        IHandler dateParamHandler = new DateParamHandler();
-
-        randomParamHandler.setHandler(cardHandler);
-        cardHandler.setHandler(phoneNoHandler);
-        phoneNoHandler.setHandler(emailHandler);
-        emailHandler.setHandler(dateParamHandler);
-        randomParamHandler.handle(context);
-    }
-
-    /**
-     * 获取SQL语句对应的真实值
-     * @param param
-     * @param field
-     * @return
-     * @throws SQLException
-     */
-    private static Object getRealValue(Map<String, Object> param, String field) throws SQLException {
-        Object value = param.get(field);
-        if (value instanceof String) {
-            value = ParamUtils.getSqlValue(value.toString(), String.class);
-            // 把入参里面的 sql 语句改成真实的值
-            param.put(field, value);
-        }
-        return value;
     }
 
     public static void assertCheck(Object testInstance, Map<String, Object> param) throws Exception {
@@ -120,7 +49,7 @@ public final class AssertCheckUtils {
         System.out.println();
     }
 
-    private static List<AssertItem> getAssertItemList(Object testInstance, boolean isBeforeTest) throws IOException {
+    public static List<AssertItem> getAssertItemList(Object testInstance, boolean isBeforeTest) throws IOException {
         // 先使用文件来代替
         String className = testInstance.getClass().getSimpleName();
         String resource = testInstance.getClass().getResource("").getPath();
@@ -241,23 +170,6 @@ public final class AssertCheckUtils {
         } else {
             assertCheck(compareType, String.valueOf(oldValue), String.valueOf(newValue), fixedValue, oldSql, newSql);
         }
-    }
-
-    /**
-     * 通过数据库获取断言前的值
-     * @param item
-     * @return
-     * @throws InvocationTargetException
-     * @throws NoSuchMethodException
-     * @throws SQLException
-     * @throws IllegalAccessException
-     */
-    private static Object getOldValue(AssertItem item, Map<String, Object> context) throws Exception {
-        Object oldValue = item.getOldValue();
-        if (org.apache.commons.lang3.StringUtils.isEmpty(item.getOldValue())) {
-            oldValue = getSqlValue(item.getOldSqlEntity(), context);
-        }
-        return oldValue;
     }
 
     private static String getNewValue(boolean isNewList,
@@ -391,7 +303,7 @@ public final class AssertCheckUtils {
         }
     }
 
-    private static List<Map<Integer, Object>> getSqlValue(SqlEntity sqlEntity,
+    public static List<Map<Integer, Object>> getSqlValue(SqlEntity sqlEntity,
                                                           Map<String, Object> context) throws Exception {
 
         String sql = sqlEntity.getSql();

@@ -344,22 +344,6 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         } else {
             ParamPrint.resultPrint(methodMeta.getMethodName(), result, context, parameters);
         }
-        /*if (AnnotationUtils.isAutoAssert(getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
-            if (getCheckMode(getTestMethod(testResult)) == CheckMode.REC) {
-                resultCallBack(result, context, callback);
-                recMode(parameters[0], result, methodMeta);
-                System.out.println("-----------------------------执行智能化断言录制模式成功！-----------------------------");
-            } else if (getCheckMode(getTestMethod(testResult)) == CheckMode.REPLAY) {
-                resultCallBack(result, context, callback);
-                replayMode(parameters[0], result, methodMeta);
-                System.out.println("-----------------------------执行智能化断言回放模式成功！-----------------------------");
-            } else {
-                assertResult(result, testResult, this, context, callback, parameters);
-            }
-        } else {
-            assertResult(result, testResult, this, context, callback, parameters);
-        }*/
-
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
         assertResult(result, testResult, this, context, callback, parameters);

@@ -3,7 +3,6 @@ package com.atomic.param;
 import com.alibaba.fastjson.JSON;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.excel.parser.ExcelResolver;
-import com.atomic.tools.assertcheck.AssertCheckUtils;
 import com.atomic.util.GsonUtils;
 import com.atomic.util.ReflectionUtils;
 import com.google.gson.Gson;
@@ -255,7 +254,7 @@ public final class ObjUtils {
                                     Integer.parseInt(param.get(Constants.CASE_INDEX).toString()) - 1);
 
                             Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
-                            AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
+                            ParamUtils.getDataBeforeTest(sheetParam, testObj);
 
                             sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
                             transferMap2Bean(commonObj, sheetParam);
@@ -345,7 +344,7 @@ public final class ObjUtils {
                                     Integer.parseInt(valMap.get(Constants.CASE_INDEX).toString()) - 1);
 
                             Object testObj = ReflectionUtils.initFromClass(methodMeta.getTestClass());
-                            AssertCheckUtils.getDataBeforeTest(sheetParam, testObj);
+                            ParamUtils.getDataBeforeTest(sheetParam, testObj);
 
                             sheetParam.putIfAbsent(Constants.TESTMETHODMETA, methodMeta);
                             transferMap2Bean(fieldObj, sheetParam);

@@ -174,28 +174,6 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
 
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
-
-        //返回result为String，则检测是否需要录制回放和自动断言
-        /*if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(testResult)) && ParamUtils.isAutoAssert(context)) {
-
-            if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REC) {
-
-                recMode(context.get(Constants.PARAMETER_NAME_), result, TestNGUtils.getHttpMethod(testResult));
-                System.out.println("-----------------------执行智能化断言录制模式成功！-------------------------");
-                resultCallBack(response, context, callback);
-
-            } else if (getCheckMode(TestNGUtils.getTestMethod(testResult)) == CheckMode.REPLAY) {
-                replayMode(result, TestNGUtils.getHttpMethod(testResult), context, callback);
-                System.out.println("-----------------------执行智能化断言回放模式成功！-------------------------");
-                resultCallBack(response, context, callback);
-            } else {
-                // 自动断言
-                assertResult(result, context, callback);
-            }
-        } else {
-            // 自动断言
-            assertResult(result, context, callback);
-        }*/
         // 自动断言
         assertResult(result, context, callback);
         testCallBack(callBack, testResult);

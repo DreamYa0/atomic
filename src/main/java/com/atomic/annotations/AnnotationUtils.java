@@ -1,14 +1,12 @@
 package com.atomic.annotations;
 
-import com.atomic.tools.assertcheck.AutoAssert;
-import com.atomic.tools.autotest.AutoTest;
-import com.atomic.tools.autotest.AutoTestMode;
-import com.atomic.tools.assertcheck.CheckMode;
 import com.atomic.exception.AnnotationException;
 import com.atomic.param.Constants;
-import com.atomic.util.TestNGUtils;
+import com.atomic.tools.autotest.AutoTest;
+import com.atomic.tools.autotest.AutoTestMode;
 import com.atomic.tools.rollback.RollBack;
 import com.atomic.tools.rollback.RollBackAll;
+import com.atomic.util.TestNGUtils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
@@ -173,35 +171,6 @@ public abstract class AnnotationUtils {
     public static boolean isPrintResult(Method testMethod) {
         AutoTest annotation = testMethod.getAnnotation(AutoTest.class);
         return annotation == null || annotation.autoTestPrintResult();
-    }
-
-    /**
-     * 判断是否有@AutoAssert注解
-     * @param method
-     * @return
-     */
-    public static boolean isAutoAssert(Method method) {
-        Annotation[] annotations = method.getAnnotations();
-        if (annotations != null) {
-            AutoAssert autoAssert = method.getAnnotation(AutoAssert.class);
-            if (autoAssert == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 获取智能断言类型值
-     * @param method
-     * @return
-     */
-    public static CheckMode getCheckMode(Method method) {
-        AutoAssert autoAssert = method.getAnnotation(AutoAssert.class);
-        if (autoAssert != null) {
-            return autoAssert.checkMode();
-        }
-        return CheckMode.NORMAL;
     }
 
     /**
