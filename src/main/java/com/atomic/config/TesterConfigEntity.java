@@ -9,7 +9,7 @@ import java.util.List;
  * @date 2020/6/22 9:23 PM
  * @since 1.0.0
  */
-public class ConfigEntity implements Serializable {
+public class TesterConfigEntity implements Serializable {
 
     private static final long serialVersionUID = 2742985008776382196L;
 

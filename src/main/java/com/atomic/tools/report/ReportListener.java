@@ -1,6 +1,6 @@
 package com.atomic.tools.report;
 
-import com.atomic.config.GlobalConfig;
+import com.atomic.config.TesterConfig;
 import com.atomic.param.Constants;
 import com.atomic.util.TestNGUtils;
 import com.atomic.param.excel.parser.ExcelResolver;
@@ -62,8 +62,8 @@ public class ReportListener implements IReporter {
                 ExtentTest suiteTest = null;
 
                 // 加载环境配置文件
-                this.projectName = GlobalConfig.getProjectName();
-                String runAuthors = GlobalConfig.getRunner();
+                this.projectName = TesterConfig.getProjectName();
+                String runAuthors = TesterConfig.getRunner();
                 this.runAuthor = runAuthors.split(",");
 
                 extent = ExtentManager.getInstance(projectName);

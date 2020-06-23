@@ -4,8 +4,8 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.atomic.config.CenterConfig;
-import com.atomic.config.GlobalConfig;
+import com.atomic.config.AtomicConfig;
+import com.atomic.config.TesterConfig;
 import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.ParameterException;
@@ -93,15 +93,15 @@ public abstract class BaseHttp extends AbstractRestTest implements IHookable, IT
 
         String httpHost;
         if (!isHttpHostNoNull(context)) {
-            httpHost = CenterConfig.newInstance().getHttpHost();
+            httpHost = AtomicConfig.newInstance().getHttpHost();
         } else {
             httpHost = context.get(HTTP_HOST).toString();
         }
         HttpRequest request = new HttpRequest(httpHost);
-        if (Constants.PROFILE_TESTING.equals(GlobalConfig.getProfile())) {
+        if (Constants.PROFILE_TESTING.equals(TesterConfig.getProfile())) {
             // 预发布环境设置代理
-            String httpProxy = CenterConfig.newInstance().readPropertyConfig(
-                    GlobalConfig.getProfile()).get(HTTP_PROXY);
+            String httpProxy = AtomicConfig.newInstance().readPropertyConfig(
+                    TesterConfig.getProfile()).get(HTTP_PROXY);
             String host = httpProxy.split(":")[0];
             int port = Integer.parseInt(httpProxy.split(":")[1]);
             InetSocketAddress address = new InetSocketAddress(host, port);

@@ -20,16 +20,16 @@ import java.util.concurrent.ExecutionException;
  * @title
  * @date  2018/05/30 10:48
  */
-public class CenterConfig {
+public class AtomicConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(CenterConfig.class);
-    private static final CenterConfig INSTANCE = new CenterConfig();
+    private static final Logger logger = LoggerFactory.getLogger(AtomicConfig.class);
+    private static final AtomicConfig INSTANCE = new AtomicConfig();
     private Cache<String, Map<String, String>> centerConfigCache = CacheBuilder.newBuilder().build();
 
-    private CenterConfig() {
+    private AtomicConfig() {
     }
 
-    public static CenterConfig newInstance() {
+    public static AtomicConfig newInstance() {
         return INSTANCE;
     }
 
@@ -44,7 +44,7 @@ public class CenterConfig {
                 Map<String, String> config = Maps.newHashMap();
                 try {
 
-                    InputStream stream = CenterConfig.class.getClassLoader().getResourceAsStream(
+                    InputStream stream = AtomicConfig.class.getClassLoader().getResourceAsStream(
                             "zookeeper/" + profile + ".properties");
                     Properties properties = new Properties();
                     properties.load(stream);
@@ -72,7 +72,7 @@ public class CenterConfig {
      * @return 域名或IP+Port
      */
     public String getHttpHost() {
-        String httpHost = GlobalConfig.getHttpHost();
+        String httpHost = TesterConfig.getHttpHost();
         if (httpHost == null || "".equals(httpHost)) {
             throw new ParameterException("从配置中获取Http请求的域名或IP地址失败！");
         }

@@ -1,7 +1,7 @@
 package com.atomic;
 
 import com.atomic.annotations.AnnotationUtils;
-import com.atomic.config.GlobalConfig;
+import com.atomic.config.TesterConfig;
 import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.InvokeException;
@@ -107,8 +107,8 @@ public abstract class BaseDubbo<T> extends AbstractDubboTest implements IHookabl
         CompletableFuture<Object> future = new CompletableFuture<>();
         try {
             String dubboServiceVersion = null;
-            if (GlobalConfig.getServiceVersion() != null) {
-                dubboServiceVersion = GlobalConfig.getServiceVersion();
+            if (TesterConfig.getServiceVersion() != null) {
+                dubboServiceVersion = TesterConfig.getServiceVersion();
             } else if (isServiceVersion(getTestMethod(testResult))) {
                 dubboServiceVersion = getServiceVersion(getTestMethod(testResult));
             }

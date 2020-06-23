@@ -1,6 +1,6 @@
 package com.atomic;
 
-import com.atomic.config.CenterConfig;
+import com.atomic.config.AtomicConfig;
 import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.param.Constants;
@@ -127,7 +127,7 @@ public abstract class BaseRestful extends AbstractRestTest implements IHookable,
         Headers headers;
         String httpHost;
         if (!isHttpHostNoNull(newContext)) {
-            httpHost = CenterConfig.newInstance().getHttpHost();
+            httpHost = AtomicConfig.newInstance().getHttpHost();
         } else {
             httpHost = newContext.get(HTTP_HOST).toString();
         }

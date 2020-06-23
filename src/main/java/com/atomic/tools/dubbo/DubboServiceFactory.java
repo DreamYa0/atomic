@@ -5,8 +5,8 @@ import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.rpc.service.GenericService;
-import com.atomic.config.CenterConfig;
-import com.atomic.config.GlobalConfig;
+import com.atomic.config.AtomicConfig;
+import com.atomic.config.TesterConfig;
 import com.atomic.exception.DubboServiceException;
 import com.atomic.param.Constants;
 import com.google.common.cache.Cache;
@@ -34,7 +34,7 @@ public class DubboServiceFactory {
     private volatile String profile;
 
     public DubboServiceFactory(String env) {
-        Map<String, String> maps = CenterConfig.newInstance().readPropertyConfig(env);
+        Map<String, String> maps = AtomicConfig.newInstance().readPropertyConfig(env);
         host = maps.get(Constants.ZOOKEEPER);
         application = new ApplicationConfig();
         application.setName("atomic_config");
@@ -48,8 +48,8 @@ public class DubboServiceFactory {
 
     public DubboServiceFactory() {
         //加载环境配置文件
-        profile = GlobalConfig.getProfile();
-        Map<String, String> maps = CenterConfig.newInstance().readPropertyConfig(profile);
+        profile = TesterConfig.getProfile();
+        Map<String, String> maps = AtomicConfig.newInstance().readPropertyConfig(profile);
         host = maps.get(Constants.ZOOKEEPER);
         application = new ApplicationConfig();
         application.setName("atomic_config");
@@ -72,8 +72,8 @@ public class DubboServiceFactory {
     public <T> T getService(Class<? extends T> clazz, String... version) {
         //为获取覆盖率做全局配置,强制指定请求服务地址
         try {
-            if (GlobalConfig.getHostDomain() != null) {
-                String url = "dubbo://" + GlobalConfig.getHostDomain() + "/" + clazz.getName();
+            if (TesterConfig.getHostDomain() != null) {
+                String url = "dubbo://" + TesterConfig.getHostDomain() + "/" + clazz.getName();
                 T t = getServiceByUrl(clazz, url, version);
                 checkService(t, clazz);
                 return t;

@@ -1,6 +1,6 @@
 package com.atomic.schema;
 
-import com.atomic.config.GlobalConfig;
+import com.atomic.config.TesterConfig;
 import com.atomic.util.ApplicationUtils;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -39,13 +39,13 @@ public class AtomicBeanDefinitionParser implements BeanDefinitionParser {
 
     private BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass) {
 
-        if (GlobalConfig.class.equals(beanClass)) {
+        if (TesterConfig.class.equals(beanClass)) {
             // 解析XML文件获取配置值
             Map<String, String> parameters = parseParameters(element);
 
             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(parameters))) {
-                GlobalConfig.setProjectName(parameters.get("projectName"));
-                GlobalConfig.setRunner(parameters.get("runner"));
+                TesterConfig.setProjectName(parameters.get("projectName"));
+                TesterConfig.setRunner(parameters.get("runner"));
             }
 
             RootBeanDefinition beanDefinition = new RootBeanDefinition();

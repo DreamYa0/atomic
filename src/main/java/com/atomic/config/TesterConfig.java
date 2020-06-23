@@ -16,10 +16,10 @@ import java.util.Properties;
  * @date 16/5/23 下午7:55
  * @since 1.0.0
  */
-public class GlobalConfig {
+public class TesterConfig {
 
     private static final String TEST_CONFIG_FILE_PATH = "/test.properties";
-    private static ConfigEntity entity;
+    private static TesterConfigEntity entity;
 
     static {
         load();
@@ -27,7 +27,7 @@ public class GlobalConfig {
 
     private static void load() {
 
-        entity = new ConfigEntity();
+        entity = new TesterConfigEntity();
 
         try {
 

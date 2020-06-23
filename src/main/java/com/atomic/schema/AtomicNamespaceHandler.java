@@ -1,6 +1,6 @@
 package com.atomic.schema;
 
-import com.atomic.config.GlobalConfig;
+import com.atomic.config.TesterConfig;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
@@ -17,6 +17,6 @@ public class AtomicNamespaceHandler  extends NamespaceHandlerSupport {
 
     public void init() {
         registerBeanDefinitionParser("atomic",
-                new AtomicBeanDefinitionParser(GlobalConfig.class));
+                new AtomicBeanDefinitionParser(TesterConfig.class));
     }
 }

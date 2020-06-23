@@ -1,7 +1,7 @@
 package com.atomic.tools.report;
 
 import com.alibaba.fastjson.JSON;
-import com.atomic.config.GlobalConfig;
+import com.atomic.config.TesterConfig;
 import com.atomic.param.Constants;
 import com.atomic.util.TestNGUtils;
 import com.atomic.util.GsonUtils;
@@ -139,8 +139,8 @@ public class SaveResultListener extends TestListenerAdapter {
     private void init() {
         // 加载环境配置文件
         // 项目名称
-        String projectName = GlobalConfig.getProjectName();
-        this.runAuthor = GlobalConfig.getRunner();
+        String projectName = TesterConfig.getProjectName();
+        this.runAuthor = TesterConfig.getRunner();
         if (StringUtils.isEmpty(projectName)) {
             projectName = "default";
         }
