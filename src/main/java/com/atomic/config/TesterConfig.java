@@ -20,50 +20,54 @@ import java.util.Properties;
 public class TesterConfig {
 
     private static final String TEST_CONFIG_FILE_PATH = "/test.properties";
-    private static TesterConfigEntity entity;
+    private static TesterConfigEntity entity = new TesterConfigEntity();
 
-    private synchronized static void load() {
+    static {
+        load();
+    }
 
-        if (Objects.isNull(entity)) {
-            entity = new TesterConfigEntity();
+    private static void load() {
 
-            try {
+        InputStream in = FileUtils.getTestFileInputStream(TEST_CONFIG_FILE_PATH);
+        if (Objects.isNull(in)) {
+            return;
+        }
 
-                InputStream in = FileUtils.getTestFileInputStream(TEST_CONFIG_FILE_PATH);
-                Properties properties = new Properties();
-                properties.load(in);
+        try {
 
-                if (properties.containsKey("profile")) {
-                    String env = properties.getProperty("profile");
-                    entity.setProfile((env == null || "".equals(env)) ? TestMode.T1.getName() : env);
-                }
-                if (properties.containsKey("mail.addr.list")) {
-                    entity.setMailAddrList(splitter(properties.getProperty("mail.addr.list")));
-                }
-                if (properties.containsKey("host.domain")) {
-                    entity.setHostDomain(properties.getProperty("host.domain"));
-                }
-                if (properties.containsKey("project.name") &&
-                        Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("project.name")))) {
-                    entity.setProjectName(properties.getProperty("project.name"));
-                }
-                if (properties.containsKey("runner") &&
-                        Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("runner")))) {
-                    entity.setRunner( properties.getProperty("runner"));
-                }
-                if (properties.containsKey("run.mode")) {
-                    entity.setRunMode(properties.getProperty("run.mode"));
-                }
-                if (properties.containsKey("service.version")) {
-                    entity.setServiceVersion(properties.getProperty("service.version"));
-                }
-                if (properties.containsKey("http.host")) {
-                    entity.setHttpHost(properties.getProperty("http.host"));
-                }
+            Properties properties = new Properties();
+            properties.load(in);
 
-            } catch (Exception e) {
-                throw new RuntimeException("配置文件参数非法,请检查test.properties的配置", e);
+            if (properties.containsKey("profile")) {
+                String env = properties.getProperty("profile");
+                entity.setProfile((env == null || "".equals(env)) ? TestMode.T1.getName() : env);
             }
+            if (properties.containsKey("mail.addr.list")) {
+                entity.setMailAddrList(splitter(properties.getProperty("mail.addr.list")));
+            }
+            if (properties.containsKey("host.domain")) {
+                entity.setHostDomain(properties.getProperty("host.domain"));
+            }
+            if (properties.containsKey("project.name") &&
+                    Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("project.name")))) {
+                entity.setProjectName(properties.getProperty("project.name"));
+            }
+            if (properties.containsKey("runner") &&
+                    Boolean.FALSE.equals(StringUtils.isEmpty(properties.getProperty("runner")))) {
+                entity.setRunner( properties.getProperty("runner"));
+            }
+            if (properties.containsKey("run.mode")) {
+                entity.setRunMode(properties.getProperty("run.mode"));
+            }
+            if (properties.containsKey("service.version")) {
+                entity.setServiceVersion(properties.getProperty("service.version"));
+            }
+            if (properties.containsKey("http.host")) {
+                entity.setHttpHost(properties.getProperty("http.host"));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("配置文件参数非法,请检查test.properties的配置", e);
         }
     }
 
@@ -73,42 +77,34 @@ public class TesterConfig {
     }
 
     public static String getServiceVersion() {
-        load();
         return entity.getServiceVersion();
     }
 
     public static String getProfile() {
-        load();
         return entity.getProfile();
     }
 
     public static String getHttpHost() {
-        load();
         return entity.getHttpHost();
     }
 
     public static String getHostDomain() {
-        load();
         return entity.getHostDomain();
     }
 
     public static String getRunner() {
-        load();
         return entity.getRunner();
     }
 
     public static void setRunner(String runner) {
-        load();
         entity.setRunner(runner);
     }
 
     public static String getProjectName() {
-        load();
         return entity.getProjectName();
     }
 
     public static void setProjectName(String projectName) {
-        load();
         entity.setProjectName(projectName);
     }
 }

@@ -17,7 +17,7 @@ public final class FileUtils {
         try {
             return FileUtils.class.getResourceAsStream(filePath);
         } catch (Exception e) {
-            e.printStackTrace();
+            //
         }
         return null;
     }
