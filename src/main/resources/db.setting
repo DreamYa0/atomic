@@ -2,22 +2,36 @@
 url = jdbc:mysql://rm-2zep114yhnld70zcj.mysql.rds.aliyuncs.com:3306/ntocc_test?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=round&useSSL=false
 username = obill_rw
 password = Xs5VGMLrDUV4RcXm
+# 是否在日志中显示执行的SQL
+showSql = true
+# 是否格式化显示的SQL
+formatSql = true
+# 是否显示SQL参数
+showParams = true
+# 打印SQL的日志等级，默认debug，可以是info、warn、error
+sqlLevel = debug
 
 [ntocc_demo]
 url = jdbc:mysql://rm-2zep114yhnld70zcj.mysql.rds.aliyuncs.com:3306/ntocc_demo?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=round&useSSL=false
 username = obill_rw
 password = Xs5VGMLrDUV4RcXm
+# 是否在日志中显示执行的SQL
+showSql = true
+# 是否格式化显示的SQL
+formatSql = true
+# 是否显示SQL参数
+showParams = true
+# 打印SQL的日志等级，默认debug，可以是info、warn、error
+sqlLevel = debug
 
 [atomic_autotest]
 url = jdbc:mysql://rm-2zep114yhnld70zcj.mysql.rds.aliyuncs.com:3306/atomic_autotest?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=round&useSSL=false
 username = obill_rw
 password = Xs5VGMLrDUV4RcXm
-
-## 可选配置
 # 是否在日志中显示执行的SQL
 showSql = true
 # 是否格式化显示的SQL
-formatSql = false
+formatSql = true
 # 是否显示SQL参数
 showParams = true
 # 打印SQL的日志等级，默认debug，可以是info、warn、error
