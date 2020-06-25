@@ -455,7 +455,6 @@ public final class ParamUtils {
         removeKey.add(Constants.CONTENT_TYPE);
         removeKey.add(Constants.HTTP_HEADER);
         removeKey.add(Constants.HTTP_ENTITY);
-        removeKey.add(Constants.AUTO_ASSERT);
         removeKey.add(Constants.MESSAGE_TYPE);
         return removeKey;
     }

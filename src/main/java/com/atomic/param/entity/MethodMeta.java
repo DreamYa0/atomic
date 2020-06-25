@@ -11,7 +11,7 @@ public class MethodMeta {
     /**
      * 测试类
      */
-    private Class testClass;
+    private Class<?> testClass;
     /**
      * 测试方法
      */
@@ -19,8 +19,7 @@ public class MethodMeta {
     /**
      * 接口类
      */
-    private Class interfaceClass;
-
+    private Class<?> interfaceClass;
     /**
      * 接口实例
      */
@@ -74,11 +73,11 @@ public class MethodMeta {
         this.returnType = returnType;
     }
 
-    public Class getInterfaceClass() {
+    public Class<?> getInterfaceClass() {
         return interfaceClass;
     }
 
-    public void setInterfaceClass(Class interfaceClass) {
+    public void setInterfaceClass(Class<?> interfaceClass) {
         this.interfaceClass = interfaceClass;
     }
 
@@ -122,11 +121,11 @@ public class MethodMeta {
         this.paramTypes = paramTypes;
     }
 
-    public Class getTestClass() {
+    public Class<?> getTestClass() {
         return testClass;
     }
 
-    public void setTestClass(Class testClass) {
+    public void setTestClass(Class<?> testClass) {
         this.testClass = testClass;
     }
 

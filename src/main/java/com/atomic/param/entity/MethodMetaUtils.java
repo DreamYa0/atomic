@@ -200,7 +200,7 @@ public final class MethodMetaUtils {
         }
         ImmutableList<String> expectList = ImmutableList.of(Constants.ASSERT_RESULT,
                 Constants.EXCEL_DESC, Constants.AUTO_TEST, Constants.CASE_NAME, Constants.ASSERT_CODE,
-                Constants.ASSERT_MSG, Constants.EXPECTED_RESULT, Constants.AUTO_ASSERT, "");
+                Constants.ASSERT_MSG, Constants.EXPECTED_RESULT, "");
 
         List<String> allParamList = new ArrayList<>(param.keySet());
         allParamList.removeAll(expectList);

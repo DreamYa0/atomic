@@ -24,9 +24,6 @@ public final class Constants {
     /** 预期结果字段，当预期结果内容不为空是进行自动断言 */
     public static final String EXPECTED_RESULT = "expectedResult";
 
-    /** 智能化断言标示，为Y时表示使用智能化断言 */
-    public static final String AUTO_ASSERT = "autoAssert";
-
     /** 请求类型，如：GET,POST */
     public static final String HTTP_MODE = "httpMode";
 
