@@ -1,7 +1,6 @@
 package com.atomic.tools.rollback;
 
 import cn.hutool.core.collection.CollUtil;
-import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.AnnotationException;
 import com.atomic.exception.RollBackException;
 import com.atomic.tools.rollback.db.Changes;
@@ -13,6 +12,7 @@ import org.testng.ITestNGMethod;
 import org.testng.Reporter;
 import org.testng.TestListenerAdapter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -66,14 +66,14 @@ public class RollBackListener extends TestListenerAdapter {
         Map<String, String[]> dbName2TbNames = Maps.newHashMap();
         for (ITestNGMethod testNGMethod : testNGMethods) {
             Method method = testNGMethod.getConstructorOrMethod().getMethod();
-            if (AnnotationUtils.isRollBackMethod(method)) {
+            if (isRollBackMethod(method)) {
                 // 处理 @RollBack 注解
                 String dbName = getDbName(testNGMethod.getConstructorOrMethod().getMethod());
                 dbName2Changes.put(dbName, new Changes());
 
                 String[] tableNames = getTableName(testNGMethod.getConstructorOrMethod().getMethod());
                 dbName2TbNames.put(dbName, tableNames);
-            } else if (AnnotationUtils.isRollBackAllMethod(method)) {
+            } else if (isRollBackAllMethod(method)) {
                 // 处理 @RollBackAll 注解
                 // 实现多数据库数据回滚
                 Multimap<String, String> multimap = getDbName2TableName(
@@ -87,6 +87,48 @@ public class RollBackListener extends TestListenerAdapter {
             }
         }
         return dbName2TbNames;
+    }
+
+    private boolean isRollBackMethod(Method testMethod) throws AnnotationException {
+        // 判断测试方法是否添加回滚注解
+        Annotation[] annotations = testMethod.getAnnotations();
+        if (annotations != null) {
+            RollBack rollBack = testMethod.getAnnotation(RollBack.class);
+            RollBackAll rollBackAll = testMethod.getAnnotation(RollBackAll.class);
+            if (rollBack == null) {
+                return false;
+            } else if (rollBackAll != null) {
+                Reporter.log("@RollBack 和 @RollBackAll 不能同时使用");
+                throw new AnnotationException("@RollBack 和 @RollBackAll 不能同时使用");
+            } else if (rollBack.enabled()) {
+                if ("".equals(rollBack.dbName()) || rollBack.tableName().length == 0) {
+                    return false;
+                }
+            } else if (!rollBack.enabled()) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isRollBackAllMethod(Method method) throws AnnotationException {
+        // 检查方法上是否有RollBackAll注解和注解是否开启
+        Annotation[] annotations = method.getAnnotations();
+        if (annotations != null) {
+            RollBack rollBack = method.getAnnotation(RollBack.class);
+            RollBackAll rollBackAll = method.getAnnotation(RollBackAll.class);
+            if (rollBackAll != null) {
+                if (rollBack != null) {
+                    Reporter.log("@RollBack 和 @RollBackAll 不能同时使用");
+                    throw new AnnotationException("@RollBack 和 @RollBackAll 不能同时使用");
+                } else if (!rollBackAll.enabled()) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getDbName(Method testMethod) {

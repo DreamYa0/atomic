@@ -4,8 +4,6 @@ import com.atomic.exception.AnnotationException;
 import com.atomic.param.Constants;
 import com.atomic.tools.autotest.AutoTest;
 import com.atomic.tools.autotest.AutoTestMode;
-import com.atomic.tools.rollback.RollBack;
-import com.atomic.tools.rollback.RollBackAll;
 import com.atomic.util.TestNGUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Component;
@@ -28,48 +26,6 @@ import java.util.List;
  * @version 1.0 Created by dreamyao on 2017/5/28.
  */
 public abstract class AnnotationUtils {
-
-    public static boolean isRollBackMethod(Method testMethod) throws AnnotationException {
-        // 判断测试方法是否添加回滚注解
-        Annotation[] annotations = testMethod.getAnnotations();
-        if (annotations != null) {
-            RollBack rollBack = testMethod.getAnnotation(RollBack.class);
-            RollBackAll rollBackAll = testMethod.getAnnotation(RollBackAll.class);
-            if (rollBack == null) {
-                return false;
-            } else if (rollBackAll != null) {
-                Reporter.log("不能同时存在两个类型的数据回滚注解！");
-                throw new AnnotationException("不能同时存在两个类型的数据回滚注解！");
-            } else if (rollBack.enabled()) {
-                if ("".equals(rollBack.dbName()) || rollBack.tableName().length == 0) {
-                    return false;
-                }
-            } else if (!rollBack.enabled()) {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean isRollBackAllMethod(Method method) throws AnnotationException {
-        // 检查方法上是否有RollBackAll注解和注解是否开启
-        Annotation[] annotations = method.getAnnotations();
-        if (annotations != null) {
-            RollBack rollBack = method.getAnnotation(RollBack.class);
-            RollBackAll rollBackAll = method.getAnnotation(RollBackAll.class);
-            if (rollBackAll != null) {
-                if (rollBack != null) {
-                    Reporter.log("不能同时存在两个类型的数据回滚注解！");
-                    throw new AnnotationException("不能同时存在两个类型的数据回滚注解！");
-                } else if (!rollBackAll.enabled()) {
-                    return false;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static boolean isAutoTest(Method method) {
         // 判断@AutoTest注解是否存在
