@@ -154,13 +154,13 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
     private void autoTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
         // 跳过自动化测试用例
         if (getAutoTestMode(TestNGUtils.getTestMethod(testResult)) == AutoTestMode.NONE) {
-            System.out.println("-----------------------------自动化测试用例已跳过!-----------------------------");
+            System.out.println("------------------- 自动化测试用例已跳过! -------------------");
             return;
         }
         long start = System.currentTimeMillis();
         List<Map<String, Object>> allTestCases = generateAutoTestCases(testResult, this);
-        System.out.println("------------------------------------------自动化测试开始，测试用例数量："
-                + allTestCases.size() + "------------------------------------------");
+        System.out.println("------------------- 自动化测试开始，测试用例数量："
+                + allTestCases.size() + " -------------------");
         final Exception[] exception = {null};
         Map<String, List<Map<String, Object>>> exceptionMsgs = Maps.newHashMap();
         allTestCases.forEach(newParam -> {
@@ -176,8 +176,8 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
             }
         });
         long end = System.currentTimeMillis();
-        System.out.println("------------------------------------------自动化测试结束，耗时："
-                + (end - start) / 1000 + "s------------------------------------------");
+        System.out.println(" -------------------自动化测试结束，耗时："
+                + (end - start) / 1000 + "s -------------------");
         // 如果有异常则抛出，提醒测试未通过
         ExceptionManager.printExceptions(exception[0], exceptionMsgs);
     }
@@ -191,7 +191,7 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         // 构建完成服务
         CompletionService completionService = new ExecutorCompletionService(executor);
-        System.out.println("-----------------------多线程开始执行！-----------------------");
+        System.out.println("------------------- 多线程开始执行！-------------------");
         for (int i = 1; i <= threadCount; i++) {
             // 向线程池提交任务
             completionService.submit(() -> {
@@ -205,7 +205,7 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
             completionService.take().get();
         }
         // 所有任务已经完成,关闭线程池
-        System.out.println("-----------------------多线程执行完毕！-----------------------");
+        System.out.println("------------------- 多线程执行完毕！-------------------");
         executor.shutdown();
     }
 
@@ -354,8 +354,8 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
         }
 
         if (isAutoTest(context) && !AnnotationUtils.isPrintResult(methodMeta.getTestMethod())) {
-            System.out.println(method.getName() + "----------------------------- 测试用例执行完一个 " +
-                    "-----------------------------");
+            System.out.println(method.getName() + "------------------- 测试用例执行完一个 " +
+                    " -------------------");
         } else {
             // parameters 可能被接口改变，打印出来看起来就像有问题
             resultPrint(method.getName(), result, context, parameters);

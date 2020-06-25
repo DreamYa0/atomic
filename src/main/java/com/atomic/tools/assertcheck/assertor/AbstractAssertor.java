@@ -47,7 +47,7 @@ public abstract class AbstractAssertor implements Assertor {
             }
 
         } catch (Exception e) {
-            logger.info("---------------- excel中名称为exceptResult的sheet页不存在或值为空，请进行手动断言！ " +
+            System.out.println("---------------- exceptResult的sheet页不存在或值为空，请进行手动断言！ " +
                     "----------------");
         }
     }

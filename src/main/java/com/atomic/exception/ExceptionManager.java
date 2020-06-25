@@ -78,16 +78,16 @@ public class ExceptionManager {
     public static void printExceptions(Exception exception,
                                        Map<String, List<Map<String, Object>>> exceptionMsgs) throws Exception {
         if (exception != null) {
-            System.out.println("-----------------------下面打印所有异常信息：" +
-                    "-----------------------------------------------");
+            System.out.println("------------------- 下面打印所有异常信息：" +
+                    " -------------------");
             // 打印所有遇到的异常
             for (String msg : exceptionMsgs.keySet()) {
-                System.out.println("-----------------------------------我是分割线-----------------------------------");
+                System.out.println("------------------- 我是分割线 -------------------");
                 System.err.println("异常：" + msg);
                 System.err.println("测试用例列表：" + ParamUtils.getJSONString(exceptionMsgs.get(msg)));
             }
-            System.out.println("---------------------- -异常信息打印完毕，下面抛出异常 " +
-                    "-----------------------------------------------");
+            System.out.println("------------------- 异常信息打印完毕，下面抛出异常 " +
+                    " -------------------");
             //先判断异常具体类型
             throwNewException(exception);
             // 抛出异常，提醒测试未通过

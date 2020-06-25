@@ -149,7 +149,7 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
 
         // 跳过自动化测试用例
         if (getAutoTestMode(getTestMethod(testResult)) == AutoTestMode.NONE) {
-            System.out.println("-------------------自动化测试用例已跳过-------------------");
+            System.out.println("------------------- 自动化测试用例已跳过 -------------------");
             return;
         }
         long start = System.currentTimeMillis();
@@ -166,8 +166,8 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
         allTestCases.forEach(newParam -> removeValueByKeys(newParam, removeKeys));
         // 去除List中重复的Map
         toHeavy4ListMap(allTestCases);
-        System.out.println("----------------------------------------自动化测试开始，测试用例数量：" +
-                allTestCases.size() + "----------------------------------------");
+        System.out.println("------------------- 自动化测试开始，测试用例数量：" +
+                allTestCases.size() + " -------------------");
         allTestCases.forEach(Param -> {
             // 合并参数
             MapUtils.mergeMap(paramMap, Param);
@@ -182,8 +182,8 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
             }
         });
         long end = System.currentTimeMillis();
-        System.out.println("----------------------------------------自动化测试结束，耗时：" +
-                (end - start) / 1000 + "s----------------------------------------");
+        System.out.println("------------------- 自动化测试结束，耗时：" +
+                (end - start) / 1000 + "s -------------------");
         // 如果有异常则抛出，提醒测试未通过
         ExceptionManager.printExceptions(exception[0], exceptionMsgs);
     }
@@ -298,7 +298,7 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
         }
         boolean isPrintResult = AnnotationUtils.isPrintResult(methodMeta.getTestMethod());
         if (ParamUtils.isAutoTest(context) && !isPrintResult) {
-            System.out.println(methodMeta.getInterfaceMethod().getName() + "-----------------测试用例执行完一个！" +
+            System.out.println(methodMeta.getInterfaceMethod().getName() + "----------------- 测试用例执行完一个！" +
                     "-----------------");
         } else {
             ParamPrint.resultPrint(methodMeta.getMethodName(), result, context, parameters);

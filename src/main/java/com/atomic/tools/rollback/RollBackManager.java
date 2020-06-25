@@ -74,7 +74,7 @@ public final class RollBackManager {
                 e.printStackTrace();*/
                 continue;
             }
-            System.out.println("----------------回滚SQL: " + sql + "------------------");
+            System.out.println("------------------- rollback sql: " + sql + " -------------------");
         }
     }
 

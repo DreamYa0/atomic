@@ -7,6 +7,8 @@ import com.atomic.param.Constants;
 import com.atomic.util.TestNGUtils;
 import com.atomic.util.GsonUtils;
 import io.restassured.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
@@ -28,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ThreadSafe
 public class SaveResultListener extends TestListenerAdapter {
 
+    private static final Logger logger = LoggerFactory.getLogger(SaveResultListener.class);
     /**
      * 项目ID
      */
@@ -132,8 +135,8 @@ public class SaveResultListener extends TestListenerAdapter {
                     expectedReturn, testStatus, round.get(), runAuthor);
 
         } catch (Exception e) {
-            System.out.println("---------------------" + className + "#" + methodName + "--------------------");
-            e.printStackTrace();
+            System.out.println("------------------- " + className + "#" + methodName + " -------------------");
+            logger.error("保存测试用例失败", e);
         }
     }
 

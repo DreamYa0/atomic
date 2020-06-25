@@ -32,8 +32,8 @@ public abstract class BaseTestCase<T> extends CommonTest<T> {
         try {
             DbUtil.use(dataSource).execute(delSQL);
             DbUtil.use(dataSource).execute(insertSql);
-            System.out.println("---------------------------SQL: " + insertSql + "---------------------------");
-            System.out.println("---------------------------SQL: " + delSQL + "---------------------------");
+            System.out.println("--------------------- SQL: " + insertSql + " ---------------------");
+            System.out.println("--------------------- SQL: " + delSQL + " ---------------------");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -50,8 +50,8 @@ public abstract class BaseTestCase<T> extends CommonTest<T> {
         try {
             DbUtil.use(dataSource).execute(delSQL);
             Long key = DbUtil.use(dataSource).executeForGeneratedKey(insertSql);
-            System.out.println("---------------------------SQL: " + insertSql + "---------------------------");
-            System.out.println("---------------------------SQL: " + delSQL + "---------------------------");
+            System.out.println("--------------------- SQL: " + insertSql + " ---------------------");
+            System.out.println("--------------------- SQL: " + delSQL + " ---------------------");
             return key;
         } catch (SQLException e) {
             e.printStackTrace();

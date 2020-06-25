@@ -37,7 +37,7 @@ public final class AssertCheckUtils {
     }
 
     public static void assertCheck(Object testInstance, Map<String, Object> param) throws Exception {
-        System.out.println("==================开始自动断言==================");
+        System.out.println("------------------- 开始自动断言 -------------------");
         List<AssertItem> assertItemList = getAssertItemList(testInstance, false);
         if (CollectionUtils.isEmpty(assertItemList)) {
             return;
@@ -45,7 +45,7 @@ public final class AssertCheckUtils {
         for (int i = 0; i < assertItemList.size(); i++) {
             assertCheck(assertItemList.get(i), param, i);
         }
-        System.out.println("==================自动断言完成==================");
+        System.out.println("------------------- 自动断言完成 -------------------");
         System.out.println();
     }
 

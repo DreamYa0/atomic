@@ -12,6 +12,8 @@ import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.model.TestAttribute;
 import com.google.common.collect.Maps;
 import io.restassured.response.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.testng.IReporter;
 import org.testng.IResultMap;
@@ -39,6 +41,7 @@ import static java.util.Comparator.comparing;
  */
 public class ReportListener implements IReporter {
 
+    private static final Logger logger = LoggerFactory.getLogger(ReportListener.class);
     private ExtentReports extent;
     private String projectName;
     private String[] runAuthor;
@@ -206,7 +209,7 @@ public class ReportListener implements IReporter {
                     }
 
                     String className = TestNGUtils.getTestCaseClassName(result);
-                    Class clazz = result.getTestClass().getRealClass();
+                    Class<?> clazz = result.getTestClass().getRealClass();
                     String resource = clazz.getResource("").getPath();
                     String filePath = resource + className + ".xls";
 
@@ -293,16 +296,9 @@ public class ReportListener implements IReporter {
         // 创建报告用例标题名称
         String className = HandleMethodName.getTestClassName(result);
         String methodName = HandleMethodName.getTestMethodName(result);
+        Map<String, Object> param = TestNGUtils.getParamContext(result);
+
         StringBuilder sb = new StringBuilder();
-
-        Map<String, Object> param = null;
-        try {
-            param = TestNGUtils.getParamContext(result);
-        } catch (Exception e) {
-            System.out.println("---------------------" + className + "#" + methodName + "--------------------");
-            e.printStackTrace();
-        }
-
         if (Objects.nonNull(param) && Objects.nonNull(param.get(Constants.HTTP_METHOD))) {
             Object uri = param.get(Constants.HTTP_METHOD);
             sb.append(uri);
