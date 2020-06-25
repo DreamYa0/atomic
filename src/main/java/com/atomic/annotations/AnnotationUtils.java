@@ -7,8 +7,6 @@ import com.atomic.tools.autotest.AutoTestMode;
 import com.atomic.tools.rollback.RollBack;
 import com.atomic.tools.rollback.RollBackAll;
 import com.atomic.util.TestNGUtils;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -71,34 +69,6 @@ public abstract class AnnotationUtils {
             }
         }
         return false;
-    }
-
-    public static Multimap<String, String> getDbNameAndTableName(Method method) throws AnnotationException {
-        // 处理多库多表时，表名和库名,参数示例：zhubajie_market.mk_service
-        RollBackAll rollBackAll = method.getAnnotation(RollBackAll.class);
-        String[] dbAndTable = rollBackAll.dbAndTable();
-        Multimap<String, String> multimap = ArrayListMultimap.create();
-        for (int i = 0; i < dbAndTable.length; i++) {
-            String[] dbNameAndTableName = dbAndTable[i].split("\\.");
-            if (dbNameAndTableName.length != 2) {
-                Reporter.log("传入的库名和表名方式错误！");
-                throw new AnnotationException("传入的库名和表名方式错误！");
-            }
-            multimap.put(dbNameAndTableName[0], dbNameAndTableName[1]);
-        }
-        return multimap;
-    }
-
-    public static String getDbName(Method testMethod) {
-        // 从注解中获取数据库名
-        RollBack annotation = testMethod.getAnnotation(RollBack.class);
-        return annotation.dbName();
-    }
-
-    public static String[] getTableName(Method testMethod) {
-        // 从注解中获取表名
-        RollBack annotation = testMethod.getAnnotation(RollBack.class);
-        return annotation.tableName();
     }
 
     public static boolean isAutoTest(Method method) {

@@ -1,26 +1,18 @@
 package com.atomic.tools.rollback;
 
 import cn.hutool.db.DbUtil;
-import com.atomic.annotations.AnnotationUtils;
-import com.atomic.exception.AnnotationException;
-import com.atomic.tools.db.Change;
-import com.atomic.tools.db.ChangeType;
-import com.atomic.tools.db.Changes;
-import com.atomic.tools.db.Table;
-import com.atomic.tools.db.Value;
+import com.atomic.tools.rollback.db.Change;
+import com.atomic.tools.rollback.db.ChangeType;
+import com.atomic.tools.rollback.db.Changes;
+import com.atomic.tools.rollback.db.Table;
+import com.atomic.tools.rollback.db.Value;
 import com.atomic.util.DataSourceUtils;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.ITestNGMethod;
 
 import javax.sql.DataSource;
-import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -34,6 +26,7 @@ public final class RollBackManager {
     private static final RollBackManager INSTANCE = new RollBackManager();
 
     private RollBackManager() {
+
     }
 
     public static RollBackManager newInstance() {
@@ -123,37 +116,5 @@ public final class RollBackManager {
             return sql.toString();
         }
         return "";
-    }
-
-    Map<String, String[]> getTableNames4Scenario(ITestNGMethod[] testNGMethods, Map<String, Changes> changesMap) {
-        // 获取监控的数据库表名
-        Map<String, String[]> tableNameList = Maps.newHashMap();
-        for (ITestNGMethod testNGMethod : testNGMethods) {
-            Method method = testNGMethod.getConstructorOrMethod().getMethod();
-            if (AnnotationUtils.isRollBackMethod(method) && AnnotationUtils.isScenario(method)) {
-                String dbName = AnnotationUtils.getDbName(testNGMethod.getConstructorOrMethod().getMethod());
-                changesMap.put(dbName, new Changes());
-
-                String[] tableNames = AnnotationUtils.getTableName(testNGMethod.getConstructorOrMethod().getMethod());
-                tableNameList.put(dbName, tableNames);
-            } else if (AnnotationUtils.isRollBackAllMethod(method) && AnnotationUtils.isScenario(method)) {
-                // 实现多数据库数据回滚
-                try {
-                    Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(
-                            testNGMethod.getConstructorOrMethod().getMethod());
-                    Set<String> set = multimap.keySet();
-                    for (String dbName : set) {
-                        changesMap.put(dbName, new Changes());
-                    }
-                    set.forEach(dbName -> {
-                        List<String> list = (List<String>) multimap.get(dbName);
-                        tableNameList.put(dbName, (String[]) list.toArray());
-                    });
-                } catch (AnnotationException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return tableNameList;
     }
 }

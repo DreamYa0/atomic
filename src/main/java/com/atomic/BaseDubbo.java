@@ -19,7 +19,6 @@ import com.atomic.tools.report.HandleMethodName;
 import com.atomic.tools.report.ParamPrint;
 import com.atomic.tools.report.ReportListener;
 import com.atomic.tools.rollback.RollBackListener;
-import com.atomic.tools.rollback.ScenarioRollBackListener;
 import com.atomic.util.MapUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,9 +42,9 @@ import static com.atomic.annotations.AnnotationUtils.isServiceVersion;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.CASE_NAME;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
-import static com.atomic.tools.assertcheck.AssertResult.assertResult;
 import static com.atomic.param.ResultCache.saveTestRequestInCache;
 import static com.atomic.param.ResultCache.saveTestResultInCache;
+import static com.atomic.tools.assertcheck.AssertResult.assertResult;
 import static com.atomic.tools.report.SaveRunTime.endTestTime;
 import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.TestNGUtils.getParamContext;
@@ -79,7 +78,7 @@ import static com.atomic.util.TestNGUtils.injectScenarioReturnResult;
  * @version 2.0.0 Created by dreamyao on 2017/5/9.
  * @title dubbo接口测试基类
  */
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
+@Listeners({RollBackListener.class, ReportListener.class})
 public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, ITestBase {
 
     protected final DubboServiceFactory dubboServiceFactory = new DubboServiceFactory();

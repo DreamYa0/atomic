@@ -15,7 +15,7 @@ import com.atomic.tools.autotest.AutoTestMode;
 import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.tools.report.ReportListener;
-import com.atomic.tools.rollback.IntegrationTestRollBackListener;
+import com.atomic.tools.rollback.RollBackListener;
 import com.atomic.util.MapUtils;
 import com.atomic.util.TestNGUtils;
 import com.google.common.base.Charsets;
@@ -77,7 +77,7 @@ import static com.atomic.util.TestNGUtils.injectResultAndParameters;
  * @version 1.0
  */
 @SqlConfig
-@Listeners({ReportListener.class, IntegrationTestRollBackListener.class})
+@Listeners({ReportListener.class, RollBackListener.class})
 @TestExecutionListeners(listeners = {TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
 public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
 

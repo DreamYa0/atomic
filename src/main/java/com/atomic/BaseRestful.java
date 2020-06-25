@@ -6,11 +6,10 @@ import com.atomic.exception.InjectResultException;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
 import com.atomic.param.ParamUtils;
-import com.atomic.tools.report.ReportListener;
 import com.atomic.param.ResultCache;
+import com.atomic.tools.report.ReportListener;
 import com.atomic.tools.report.SaveRunTime;
 import com.atomic.tools.rollback.RollBackListener;
-import com.atomic.tools.rollback.ScenarioRollBackListener;
 import com.atomic.util.GsonUtils;
 import com.atomic.util.TestNGUtils;
 import com.google.common.collect.Lists;
@@ -45,10 +44,10 @@ import static com.atomic.param.ParamUtils.isContentTypeNoNull;
 import static com.atomic.param.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.ParamUtils.isHttpHostNoNull;
 import static com.atomic.param.ParamUtils.isLoginUrlNoNull;
+import static com.atomic.param.ResultCache.saveTestRequestInCache;
 import static com.atomic.tools.assertcheck.AssertResult.assertResultForRest;
 import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
 import static com.atomic.tools.report.ParamPrint.resultPrint;
-import static com.atomic.param.ResultCache.saveTestRequestInCache;
 import static com.atomic.util.TestNGUtils.injectResultAndParameters;
 import static io.restassured.RestAssured.config;
 import static io.restassured.RestAssured.given;
@@ -63,7 +62,7 @@ import static java.nio.charset.Charset.defaultCharset;
  * @title REST风格接口测试基类
  * @date  2018/05/30 10:48
  */
-@Listeners({ScenarioRollBackListener.class, RollBackListener.class, ReportListener.class})
+@Listeners({RollBackListener.class, ReportListener.class})
 public abstract class BaseRestful extends AbstractRest implements IHookable, ITestBase {
 
     @Override

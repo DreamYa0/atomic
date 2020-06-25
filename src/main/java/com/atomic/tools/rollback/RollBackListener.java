@@ -1,123 +1,119 @@
 package com.atomic.tools.rollback;
 
+import cn.hutool.core.collection.CollUtil;
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.AnnotationException;
 import com.atomic.exception.RollBackException;
-import com.atomic.util.TestNGUtils;
-import com.atomic.tools.db.Changes;
-import com.google.common.collect.Lists;
+import com.atomic.tools.rollback.db.Changes;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import org.springframework.util.CollectionUtils;
-import org.testng.ITestResult;
+import org.testng.ITestContext;
+import org.testng.ITestNGMethod;
 import org.testng.Reporter;
 import org.testng.TestListenerAdapter;
 
-import javax.annotation.concurrent.ThreadSafe;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 
 /**
- * 数据回滚监听器
  * @author dreamyao
- * @version 1.0           Created by dreamyao on 2017/6/5.
+ * @version 1.0.0
+ * @title
+ * @date 2017/8/25 22:28
  */
-@ThreadSafe
 public class RollBackListener extends TestListenerAdapter {
 
-    private Map<String, Changes> dbNameAndChanges = Maps.newConcurrentMap();
-
-    public RollBackListener() {
-
-    }
+    private final ConcurrentMap<String, Changes> dbNameAndChanges = new ConcurrentHashMap<>(16);
 
     @Override
-    public void onTestStart(ITestResult testResult) {
-        // 开启数据回滚监听
-        //实现单库多表数据回滚
-        if (AnnotationUtils.isRollBackMethod(TestNGUtils.getTestMethod(testResult)) &&
-                !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
-            // 开启监听，当为@RollBack注解时执行单库,多表数据回滚
-            startRollBack(testResult);
-        } else if (AnnotationUtils.isRollBackAllMethod(TestNGUtils.getTestMethod(testResult)) &&
-                !AnnotationUtils.isScenario(TestNGUtils.getTestMethod(testResult))) {
-            // 实现多库多表数据回滚
-            try {
-                // 当为@RollBackAll注解时执行多库,多表数据回滚
-                startRollBackAll(testResult);
-            } catch (RollBackException e) {
-                Reporter.log("-----------------回滚数据库限制不能超过5个！--------------");
-                throw new RollBackException("回滚数据库限制不能超过5个！");
-            }
-        }
-    }
-
-    @Override
-    public void onTestSuccess(ITestResult tr) {
-        finishRollBack();
-    }
-
-    @Override
-    public void onTestFailure(ITestResult tr) {
-        finishRollBack();
-    }
-
-    @Override
-    public void onTestSkipped(ITestResult tr) {
-        finishRollBack();
-    }
-
-    private void startRollBack(ITestResult testResult) {
-        // 当为@RollBack注解时执行单库,多表数据回滚
-        String dbName = AnnotationUtils.getDbName(TestNGUtils.getTestMethod(testResult));
-        String[] tableNames = AnnotationUtils.getTableName(TestNGUtils.getTestMethod(testResult));
-        //开启监听
-        dbNameAndChanges.putIfAbsent(dbName, new Changes());
-        Set<Map.Entry<String, Changes>> entries = dbNameAndChanges.entrySet();
-        for (Map.Entry<String, Changes> entry : entries) {
-            RollBackManager.newInstance().setStartPoint(entry.getKey(), entry.getValue(), tableNames);
+    public void onStart(ITestContext testContext) {
+        ITestNGMethod[] testNGMethods = testContext.getAllTestMethods();
+        Map<String, String[]> dbName2TbNames = getDbName2TbNames8TestContext(testNGMethods, dbNameAndChanges);
+        if (dbNameAndChanges.size() > 10) {
+            Reporter.log("回滚数据库不能超过10个！");
+            throw new RollBackException("回滚数据库不能超过10个！");
         }
 
-    }
-
-    private void startRollBackAll(ITestResult testResult) throws RollBackException {
-        // 当为@RollBackAll注解时执行多库,多表数据回滚
-        //实现多数据库数据回滚
-        try {
-            Multimap<String, String> multimap = AnnotationUtils.getDbNameAndTableName(
-                    TestNGUtils.getTestMethod(testResult));
-            Set<String> set = multimap.keySet();
-            List<String> stringList = Lists.newArrayList();
-            stringList.addAll(set);
-            for (String dbName : stringList) {
-                dbNameAndChanges.put(dbName, new Changes());
-            }
-            if (dbNameAndChanges.size() >= 6) {
-                Reporter.log("-----------------回滚数据库限制不能超过5个！--------------");
-                throw new RollBackException("回滚数据库不能超过5个！");
-            }
+        if (CollUtil.isNotEmpty(dbNameAndChanges)) {
+            // 开启监听
             Set<Map.Entry<String, Changes>> entries = dbNameAndChanges.entrySet();
-            for (Map.Entry<String, Changes> entry : entries) {
-                List<String> list = (List<String>) multimap.get(entry.getKey());
-                String[] tableNames = new String[list.size()];
-                for (int j = 0; j < list.size(); j++) {
-                    tableNames[j] = list.get(j);
-                }
-                RollBackManager.newInstance().setStartPoint(entry.getKey(), entry.getValue(), tableNames);
+            for (Map.Entry<String, Changes> map : entries) {
+                RollBackManager.newInstance().setStartPoint(map.getKey(), map.getValue(),
+                        dbName2TbNames.get(map.getKey()));
             }
-        } catch (AnnotationException e) {
-            e.printStackTrace();
         }
     }
 
-    private void finishRollBack() {
-        // 关闭数据回滚监听并执行数据回滚
-        if (!CollectionUtils.isEmpty(dbNameAndChanges)) {
+    @Override
+    public void onFinish(ITestContext testContext) {
+        if (CollUtil.isNotEmpty(dbNameAndChanges)) {
             Set<Map.Entry<String, Changes>> entries = dbNameAndChanges.entrySet();
             for (Map.Entry<String, Changes> map : entries) {
                 RollBackManager.newInstance().setEndPoint(map.getKey(), map.getValue());
             }
         }
+    }
+
+    private Map<String, String[]> getDbName2TbNames8TestContext(ITestNGMethod[] testNGMethods,
+                                                                Map<String, Changes> dbName2Changes) {
+        // 获取监控的数据库表名
+        Map<String, String[]> dbName2TbNames = Maps.newHashMap();
+        for (ITestNGMethod testNGMethod : testNGMethods) {
+            Method method = testNGMethod.getConstructorOrMethod().getMethod();
+            if (AnnotationUtils.isRollBackMethod(method)) {
+                // 处理 @RollBack 注解
+                String dbName = getDbName(testNGMethod.getConstructorOrMethod().getMethod());
+                dbName2Changes.put(dbName, new Changes());
+
+                String[] tableNames = getTableName(testNGMethod.getConstructorOrMethod().getMethod());
+                dbName2TbNames.put(dbName, tableNames);
+            } else if (AnnotationUtils.isRollBackAllMethod(method)) {
+                // 处理 @RollBackAll 注解
+                // 实现多数据库数据回滚
+                Multimap<String, String> multimap = getDbName2TableName(
+                        testNGMethod.getConstructorOrMethod().getMethod());
+                Set<String> set = multimap.keySet();
+                for (String dbName : set) {
+                    dbName2Changes.put(dbName, new Changes());
+                    List<String> list = (List<String>) multimap.get(dbName);
+                    dbName2TbNames.put(dbName, list.toArray(new String[]{}));
+                }
+            }
+        }
+        return dbName2TbNames;
+    }
+
+    private String getDbName(Method testMethod) {
+        // 从注解中获取数据库名
+        RollBack annotation = testMethod.getAnnotation(RollBack.class);
+        return annotation.dbName();
+    }
+
+    private String[] getTableName(Method testMethod) {
+        // 从注解中获取表名
+        RollBack annotation = testMethod.getAnnotation(RollBack.class);
+        return annotation.tableName();
+    }
+
+    private Multimap<String, String> getDbName2TableName(Method method) throws AnnotationException {
+        // 处理多库多表时，表名和库名,参数示例：库名.表名
+        RollBackAll rollBackAll = method.getAnnotation(RollBackAll.class);
+        String[] dbAndTable = rollBackAll.dbAndTable();
+        Multimap<String, String> multimap = ArrayListMultimap.create();
+        for (int i = 0; i < dbAndTable.length; i++) {
+            String[] dbNameAndTableName = dbAndTable[i].split("\\.");
+            if (dbNameAndTableName.length != 2) {
+                Reporter.log("库名和表名方式错误！");
+                throw new AnnotationException("库名和表名方式错误！");
+            }
+            multimap.put(dbNameAndTableName[0], dbNameAndTableName[1]);
+        }
+        return multimap;
     }
 }
