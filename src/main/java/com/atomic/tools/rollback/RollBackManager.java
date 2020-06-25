@@ -72,6 +72,7 @@ public final class RollBackManager {
                 continue;
             }
         }
+        System.out.println();
         System.out.println("------------------- rollback sql" + " -------------------");
     }
 
