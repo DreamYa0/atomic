@@ -56,7 +56,7 @@ public final class ParamPrint {
             }
             System.out.println("出参：" + ParamUtils.getJSONStringWithDateFormat(result,
                     true, Constants.DATE_FORMAT));
-            System.out.println("------------------------------------------------");
+            System.out.println("----------------------------------------------------------");
             System.out.println("");
         } finally {
             lock.unlock();
@@ -98,7 +98,7 @@ public final class ParamPrint {
             }
             System.out.println("出参：");
             response.body().prettyPrint();
-            System.out.println("------------------------------------------------");
+            System.out.println("----------------------------------------------------------");
             System.out.println("");
         } finally {
             lock.unlock();
@@ -139,7 +139,7 @@ public final class ParamPrint {
                         context.get(Constants.CASE_NAME) + ") -------------------");
             }
             System.out.println("出参：\n" + formatJson(result));
-            System.out.println("------------------------------------------------");
+            System.out.println("----------------------------------------------------------");
             System.out.println("");
         } finally {
             lock.unlock();
