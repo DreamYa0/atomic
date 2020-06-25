@@ -23,17 +23,17 @@ public abstract class BaseTestCase<T> extends CommonTest<T> {
         String db_tab;
         String PrimaryKey;
         String PrimaryValue;
-        db_tab = insertSql.substring(insertSql.indexOf("INSERT INTO") + 12, insertSql.indexOf("(") - 1);
+        db_tab = insertSql.substring(insertSql.indexOf("insert into") + 12, insertSql.indexOf("(") - 1);
         PrimaryKey = insertSql.substring(insertSql.indexOf("(") + 1, insertSql.indexOf(","));
-        PrimaryValue = insertSql.substring(insertSql.indexOf("VALUES (") + 8,
-                insertSql.indexOf(",", insertSql.indexOf("VALUES (") + 8));
+        PrimaryValue = insertSql.substring(insertSql.indexOf("values (") + 8,
+                insertSql.indexOf(",", insertSql.indexOf("values (") + 8));
         String delSQL = "delete from " + db_tab + " where " + PrimaryKey + " = " + PrimaryValue;
         DataSource dataSource = getDataSource(dbName);
         try {
             DbUtil.use(dataSource).execute(delSQL);
             DbUtil.use(dataSource).execute(insertSql);
-            System.out.println("--------------------- SQL: " + insertSql + " ---------------------");
-            System.out.println("--------------------- SQL: " + delSQL + " ---------------------");
+            System.out.println("--------------------- sql: " + insertSql + " ---------------------");
+            System.out.println("--------------------- sql: " + delSQL + " ---------------------");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -41,17 +41,17 @@ public abstract class BaseTestCase<T> extends CommonTest<T> {
 
     protected final long insert(String dbName, String insertSql, String... pkName) {
         // 初始化数据并返回初始化数据的主键ID
-        String dbTableName = insertSql.substring(insertSql.indexOf("INSERT INTO") + 12, insertSql.indexOf("(") - 1);
+        String dbTableName = insertSql.substring(insertSql.indexOf("insert into") + 12, insertSql.indexOf("(") - 1);
         String primaryKey = insertSql.substring(insertSql.indexOf("(") + 1, insertSql.indexOf(","));
-        String primaryValue = insertSql.substring(insertSql.indexOf("VALUES (") + 8, insertSql.indexOf(",",
-                insertSql.indexOf("VALUES (") + 8));
+        String primaryValue = insertSql.substring(insertSql.indexOf("values (") + 8, insertSql.indexOf(",",
+                insertSql.indexOf("values (") + 8));
         String delSQL = "delete from " + dbTableName + " where " + primaryKey + " = " + primaryValue;
         DataSource dataSource = getDataSource(dbName);
         try {
             DbUtil.use(dataSource).execute(delSQL);
             Long key = DbUtil.use(dataSource).executeForGeneratedKey(insertSql);
-            System.out.println("--------------------- SQL: " + insertSql + " ---------------------");
-            System.out.println("--------------------- SQL: " + delSQL + " ---------------------");
+            System.out.println("--------------------- sql: " + insertSql + " ---------------------");
+            System.out.println("--------------------- sql: " + delSQL + " ---------------------");
             return key;
         } catch (SQLException e) {
             e.printStackTrace();
