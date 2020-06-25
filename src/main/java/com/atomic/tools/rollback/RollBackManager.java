@@ -1,6 +1,8 @@
 package com.atomic.tools.rollback;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.db.DbUtil;
+import cn.hutool.db.sql.SqlFormatter;
 import com.atomic.tools.rollback.db.Change;
 import com.atomic.tools.rollback.db.ChangeType;
 import com.atomic.tools.rollback.db.Changes;
@@ -58,17 +60,19 @@ public final class RollBackManager {
 
     private void runRollback(String dbName, Changes changes) {
         List<Change> changeList = changes.getChangesList();
+        System.out.println("------------------- rollback sql" + " -------------------");
         for (Change change : changeList) {
             String sql = editSql(change);
             try {
                 DbUtil.use(DataSourceUtils.getDataSource(dbName)).execute(sql);
+                System.out.println(StrUtil.format("\nSQL -> {}", SqlFormatter.format(sql)));
             } catch (SQLException e) {
                 /*Reporter.log("执行数据回滚SQL语句异常! sql：" + sql ,true);
                 e.printStackTrace();*/
                 continue;
             }
-            System.out.println("------------------- rollback sql: " + sql + " -------------------");
         }
+        System.out.println("------------------- rollback sql" + " -------------------");
     }
 
     private String editSql(Change change) {
