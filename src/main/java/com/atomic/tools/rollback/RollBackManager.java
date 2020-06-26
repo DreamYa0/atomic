@@ -11,6 +11,7 @@ import com.atomic.tools.rollback.db.Value;
 import com.atomic.util.DataSourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Reporter;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -67,8 +68,7 @@ public final class RollBackManager {
                 DbUtil.use(DataSourceUtils.getDataSource(dbName)).execute(sql);
                 System.out.println(StrUtil.format("\nSQL -> {}", SqlFormatter.format(sql)));
             } catch (SQLException e) {
-                /*Reporter.log("执行数据回滚SQL语句异常! sql：" + sql ,true);
-                e.printStackTrace();*/
+                Reporter.log("数据回滚SQL执行异常! sql：" + sql ,true);
                 continue;
             }
         }
