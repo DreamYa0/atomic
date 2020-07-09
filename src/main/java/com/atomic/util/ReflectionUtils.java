@@ -167,7 +167,7 @@ public final class ReflectionUtils {
         final String n = m.getDeclaringClass().getName();
         final ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         ClassReader cr = new ClassReader(n);
-        cr.accept(new ClassVisitor(Opcodes.ASM4, cw) {
+        cr.accept(new ClassVisitor(Opcodes.ASM5, cw) {
             @Override
             public MethodVisitor visitMethod(final int access,
                                              final String name,
@@ -184,7 +184,7 @@ public final class ReflectionUtils {
                 }
                 MethodVisitor v = cv.visitMethod(access, name, desc, signature,
                         exceptions);
-                return new MethodVisitor(Opcodes.ASM4, v) {
+                return new MethodVisitor(Opcodes.ASM5, v) {
                     @Override
                     public void visitLocalVariable(String name,
                                                    String desc,
