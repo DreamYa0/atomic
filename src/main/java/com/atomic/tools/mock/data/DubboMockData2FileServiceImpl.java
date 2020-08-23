@@ -6,7 +6,7 @@ import com.atomic.param.ObjUtils;
 import com.atomic.tools.mock.dto.MockData;
 import com.atomic.tools.mock.dto.MockData4Rpc;
 import com.atomic.tools.mock.helper.MockFileHelper;
-import com.atomic.tools.mock.util.JacksonUtils;
+import com.atomic.util.GsonUtils;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class DubboMockData2FileServiceImpl implements MockDataService<MockData4R
         try {
             Method method = invocation.getInvoker().getInterface()
                     .getMethod(invocation.getMethodName(), invocation.getParameterTypes());
-            Object apiResult = ObjUtils.json2Bean("", JacksonUtils.encode(ret.getValue()),
+            Object apiResult = ObjUtils.json2Bean("", GsonUtils.getGson().toJson(ret.getValue()),
                     method.getGenericReturnType());
             ret.setValue(apiResult);
 

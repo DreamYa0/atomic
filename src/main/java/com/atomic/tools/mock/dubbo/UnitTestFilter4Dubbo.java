@@ -7,12 +7,12 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcException;
-import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.data.DubboMockData2FileServiceImpl;
 import com.atomic.tools.mock.data.MockContext;
 import com.atomic.tools.mock.data.MockDataService;
+import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.dto.MockData4Rpc;
-import com.atomic.tools.mock.util.JacksonUtils;
+import com.atomic.util.GsonUtils;
 import org.testng.Reporter;
 
 @Activate(group = Constants.CONSUMER)
@@ -41,7 +41,7 @@ public class UnitTestFilter4Dubbo implements Filter {
             Result result = invoker.invoke(invocation);
 
             MockData4Rpc mockData4Rpc = new MockData4Rpc();
-            mockData4Rpc.setRpcRequest(JacksonUtils.encode(invocation.getArguments()));
+            mockData4Rpc.setRpcRequest(GsonUtils.getGson().toJson(invocation.getArguments()));
             mockData4Rpc.setApiResult(result.getValue());
             mockData4Rpc.setRpcMethod(invocation.getInvoker().getInterface().getName() + ":" +
                     invocation.getMethodName());
