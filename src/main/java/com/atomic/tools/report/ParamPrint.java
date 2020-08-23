@@ -1,7 +1,7 @@
 package com.atomic.tools.report;
 
 import com.atomic.param.Constants;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ParamUtils;
 import com.google.common.collect.Lists;
 import io.restassured.response.Response;
 import org.springframework.util.CollectionUtils;

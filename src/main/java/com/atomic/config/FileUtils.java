@@ -1,4 +1,4 @@
-package com.atomic.util;
+package com.atomic.config;
 
 import java.io.InputStream;
 

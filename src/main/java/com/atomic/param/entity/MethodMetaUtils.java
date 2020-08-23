@@ -2,11 +2,11 @@ package com.atomic.param.entity;
 
 import com.atomic.exception.GetBeanException;
 import com.atomic.param.Constants;
-import com.atomic.param.ObjUtils;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ObjUtils;
+import com.atomic.param.util.ParamUtils;
 import com.atomic.util.TestNGUtils;
 import com.atomic.util.ApplicationUtils;
-import com.atomic.util.ReflectionUtils;
+import com.atomic.param.util.ReflectionUtils;
 import com.google.common.collect.ImmutableList;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestContextManager;

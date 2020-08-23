@@ -5,7 +5,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.Method;
 import com.alibaba.fastjson.JSON;
 import com.atomic.param.Constants;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ParamUtils;
 import com.google.common.collect.Maps;
 
 import java.util.Map;

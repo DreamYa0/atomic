@@ -1,7 +1,7 @@
 package com.atomic.runner;
 
 import com.atomic.param.Constants;
-import com.atomic.util.FileUtils;
+import com.atomic.config.FileUtils;
 import com.google.common.collect.Lists;
 
 import java.io.IOException;

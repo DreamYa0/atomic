@@ -4,7 +4,7 @@ import com.alibaba.dubbo.rpc.RpcException;
 import com.alibaba.dubbo.rpc.service.GenericException;
 import com.alibaba.fastjson.JSONException;
 import com.atomic.param.Constants;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ParamUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.entity.MethodMetaUtils;
 import com.atomic.tools.report.ParamPrint;

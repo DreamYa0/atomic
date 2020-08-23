@@ -2,7 +2,6 @@ package com.atomic.config;
 
 
 import com.atomic.tools.mock.data.TestMode;
-import com.atomic.util.FileUtils;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 

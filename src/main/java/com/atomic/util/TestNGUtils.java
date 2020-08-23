@@ -2,7 +2,8 @@ package com.atomic.util;
 
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.param.Constants;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ParamUtils;
+import com.atomic.param.util.ReflectionUtils;
 import com.atomic.param.ResultCache;
 import org.testng.IClass;
 import org.testng.ITestResult;

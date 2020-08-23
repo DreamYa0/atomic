@@ -2,7 +2,7 @@ package com.atomic.tools.mock.data;
 
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.RpcResult;
-import com.atomic.param.ObjUtils;
+import com.atomic.param.util.ObjUtils;
 import com.atomic.tools.mock.dto.MockData;
 import com.atomic.tools.mock.dto.MockData4Rpc;
 import com.atomic.tools.mock.helper.MockFileHelper;

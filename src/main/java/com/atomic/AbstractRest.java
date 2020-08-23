@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.atomic.param.Constants.TEST_ONLY;
-import static com.atomic.param.ParamUtils.isValueTrue;
+import static com.atomic.param.util.ParamUtils.isValueTrue;
 
 
 /**

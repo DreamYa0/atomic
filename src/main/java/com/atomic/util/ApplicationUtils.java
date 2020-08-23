@@ -2,7 +2,7 @@ package com.atomic.util;
 
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.GetBeanException;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ParamUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

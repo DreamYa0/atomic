@@ -1,6 +1,6 @@
 package com.atomic;
 
-import com.atomic.util.DataProviderUtils;
+import com.atomic.param.util.DataProviderUtils;
 import org.testng.annotations.DataProvider;
 
 import java.lang.reflect.Method;

@@ -3,7 +3,7 @@ package com.atomic.tools.autotest;
 
 import com.atomic.annotations.AnnotationUtils;
 import com.atomic.exception.AutoTestException;
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ParamUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.values.AutoTestBigDecimalValues;
 import com.atomic.param.values.AutoTestBooleanValues;
@@ -16,8 +16,8 @@ import com.atomic.param.values.AutoTestLongValues;
 import com.atomic.param.values.AutoTestShortValues;
 import com.atomic.param.values.AutoTestStringValues;
 import com.atomic.param.values.IAutoTestValues;
-import com.atomic.util.ListUtils;
-import com.atomic.util.ReflectionUtils;
+import com.atomic.param.util.ReflectionUtils;
+import com.atomic.tools.util.ListUtils;
 import com.atomic.util.TestNGUtils;
 import com.g7.framework.common.dto.BaseRequest;
 import com.google.common.collect.Lists;
@@ -39,9 +39,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
-import static com.atomic.param.ObjUtils.getValue;
-import static com.atomic.param.ObjUtils.isBasicType;
-import static com.atomic.param.ParamUtils.getParamName;
+import static com.atomic.param.util.ObjUtils.getValue;
+import static com.atomic.param.util.ObjUtils.isBasicType;
+import static com.atomic.param.util.ParamUtils.getParamName;
 import static com.atomic.param.entity.MethodMetaUtils.getMethodMeta;
 import static java.util.Comparator.comparing;
 

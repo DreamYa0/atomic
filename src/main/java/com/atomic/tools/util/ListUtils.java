@@ -1,4 +1,4 @@
-package com.atomic.util;
+package com.atomic.tools.util;
 
 import com.google.common.collect.Lists;
 import org.springframework.util.CollectionUtils;

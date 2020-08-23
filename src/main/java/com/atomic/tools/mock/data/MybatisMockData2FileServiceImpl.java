@@ -1,7 +1,7 @@
 package com.atomic.tools.mock.data;
 
 import com.alibaba.fastjson.JSON;
-import com.atomic.param.ObjUtils;
+import com.atomic.param.util.ObjUtils;
 import com.atomic.tools.mock.dto.MockData4Db;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import org.apache.ibatis.plugin.Invocation;

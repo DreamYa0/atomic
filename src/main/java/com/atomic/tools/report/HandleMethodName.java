@@ -1,6 +1,6 @@
 package com.atomic.tools.report;
 
-import com.atomic.param.ParamUtils;
+import com.atomic.param.util.ParamUtils;
 import org.testng.IClass;
 import org.testng.ITestResult;
 
