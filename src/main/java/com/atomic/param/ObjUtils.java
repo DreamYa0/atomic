@@ -435,6 +435,7 @@ public final class ObjUtils {
             return parseDate(value);
         } else if (type instanceof Class && ((Class<?>) type).isEnum()) {
             //增加对枚举的处理
+
             return Enum.valueOf((Class) type, value);
         } else {
             // 支持sql语句
