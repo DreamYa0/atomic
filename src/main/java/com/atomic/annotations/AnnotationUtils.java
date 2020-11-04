@@ -36,7 +36,7 @@ public abstract class AnnotationUtils {
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     public static int getMaxTestCases(Method testMethod) {
