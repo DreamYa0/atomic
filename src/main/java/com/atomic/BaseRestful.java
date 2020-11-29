@@ -78,6 +78,7 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
     public void run(IHookCallBack callBack, ITestResult testResult) {
         // 有Ignore注解，就直接转测试代码
         if (isIgnoreMethod(TestNGUtils.getTestMethod(testResult))) {
+            // 直接执行@Test注解的测试方法
             callBack.runTestMethod(testResult);
             return;
         }
