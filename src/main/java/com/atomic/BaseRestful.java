@@ -244,6 +244,8 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
             }
         } else {
 
+            // POST 表单请求
+
             // 移除用例编号
             parameters.remove(Constants.CASE_INDEX);
 
