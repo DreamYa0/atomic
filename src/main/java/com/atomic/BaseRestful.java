@@ -261,6 +261,7 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
             }
         }
 
+        // 如果是场景测试
         if (isScenario(TestNGUtils.getTestMethod(testResult))) {
             // 保存测试场景接口入参对象
             saveTestRequestInCache(parameters, testResult, newContext);
@@ -286,16 +287,16 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
 
     @SuppressWarnings("unchecked")
     private void testCallBack(IHookCallBack callBack, ITestResult testResult) {
-        // 测试方法回调
+        // 取出整个测试过程中产生的测试数据以及入参
         Map<String, Object> context = (Map<String, Object>) testResult.getParameters()[0];
         try {
-            // 注入参数和结果，param 会去掉系统使用的一些数据
+            // 注入参数和结果给添加了@Test注解的测试方法
             injectResultAndParameters(context, testResult, this);
         } catch (Exception e) {
             Reporter.log("为TestCase方法注入入参和返回结果异常！");
             throw new InjectResultException(e);
         }
-        //回调测试方法
+        // 回调测试方法
         callBack.runTestMethod(testResult);
     }
 
