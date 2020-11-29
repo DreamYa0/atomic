@@ -25,15 +25,13 @@ public final class Constants {
     public static final String EXPECTED_RESULT = "expectedResult";
 
     /** 请求类型，如：GET,POST */
-    public static final String HTTP_MODE = "httpMode";
+    public static final String HTTP_MODE = "mode";
 
     /** 请求IP+端口号或域名 */
-    public static final String HTTP_HOST = "httpHost";
+    public static final String HTTP_HOST = "host";
 
     /** 请求URI路径 */
-    public static final String HTTP_METHOD = "httpMethod";
-
-    public static final String HTTP_ENTITY = "httpEntity";
+    public static final String HTTP_METHOD = "method";
 
     /** ContentType */
     public static final String CONTENT_TYPE = "contentType";
@@ -45,7 +43,7 @@ public final class Constants {
     public static final String CONTENT_TYPE_FROM = "application/x-www-form-urlencoded";
 
     /** 请求头 */
-    public static final String HTTP_HEADER = "httpHeader";
+    public static final String HTTP_HEADER = "header";
 
     /** 快捷登陆地址 */
     public static final String LOGIN_URL = "loginUrl";

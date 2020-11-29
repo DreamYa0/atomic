@@ -13,13 +13,32 @@ public class TesterConfigEntity implements Serializable {
 
     private static final long serialVersionUID = 2742985008776382196L;
 
+    /**
+     * 项目名称
+     */
     private String projectName = "";
+    /**
+     * 执行人
+     */
     private String runner = "";
     private String runMode = "debug";
     private String hostDomain;
+    /**
+     * dubbo服务版本
+     */
     private String serviceVersion;
+    /**
+     * 环境
+     */
     private String profile = "";
-    private String httpHost = "";
+    /**
+     * http 请求地址
+     */
+    private String host = "";
+    /**
+     * http 请求header
+     */
+    private String header;
     private List<String> mailAddrList;
 
     public String getProjectName() {
@@ -70,12 +89,12 @@ public class TesterConfigEntity implements Serializable {
         this.profile = profile;
     }
 
-    public String getHttpHost() {
-        return httpHost;
+    public String getHost() {
+        return host;
     }
 
-    public void setHttpHost(String httpHost) {
-        this.httpHost = httpHost;
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public List<String> getMailAddrList() {
@@ -84,5 +103,13 @@ public class TesterConfigEntity implements Serializable {
 
     public void setMailAddrList(List<String> mailAddrList) {
         this.mailAddrList = mailAddrList;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
     }
 }

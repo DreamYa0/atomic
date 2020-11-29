@@ -1,5 +1,6 @@
 package com.atomic.config;
 
+import cn.hutool.core.util.StrUtil;
 import com.atomic.exception.ParameterException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -73,9 +74,19 @@ public class AtomicConfig {
      */
     public String getHttpHost() {
         String httpHost = TesterConfig.getHttpHost();
-        if (httpHost == null || "".equals(httpHost)) {
+        if (StrUtil.isBlank(httpHost)) {
             throw new ParameterException("从配置中获取Http请求的域名或IP地址失败！");
         }
         return httpHost;
+    }
+
+    @SuppressWarnings("all")
+    public String getHeader() {
+        String header = TesterConfig.getHeader();
+        if (StrUtil.isNotBlank(header)) {
+            return header;
+        } else {
+            return StrUtil.EMPTY;
+        }
     }
 }

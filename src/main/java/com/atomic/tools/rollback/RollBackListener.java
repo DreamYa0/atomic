@@ -34,7 +34,8 @@ public class RollBackListener extends TestListenerAdapter {
     @Override
     public void onStart(ITestContext testContext) {
         ITestNGMethod[] testNGMethods = testContext.getAllTestMethods();
-        Map<String, String[]> dbName2TbNames = getDbName2TbNames8TestContext(testNGMethods, dbNameAndChanges);
+        Map<String, String[]> dbName2TbNames = getDbName2TbNames8TestContext(testNGMethods,
+                dbNameAndChanges);
         if (dbNameAndChanges.size() > 10) {
             Reporter.log("回滚数据库不能超过10个！");
             throw new RollBackException("回滚数据库不能超过10个！");
@@ -101,13 +102,8 @@ public class RollBackListener extends TestListenerAdapter {
                 Reporter.log("@RollBack 和 @RollBackAll 不能同时使用");
                 throw new AnnotationException("@RollBack 和 @RollBackAll 不能同时使用");
             } else if (rollBack.enabled()) {
-                if ("".equals(rollBack.dbName()) || rollBack.tableName().length == 0) {
-                    return false;
-                }
-            } else if (!rollBack.enabled()) {
-                return false;
-            }
-            return true;
+                return !"".equals(rollBack.dbName()) && rollBack.tableName().length != 0;
+            } else return rollBack.enabled();
         }
         return false;
     }
@@ -122,10 +118,7 @@ public class RollBackListener extends TestListenerAdapter {
                 if (rollBack != null) {
                     Reporter.log("@RollBack 和 @RollBackAll 不能同时使用");
                     throw new AnnotationException("@RollBack 和 @RollBackAll 不能同时使用");
-                } else if (!rollBackAll.enabled()) {
-                    return false;
-                }
-                return true;
+                } else return rollBackAll.enabled();
             }
         }
         return false;

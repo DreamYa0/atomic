@@ -1,5 +1,6 @@
 package com.atomic.param.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.atomic.exception.ParameterException;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
@@ -125,13 +127,13 @@ public final class ParamUtils {
             Set<String> keys = context.keySet();
             for (String key : keys) {
                 Object value = context.get(key);
-                if (Objects.isNull(value) || "".equals(value)) {
+                if (StringUtils.isEmpty(value) && !StringUtils.isEmpty(key)) {
 
                     String className = TestNGUtils.getTestCaseClassName(testResult);
                     String resource = instance.getClass().getResource("").getPath();
                     String filePath = resource + className + ".xls";
 
-                    ExcelResolver excel = new ExcelResolver(filePath,key);
+                    ExcelResolver excel = new ExcelResolver(filePath, key);
                     try {
                         List<Map<String, Object>> maps = excel.readDataByRow();
                         if (Boolean.FALSE.equals(CollectionUtils.isEmpty(maps))) {
@@ -246,7 +248,7 @@ public final class ParamUtils {
     }
 
     public static boolean isHttpHeaderNoNull(Map<String, Object> param) {
-        return param.get(Constants.HTTP_HEADER) != null;
+        return StrUtil.isNotBlank(param.get(Constants.HTTP_HEADER).toString());
     }
 
     public static boolean isLoginUrlNoNull(Map<String, Object> param) {
@@ -455,7 +457,6 @@ public final class ParamUtils {
         removeKey.add(Constants.HTTP_METHOD);
         removeKey.add(Constants.CONTENT_TYPE);
         removeKey.add(Constants.HTTP_HEADER);
-        removeKey.add(Constants.HTTP_ENTITY);
         removeKey.add(Constants.MESSAGE_TYPE);
         return removeKey;
     }
@@ -470,5 +471,11 @@ public final class ParamUtils {
             Reporter.log("接口请求 URI 路径不能为空！");
             throw new ParameterException("接口请求 URI 路径不能为空！");
         }
+    }
+
+    public static boolean isJsonContext(Map<String, Object> context) {
+        // 判断 ContentType 是否为 application/json
+        return Objects.nonNull(context.get(Constants.CONTENT_TYPE)) &&
+                Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(context.get(Constants.CONTENT_TYPE).toString());
     }
 }

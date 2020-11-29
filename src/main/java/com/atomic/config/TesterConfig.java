@@ -61,8 +61,11 @@ public class TesterConfig {
             if (properties.containsKey("service.version")) {
                 entity.setServiceVersion(properties.getProperty("service.version"));
             }
-            if (properties.containsKey("http.host")) {
-                entity.setHttpHost(properties.getProperty("http.host"));
+            if (properties.containsKey("host")) {
+                entity.setHost(properties.getProperty("host"));
+            }
+            if (properties.containsKey("header")) {
+                entity.setHeader(properties.getProperty("header"));
             }
 
         } catch (Exception e) {
@@ -84,7 +87,7 @@ public class TesterConfig {
     }
 
     public static String getHttpHost() {
-        return entity.getHttpHost();
+        return entity.getHost();
     }
 
     public static String getHostDomain() {
@@ -105,5 +108,9 @@ public class TesterConfig {
 
     public static void setProjectName(String projectName) {
         entity.setProjectName(projectName);
+    }
+
+    public static String getHeader() {
+        return entity.getHeader();
     }
 }

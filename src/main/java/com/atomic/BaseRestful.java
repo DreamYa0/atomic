@@ -1,12 +1,13 @@
 package com.atomic;
 
+import cn.hutool.core.util.StrUtil;
 import com.atomic.config.AtomicConfig;
 import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestResultCallback;
-import com.atomic.param.util.ParamUtils;
 import com.atomic.param.ResultCache;
+import com.atomic.param.util.ParamUtils;
 import com.atomic.tools.report.ReportListener;
 import com.atomic.tools.report.SaveRunTime;
 import com.atomic.tools.rollback.RollBackListener;
@@ -39,12 +40,10 @@ import static com.atomic.param.Constants.HTTP_HEADER;
 import static com.atomic.param.Constants.HTTP_HOST;
 import static com.atomic.param.Constants.HTTP_METHOD;
 import static com.atomic.param.Constants.HTTP_MODE;
-import static com.atomic.param.Constants.LOGIN_URL;
+import static com.atomic.param.ResultCache.saveTestRequestInCache;
 import static com.atomic.param.util.ParamUtils.isContentTypeNoNull;
 import static com.atomic.param.util.ParamUtils.isHttpHeaderNoNull;
 import static com.atomic.param.util.ParamUtils.isHttpHostNoNull;
-import static com.atomic.param.util.ParamUtils.isLoginUrlNoNull;
-import static com.atomic.param.ResultCache.saveTestRequestInCache;
 import static com.atomic.tools.assertcheck.AssertResult.assertResultForRest;
 import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
 import static com.atomic.tools.report.ParamPrint.resultPrint;
@@ -82,6 +81,7 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
             callBack.runTestMethod(testResult);
             return;
         }
+
         try {
             startTest(callBack, testResult);
         } catch (Exception e) {
@@ -91,25 +91,36 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
 
     private void startTest(IHookCallBack callBack, ITestResult testResult) throws Exception {
 
+        // 从testng上下文中获取测试入场
         Map<String, Object> context = TestNGUtils.getParamContext(testResult);
+
         //注入场景测试所需要的依赖方法的返回结果
         TestNGUtils.injectScenarioReturnResult(testResult, context);
+
         // 递归组合参数并转化为真实值
         Map<String, Object> newContext = ParamUtils.assemblyParamMap2RequestMap(testResult,
                 this, context);
-        // 先执行beforeTest
+
+        // 接口调用之前，先执行测试用例的beforeTest方法中的内容
         beforeTest(newContext);
+
         // 检查Http接口测试入参必填字段
         ParamUtils.checkKeyWord(newContext);
+
         //记录方法调用开始时间
         SaveRunTime.startTestTime(testResult);
-        // 执行接口调用
+
+        // 执行接口调用，并得到响应 Response
         Response response = startRequest(testResult, newContext);
+
         //记录方法调用结束时间
         SaveRunTime.endTestTime(testResult);
+
         // 缓存入参和返回值
         ResultCache.saveTestResultInCache(response, testResult, newContext);
-        execMethod(response, testResult, callBack, newContext);
+
+        // 处理得到的Response 并执行结果数据打印、结果断言
+        handleResponse(response, testResult, callBack, newContext);
     }
 
     @SuppressWarnings("all")
@@ -117,88 +128,113 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
         Headers headers;
         String httpHost;
         if (!isHttpHostNoNull(newContext)) {
+            // 如果测试用例中设置了host 则使用测试用例配置的
             httpHost = AtomicConfig.newInstance().getHttpHost();
         } else {
+            // 否则获取全局配置的host
             httpHost = newContext.get(HTTP_HOST).toString();
         }
         RequestSpecification specification = given().baseUri(httpHost)
-                // 编码设置
-                .config(config().encoderConfig(encoderConfig().defaultContentCharset(defaultCharset())))
-                // SSL 设置
+                // 字符编码设置
+                .config(config().encoderConfig(
+                        encoderConfig().defaultContentCharset(defaultCharset())))
+                // SSL设置，实现对Https的支持
                 .config(config().sslConfig(sslConfig().allowAllHostnames()));
 
         //设置ContentType
         setContentType(specification, newContext);
 
-        if (isLoginUrlNoNull(newContext)) {
-            // 调用快捷登录
-            headers = given().get(newContext.get(LOGIN_URL).toString()).getHeaders();
-            specification = specification.headers(headers);
-        } else if (isHttpHeaderNoNull(newContext) && newContext.get(HTTP_HEADER) != null) {
-
-            // 把Header json字符串反序列化为List<Header>
-            String headerStr = newContext.get(HTTP_HEADER).toString();
-            List<Map<String, String>> headerMapList = GsonUtils.getGson().fromJson(headerStr,
-                    new TypeToken<List<Map<String, String>>>() {}.getType());
-
-            List<Header> headerList = Lists.newArrayList();
-
-            for (Map<String, String> header : headerMapList) {
-                Set<Map.Entry<String, String>> entries = header.entrySet();
-                for (Map.Entry<String, String> entry : entries) {
-                    Header head = new Header(entry.getKey(), entry.getValue());
-                    headerList.add(head);
-                }
-            }
-
-            specification = specification.headers(new Headers(headerList));
+        // 获取header配置的优先级为，先从测试用例配置中获取，如果测试用例没有配置，则获取全局的配置，如果全局配置没有配置header信息
+        // 否则不设置header信息
+        if (isHttpHeaderNoNull(newContext) && StrUtil.isNotBlank(newContext.get(HTTP_HEADER).toString())) {
+            // 从测试用例中获取header信息
+            String header = newContext.get(HTTP_HEADER).toString();
+            specification = setHeader(specification, header);
+        } else {
+            // 从全局配置文件 test.properties文件中获取全局header配置信息
+            String header = AtomicConfig.newInstance().getHeader();
+            // 如果从全局配置文件中获取到header信息，则使用全局配置到信息
+            // 设置全局header配置信息
+            specification = setHeader(specification, header);
         }
-        return getResponse(testResult, specification, newContext);
+
+        // 执行Http接口请求调用
+        return doRequest(testResult, specification, newContext);
     }
 
     @SuppressWarnings("all")
-    private Response getResponse(ITestResult testResult,
-                                 RequestSpecification specification,
-                                 Map<String, Object> newContext) {
+    private RequestSpecification setHeader(RequestSpecification specification, String header) {
+        // 把Json字符串反序列化为Map<String,String>集合
+        Map<String, String> headerMap = GsonUtils.getGson().fromJson(header,
+                new TypeToken<Map<String, String>>() {
+                }.getType());
+
+        List<Header> headers = Lists.newArrayList();
+
+        // 构造Header对象集合
+        Set<Map.Entry<String, String>> entries = headerMap.entrySet();
+        for (Map.Entry<String, String> entry : entries) {
+            Header head = new Header(entry.getKey(), entry.getValue());
+            headers.add(head);
+        }
+
+        // 设置Header
+        specification = specification.headers(new Headers(headers));
+        return specification;
+    }
+
+    @SuppressWarnings("all")
+    private Response doRequest(ITestResult testResult,
+                               RequestSpecification specification,
+                               Map<String, Object> newContext) {
 
         Response response;
+        // 从测试用例中获取请求类型，如：POST、GET
         String httpMode = newContext.get(HTTP_MODE).toString();
+        // 从测试用例中获取请求地址
         String uri = newContext.get(HTTP_METHOD).toString();
 
         // 复制一份否则操作时会影响到测试上下文中的context
         Map<String, Object> copyContext = Maps.newHashMap(newContext);
 
-        // 去除excel中的描述字段
+        // 去除excel中的描述字段，如果 header、host等字段，留下真正的入参数据字段
         Map<String, Object> parameters = ParamUtils.getParameters(copyContext);
 
+        // 如果是GET请求
         if (Constants.HTTP_GET.equalsIgnoreCase(httpMode)) {
+            // 如果有参数
             if (parameters.size() > 0) {
-
+                // 移除用例编号
                 parameters.remove(Constants.CASE_INDEX);
-
+                // 设置入参
                 response = specification.params(parameters).when().get(uri);
                 newContext.put(Constants.PARAMETER_NAME_, parameters);
 
             } else {
+                // 如果没有入参，则不设置入参
                 response = specification.when().get(uri);
                 newContext.put(Constants.PARAMETER_NAME_, "");
             }
-        } else if (Constants.HTTP_POST.equalsIgnoreCase(httpMode) && isJsonContext(newContext)) {
+        } else if (Constants.HTTP_POST.equalsIgnoreCase(httpMode) &&
+                ParamUtils.isJsonContext(newContext)) {
             // POST Json请求
             if (parameters.containsKey("request")) {
 
                 String request = parameters.get("request").toString();
 
+                // 执行接口调用
                 response = specification.body(request).when().post(uri);
+
                 newContext.put(Constants.PARAMETER_NAME_, parameters.get("request"));
 
-                parameters = GsonUtils.getGson().fromJson(request, new TypeToken<Map<String, Objects>>() {}.getType());
+                parameters = GsonUtils.getGson().fromJson(request,
+                        new TypeToken<Map<String, Objects>>() {}.getType());
 
             } else {
 
-                // 构造出真正的入参
+                // 移除用例编号
                 parameters.remove(Constants.CASE_INDEX);
-
+                // 执行接口调用
                 response = specification.body(parameters).when().post(uri);
 
                 // 把入参和返回结果存入context中方便后续打印输出、测试报告展示等操作
@@ -207,16 +243,18 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
             }
         } else {
 
+            // 移除用例编号
             parameters.remove(Constants.CASE_INDEX);
 
             if (Boolean.FALSE.equals(CollectionUtils.isEmpty(parameters))) {
-
                 // POST 有参表单提交
+                // 执行接口调用
                 response = specification.params(parameters).when().post(uri);
                 newContext.put(Constants.PARAMETER_NAME_, parameters);
 
             } else {
                 // POST 无参表单提交
+                // 执行接口调用
                 response = specification.when().post(uri);
                 newContext.put(Constants.PARAMETER_NAME_, "");
             }
@@ -230,24 +268,18 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
         return response;
     }
 
-    private boolean isJsonContext(Map<String, Object> context) {
-        // 判断 ContentType 是否为 application/json
-        return Objects.nonNull(context.get(Constants.CONTENT_TYPE)) &&
-                Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(context.get(Constants.CONTENT_TYPE).toString());
-    }
+    private void handleResponse(Response response,
+                                ITestResult testResult,
+                                IHookCallBack callBack,
+                                Map<String, Object> context) throws Exception {
 
-    private void execMethod(Response response,
-                            ITestResult testResult,
-                            IHookCallBack callBack,
-                            Map<String, Object> context) throws Exception {
-
-        String result = response.body().asString();
         // 打印测试结果
         resultPrint(getTestMethodName(testResult), response, context);
         //回调函数，为testCase方法传入，入参和返回结果
         ITestResultCallback callback = paramAndResultCallBack();
         // 自动断言
         assertResultForRest(response, testResult, this, context, callback);
+        // 回调testng 有@Test注解的测试方法
         testCallBack(callBack, testResult);
     }
 
