@@ -28,6 +28,10 @@ public class TesterConfigEntity implements Serializable {
      */
     private String serviceVersion;
     /**
+     * dubbo服务组
+     */
+    private String serviceGroup;
+    /**
      * 环境
      */
     private String profile = "";
@@ -111,5 +115,13 @@ public class TesterConfigEntity implements Serializable {
 
     public void setHeader(String header) {
         this.header = header;
+    }
+
+    public String getServiceGroup() {
+        return serviceGroup;
+    }
+
+    public void setServiceGroup(String serviceGroup) {
+        this.serviceGroup = serviceGroup;
     }
 }

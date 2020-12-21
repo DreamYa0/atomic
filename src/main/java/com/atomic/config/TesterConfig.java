@@ -61,6 +61,9 @@ public class TesterConfig {
             if (properties.containsKey("service.version")) {
                 entity.setServiceVersion(properties.getProperty("service.version"));
             }
+            if (properties.containsKey("service.group")) {
+                entity.setServiceGroup(properties.getProperty("service.group"));
+            }
             if (properties.containsKey("host")) {
                 entity.setHost(properties.getProperty("host"));
             }
@@ -80,6 +83,10 @@ public class TesterConfig {
 
     public static String getServiceVersion() {
         return entity.getServiceVersion();
+    }
+
+    public static String getServiceGroup() {
+        return entity.getServiceGroup();
     }
 
     public static String getProfile() {

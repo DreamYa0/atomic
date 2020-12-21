@@ -1,5 +1,7 @@
 package com.atomic.annotations;
 
+import cn.hutool.core.util.StrUtil;
+import com.atomic.config.TesterConfig;
 import com.atomic.exception.AnnotationException;
 import com.atomic.param.Constants;
 import com.atomic.tools.autotest.AutoTest;
@@ -19,6 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.atomic.util.TestNGUtils.getTestMethod;
 
 /**
  * 通用注解工具类
@@ -133,9 +137,51 @@ public abstract class AnnotationUtils {
         return true;
     }
 
+    public static boolean isServiceGroup(Method method) {
+        // 判断@ServicesVersion注解是否存在
+        Annotation[] annotations = method.getAnnotations();
+        if (annotations != null) {
+            ServiceGroup serviceGroup = method.getAnnotation(ServiceGroup.class);
+            if (serviceGroup == null) {
+                return false;
+            }
+            if ("".equals(serviceGroup.group())) {
+                Reporter.log("dubbo服务组名称不能为空！");
+                throw new AnnotationException("dubbo服务组名称不能为空！");
+            }
+        }
+        return true;
+    }
+
     public static String getServiceVersion(Method method) {
         // 获取dubbo版本号
         ServiceVersion serviceVersion = method.getAnnotation(ServiceVersion.class);
         return serviceVersion.version();
+    }
+
+    public static String getDubboVersion(ITestResult testResult) {
+        String dubboServiceVersion = null;
+        if (TesterConfig.getServiceVersion() != null) {
+            dubboServiceVersion = TesterConfig.getServiceVersion();
+        } else if (isServiceVersion(getTestMethod(testResult))) {
+            dubboServiceVersion = getServiceVersion(getTestMethod(testResult));
+        }
+        return dubboServiceVersion;
+    }
+
+    public static String getServiceGroup(Method method) {
+        // 获取dubbo组
+        ServiceGroup serviceGroup = method.getAnnotation(ServiceGroup.class);
+        return serviceGroup.group();
+    }
+
+    public static String getDubboGroup(ITestResult testResult) {
+        String dubboGroup = null;
+        if (StrUtil.isNotBlank(TesterConfig.getServiceGroup())) {
+            dubboGroup = TesterConfig.getServiceGroup();
+        } else if (isServiceGroup(getTestMethod(testResult))) {
+            dubboGroup = getServiceGroup(getTestMethod(testResult));
+        }
+        return dubboGroup;
     }
 }

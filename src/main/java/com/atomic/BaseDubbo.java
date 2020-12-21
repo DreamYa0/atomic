@@ -1,17 +1,16 @@
 package com.atomic;
 
 import com.atomic.annotations.AnnotationUtils;
-import com.atomic.config.TesterConfig;
 import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
 import com.atomic.exception.InvokeException;
 import com.atomic.exception.ParameterException;
 import com.atomic.param.ITestMethodMultiTimes;
 import com.atomic.param.ITestResultCallback;
-import com.atomic.param.util.ObjUtils;
-import com.atomic.param.util.ParamUtils;
 import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.entity.MethodMetaUtils;
+import com.atomic.param.util.ObjUtils;
+import com.atomic.param.util.ParamUtils;
 import com.atomic.tools.autotest.AutoTestManager;
 import com.atomic.tools.autotest.AutoTestMode;
 import com.atomic.tools.dubbo.DubboServiceFactory;
@@ -34,11 +33,9 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
-import static com.atomic.annotations.AnnotationUtils.getServiceVersion;
 import static com.atomic.annotations.AnnotationUtils.isAutoTest;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
-import static com.atomic.annotations.AnnotationUtils.isServiceVersion;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
 import static com.atomic.param.Constants.CASE_NAME;
 import static com.atomic.param.Constants.PARAMETER_NAME_;
@@ -105,19 +102,15 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
         String testMethodName = null;
         CompletableFuture<Object> future = new CompletableFuture<>();
         try {
-            String dubboServiceVersion = null;
-            if (TesterConfig.getServiceVersion() != null) {
-                dubboServiceVersion = TesterConfig.getServiceVersion();
-            } else if (isServiceVersion(getTestMethod(testResult))) {
-                dubboServiceVersion = getServiceVersion(getTestMethod(testResult));
-            }
+
             // 获取被测接口定义
             clazz = MethodMetaUtils.getInterfaceClass(this);
             Class<? extends T> finalClazz = clazz;
-            String finalDubboServiceVersion = dubboServiceVersion;
             // 异步加载
+            String dubboServiceVersion = AnnotationUtils.getDubboVersion(testResult);
+            String dubboGroup = AnnotationUtils.getDubboGroup(testResult);
             future = CompletableFuture.supplyAsync(() -> dubboServiceFactory.getService(finalClazz,
-                    finalDubboServiceVersion));
+                    dubboServiceVersion, dubboGroup));
 
             if (testResult.getParameters() == null || testResult.getParameters().length == 0) {
                 Reporter.log("获取测试入参异常！");

@@ -65,16 +65,16 @@ public class DubboServiceFactory {
      * 获取远程服务代理
      *
      * @param clazz   clazz
-     * @param version 服务版本
+     * @param param 服务版本
      * @param <T>     类型
      * @return 实例
      */
-    public <T> T getService(Class<? extends T> clazz, String... version) {
+    public <T> T getService(Class<? extends T> clazz, String... param) {
         //为获取覆盖率做全局配置,强制指定请求服务地址
         try {
             if (TesterConfig.getHostDomain() != null) {
                 String url = "dubbo://" + TesterConfig.getHostDomain() + "/" + clazz.getName();
-                T t = getServiceByUrl(clazz, url, version);
+                T t = getServiceByUrl(clazz, url, param[0], param[1]);
                 checkService(t, clazz);
                 return t;
                 //此处获取url的方式不够稳定 可能有风险
@@ -82,16 +82,17 @@ public class DubboServiceFactory {
         } catch (Exception e) {
             throw new DubboServiceException("获取dubbo服务异常！", e);
         }
-        return getService(clazz, profile, version[0]);
+        return getService(clazz, profile, param[0], param[1]);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T getService(Class<? extends T> clazz, String profile, String version) {
+    private <T> T getService(Class<? extends T> clazz, String profile, String version, String group) {
         // 先从缓存中获取服务，如果本地缓存没有此服务则从远程注册中心获取
         String key = clazz.getName() + "_" + profile + "_" + version;
         Object object;
         try {
-            object = serviceCache.get(key, () -> getRemoteService(clazz, version));
+            object = serviceCache.get(key, () -> getRemoteService(clazz, version,
+                    group));
         } catch (ExecutionException e) {
             Reporter.log("获取远程服务失败！");
             throw new DubboServiceException("获取dubbo服务异常！", e);
@@ -99,13 +100,16 @@ public class DubboServiceFactory {
         return (T) object;
     }
 
-    private <T> T getRemoteService(Class<? extends T> clazz, String version) {
+    private <T> T getRemoteService(Class<? extends T> clazz, String version, String group) {
         // 引用远程服务，从远程注册中心获取服务
         ReferenceConfig<T> reference = new ReferenceConfig<>();
         reference.setApplication(application);
         reference.setRegistry(registry);
         if (StrUtil.isNotBlank(version)) {
             reference.setVersion(version);
+        }
+        if (StrUtil.isNotBlank(group)) {
+            reference.setGroup(group);
         }
         reference.setTimeout(10000);
         reference.setInterface(clazz);
@@ -159,15 +163,18 @@ public class DubboServiceFactory {
         return genericService;
     }
 
-    private <T> T getServiceByUrl(Class<? extends T> clazz, String url, String... version) {
+    private <T> T getServiceByUrl(Class<? extends T> clazz, String url , String version, String group) {
         // 获取点对点直连的service
         ReferenceConfig<T> reference = new ReferenceConfig<>();
         reference.setApplication(application);
         reference.setUrl(url);
         reference.setInterface(clazz);
         reference.setTimeout(10000);
-        if (version != null && version.length != 0) {
-            reference.setVersion(version[0]);
+        if (StrUtil.isNotBlank(version)) {
+            reference.setVersion(version);
+        }
+        if (StrUtil.isNotBlank(group)) {
+            reference.setGroup(group);
         }
         return reference.get();
     }
