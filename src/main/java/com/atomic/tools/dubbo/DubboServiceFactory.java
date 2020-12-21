@@ -63,18 +63,18 @@ public class DubboServiceFactory {
 
     /**
      * 获取远程服务代理
-     *
      * @param clazz   clazz
-     * @param param 服务版本
+     * @param version 服务版本
+     * @param group   服务组
      * @param <T>     类型
      * @return 实例
      */
-    public <T> T getService(Class<? extends T> clazz, String... param) {
+    public <T> T getService(Class<? extends T> clazz, String version, String group) {
         //为获取覆盖率做全局配置,强制指定请求服务地址
         try {
             if (TesterConfig.getHostDomain() != null) {
                 String url = "dubbo://" + TesterConfig.getHostDomain() + "/" + clazz.getName();
-                T t = getServiceByUrl(clazz, url, param[0], param[1]);
+                T t = getServiceByUrl(clazz, url, version, group);
                 checkService(t, clazz);
                 return t;
                 //此处获取url的方式不够稳定 可能有风险
@@ -82,7 +82,7 @@ public class DubboServiceFactory {
         } catch (Exception e) {
             throw new DubboServiceException("获取dubbo服务异常！", e);
         }
-        return getService(clazz, profile, param[0], param[1]);
+        return getService(clazz, profile, version, group);
     }
 
     @SuppressWarnings("unchecked")
@@ -163,7 +163,7 @@ public class DubboServiceFactory {
         return genericService;
     }
 
-    private <T> T getServiceByUrl(Class<? extends T> clazz, String url , String version, String group) {
+    private <T> T getServiceByUrl(Class<? extends T> clazz, String url, String version, String group) {
         // 获取点对点直连的service
         ReferenceConfig<T> reference = new ReferenceConfig<>();
         reference.setApplication(application);
