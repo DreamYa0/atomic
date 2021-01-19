@@ -1,9 +1,0 @@
-interfaceName: "Http接口名称"
-httpCaseList:
-- caseName: "用例标题"
-  testOnly: false
-  mode: ""
-  host: ""
-  method: ""
-  data: ""
-  expectResult: ""
