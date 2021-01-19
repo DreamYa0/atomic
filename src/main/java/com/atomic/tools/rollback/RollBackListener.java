@@ -103,7 +103,9 @@ public class RollBackListener extends TestListenerAdapter {
                 throw new AnnotationException("@RollBack 和 @RollBackAll 不能同时使用");
             } else if (rollBack.enabled()) {
                 return !"".equals(rollBack.dbName()) && rollBack.tableName().length != 0;
-            } else return rollBack.enabled();
+            } else {
+                return rollBack.enabled();
+            }
         }
         return false;
     }
@@ -118,7 +120,9 @@ public class RollBackListener extends TestListenerAdapter {
                 if (rollBack != null) {
                     Reporter.log("@RollBack 和 @RollBackAll 不能同时使用");
                     throw new AnnotationException("@RollBack 和 @RollBackAll 不能同时使用");
-                } else return rollBackAll.enabled();
+                } else {
+                    return rollBackAll.enabled();
+                }
             }
         }
         return false;

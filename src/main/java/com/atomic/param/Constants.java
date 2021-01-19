@@ -66,6 +66,12 @@ public final class Constants {
     /** 接口入参对象 */
     public static final String PARAMETER_NAME_ = "m_parameter_";
 
+    /** Yaml中true字段值 */
+    public static final String YAML_TRUE = "true";
+
+    /** Yaml中false字段值 */
+    public static final String YAML_FALSE = "false";
+
     /** excel中Y字段值 */
     public static final String EXCEL_YES = "Y";
 
