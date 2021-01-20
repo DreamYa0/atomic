@@ -215,7 +215,8 @@ public final class ParamUtils {
     public static boolean isValueTrue(Object value) {
         // 只有 1 或 Y 返回true
         return value != null && ("1".equalsIgnoreCase(value.toString()) ||
-                Constants.EXCEL_YES.equalsIgnoreCase(value.toString()));
+                Constants.EXCEL_YES.equalsIgnoreCase(value.toString()) ||
+                Constants.YAML_TRUE.equals(value.toString().toLowerCase()));
     }
 
     public static boolean isExpectSuccess(Map<String, Object> param) {

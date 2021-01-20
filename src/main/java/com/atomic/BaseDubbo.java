@@ -313,6 +313,7 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
                     Reporter.log("为TestCase方法注入入参和返回结果异常！");
                     throw new InjectResultException(e);
                 }
+                Object[] temps = callBack.getParameters();
                 //回调测试方法
                 callBack.runTestMethod(testResult);
             }

@@ -94,6 +94,7 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
         initEmbeddedDataSource();
     }
 
+    @Override
     public void initDb() {
 
     }
