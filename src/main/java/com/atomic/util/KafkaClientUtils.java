@@ -59,7 +59,7 @@ public final class KafkaClientUtils {
             }
 
             producer.flush();
-            producer.close();
+            closePdr();
         }
     }
 
@@ -116,22 +116,11 @@ public final class KafkaClientUtils {
      * @param recordList Kafka消息列表
      * @param interval 发送消息间隔
      */
-    public static void AsyncSend(List<ProducerRecord> recordList, int interval) {
+    public static void asyncSend(List<ProducerRecord> recordList, int interval) {
         if (null != recordList && recordList.size() > 0) {
             for (ProducerRecord record: recordList) {
                 // 发送消息
-                producer.send(record, new Callback() {
-                    @Override
-                    public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                        if (null != e) {
-                            e.printStackTrace();
-                        } else {
-                            System.out.println(String.format("offset: %s, partition: %s",
-                                    recordMetadata.offset(),
-                                    recordMetadata.partition()));
-                        }
-                    }
-                });
+                asyncSend(record);
                 // 发送消息间隔
                 if (interval > 0) {
                     try {
@@ -141,7 +130,36 @@ public final class KafkaClientUtils {
                     }
                 }
             }
-            producer.close();
+            closePdr();
         }
+    }
+
+    /**
+     * 异步方式发送消息到Kafka
+     * @param record Kafka消息
+     */
+    public static void asyncSend(ProducerRecord record) {
+        if (record != null) {
+            // 发送消息
+            producer.send(record, new Callback() {
+                @Override
+                public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                    if (null != e) {
+                        e.printStackTrace();
+                    } else {
+                        System.out.println(String.format("offset: %s, partition: %s",
+                                recordMetadata.offset(),
+                                recordMetadata.partition()));
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 关闭生产者
+     */
+    public static void closePdr() {
+        producer.close();
     }
 }
