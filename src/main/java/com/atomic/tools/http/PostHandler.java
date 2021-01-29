@@ -38,9 +38,6 @@ public class PostHandler implements IHandler {
                     request.contentType(Constants.CONTENT_TYPE_FROM);
                     Map<String, Object> newParam = ParamUtils.getParameters(newContext);
                     // TODO: 2018/6/9 递归处理map
-                    if (newParam.containsKey("expectResult")) {
-                        newParam.remove("expectResult");
-                    }
                     request.form(newParam);
                     return request.execute();
                 } else if (Constants.CONTENT_TYPE_JSON.equalsIgnoreCase(newContext.get(
