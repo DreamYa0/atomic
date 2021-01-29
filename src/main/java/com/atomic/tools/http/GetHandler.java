@@ -33,6 +33,9 @@ public class GetHandler implements IHandler {
                 Map<String, Object> newParam = ParamUtils.getParameters(newContext);
                 // TODO: 2018/6/9 递归处理map
                 if (!newParam.isEmpty()) {
+                    if (newParam.containsKey("expectResult")) {
+                        newParam.remove("expectResult");
+                    }
                     request.form(newParam);
                 }
                 return request.execute();
