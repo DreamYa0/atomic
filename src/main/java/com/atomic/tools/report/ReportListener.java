@@ -214,9 +214,11 @@ public class ReportListener implements IReporter {
                     String filePath = resource + className + ".xls";
 
                     ExcelResolver excel = new ExcelResolver(filePath, "exceptResult");
-                    Map<String, Object> exceptResult = excel.readDataByRow(
-                            Integer.parseInt(context.get(Constants.CASE_INDEX).toString()));
-                    test.info("断言内容：" + GsonUtils.getGson().toJson(exceptResult));
+                    if (excel.excelDatas().size() > 0) {
+                        Map<String, Object> exceptResult = excel.readDataByRow(
+                                Integer.parseInt(context.get(Constants.CASE_INDEX).toString()));
+                        test.info("断言内容：" + GsonUtils.getGson().toJson(exceptResult));
+                    }
                 }
 
 
