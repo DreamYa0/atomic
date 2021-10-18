@@ -12,6 +12,7 @@ public class YamlResolver {
      * @param file
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getCaseListFromYaml(File file) {
         Map<String, Object> yamlMap = null;
 

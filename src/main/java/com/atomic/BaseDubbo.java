@@ -18,7 +18,6 @@ import com.atomic.tools.report.HandleMethodName;
 import com.atomic.tools.report.ParamPrint;
 import com.atomic.tools.report.ReportListener;
 import com.atomic.tools.rollback.RollBackListener;
-import com.atomic.util.MapUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.testng.IHookCallBack;
@@ -160,9 +159,9 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
         toHeavy4ListMap(allTestCases);
         System.out.println("------------------- 自动化测试开始，测试用例数量：" +
                 allTestCases.size() + " -------------------");
-        allTestCases.forEach(Param -> {
+        allTestCases.forEach(sourceParam -> {
             // 合并参数
-            MapUtils.mergeMap(paramMap, Param);
+            paramMap.putAll(sourceParam);
             try {
                 startRunTest(testResult, clazz, paramMap, testMethodName, future);
             } catch (Exception e) {

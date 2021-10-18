@@ -7,16 +7,15 @@ import com.atomic.exception.ParameterException;
 import com.atomic.param.Constants;
 import com.atomic.param.ITestMethodMultiTimes;
 import com.atomic.param.ITestResultCallback;
+import com.atomic.param.entity.MethodMeta;
 import com.atomic.param.util.ObjUtils;
 import com.atomic.param.util.ParamUtils;
-import com.atomic.param.entity.MethodMeta;
 import com.atomic.tools.assertcheck.AssertCheckUtils;
 import com.atomic.tools.autotest.AutoTestMode;
 import com.atomic.tools.mock.data.TestMethodMode;
 import com.atomic.tools.mock.helper.MockFileHelper;
 import com.atomic.tools.report.ReportListener;
 import com.atomic.tools.rollback.RollBackListener;
-import com.atomic.util.MapUtils;
 import com.atomic.util.TestNGUtils;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
@@ -52,19 +51,16 @@ import java.util.concurrent.Executors;
 
 import static com.atomic.annotations.AnnotationUtils.getAutoTestMode;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
-import static com.atomic.param.Constants.EXCEL_DESC;
-import static com.atomic.param.Constants.PARAMETER_NAME_;
-import static com.atomic.param.Constants.RESULT_NAME;
-import static com.atomic.param.Constants.THREAD_COUNT;
+import static com.atomic.param.Constants.*;
+import static com.atomic.param.ResultCache.saveTestRequestInCache;
+import static com.atomic.param.ResultCache.saveTestResultInCache;
+import static com.atomic.param.entity.MethodMetaUtils.getMethodMeta;
 import static com.atomic.param.util.ParamUtils.isAutoTest;
 import static com.atomic.param.util.ParamUtils.isExpectSuccess;
-import static com.atomic.param.entity.MethodMetaUtils.getMethodMeta;
 import static com.atomic.tools.assertcheck.AssertResult.assertResult;
 import static com.atomic.tools.autotest.AutoTestManager.generateAutoTestCases;
 import static com.atomic.tools.mock.data.MockContext.getContext;
 import static com.atomic.tools.report.ParamPrint.resultPrint;
-import static com.atomic.param.ResultCache.saveTestRequestInCache;
-import static com.atomic.param.ResultCache.saveTestResultInCache;
 import static com.atomic.tools.report.SaveRunTime.endTestTime;
 import static com.atomic.tools.report.SaveRunTime.startTestTime;
 import static com.atomic.util.ApplicationUtils.getBean;
@@ -166,7 +162,8 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
         Map<String, List<Map<String, Object>>> exceptionMsgs = Maps.newHashMap();
         allTestCases.forEach(newParam -> {
             try {
-                MapUtils.mergeMap(TestNGUtils.getParamContext(testResult), newParam);// 合并参数
+                // 合并参数
+                TestNGUtils.getParamContext(testResult).putAll(newParam);
                 startRunTest(newParam, callBack, testResult);
             } catch (Exception e) {
                 if (exception[0] == null) {
