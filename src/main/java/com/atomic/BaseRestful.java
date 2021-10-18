@@ -1,6 +1,7 @@
 package com.atomic;
 
 import cn.hutool.core.util.StrUtil;
+import com.atomic.config.ConfigConstants;
 import com.atomic.config.AtomicConfig;
 import com.atomic.exception.ExceptionManager;
 import com.atomic.exception.InjectResultException;
@@ -36,14 +37,9 @@ import java.util.Set;
 import static com.atomic.annotations.AnnotationUtils.isIgnoreMethod;
 import static com.atomic.annotations.AnnotationUtils.isScenario;
 import static com.atomic.param.CallBack.paramAndResultCallBack;
-import static com.atomic.param.Constants.HTTP_HEADER;
-import static com.atomic.param.Constants.HTTP_HOST;
-import static com.atomic.param.Constants.HTTP_METHOD;
-import static com.atomic.param.Constants.HTTP_MODE;
+import static com.atomic.param.Constants.*;
 import static com.atomic.param.ResultCache.saveTestRequestInCache;
-import static com.atomic.param.util.ParamUtils.isContentTypeNoNull;
-import static com.atomic.param.util.ParamUtils.isHttpHeaderNoNull;
-import static com.atomic.param.util.ParamUtils.isHttpHostNoNull;
+import static com.atomic.param.util.ParamUtils.*;
 import static com.atomic.tools.assertcheck.AssertResult.assertResultForRest;
 import static com.atomic.tools.report.HandleMethodName.getTestMethodName;
 import static com.atomic.tools.report.ParamPrint.resultPrint;
@@ -130,7 +126,7 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
         String httpHost;
         if (!isHttpHostNoNull(newContext)) {
             // 如果测试用例中设置了host 则使用测试用例配置的
-            httpHost = AtomicConfig.newInstance().getHttpHost();
+            httpHost = AtomicConfig.getStr(ConfigConstants.HTTP_HOST);
         } else {
             // 否则获取全局配置的host
             httpHost = newContext.get(HTTP_HOST).toString();
@@ -153,7 +149,7 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
             specification = setHeader(specification, header);
         } else {
             // 从全局配置文件 test.properties文件中获取全局header配置信息
-            String header = AtomicConfig.newInstance().getHeader();
+            String header = AtomicConfig.getStr(ConfigConstants.HTTP_HEADER);
             // 如果从全局配置文件中获取到header信息，则使用全局配置到信息
             // 设置全局header配置信息
             specification = setHeader(specification, header);

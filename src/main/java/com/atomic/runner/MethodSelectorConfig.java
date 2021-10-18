@@ -1,14 +1,11 @@
 package com.atomic.runner;
 
-import com.atomic.param.Constants;
-import com.atomic.config.FileUtils;
+import com.atomic.config.ConfigConstants;
+import com.atomic.config.AtomicConfig;
 import com.google.common.collect.Lists;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author dreamyao
@@ -19,36 +16,28 @@ import java.util.Properties;
 public class MethodSelectorConfig {
 
     public static final MethodSelectorConfig INSTANCE = new MethodSelectorConfig();
-    private static final String testConfFilePath = "/test.properties";
-    private List<String> packageList = Lists.newArrayList();
-    private List<String> groupList = Lists.newArrayList();
-    private List<String> classList = Lists.newArrayList();
+    private final List<String> packageList = Lists.newArrayList();
+    private final List<String> groupList = Lists.newArrayList();
+    private final List<String> classList = Lists.newArrayList();
 
     private MethodSelectorConfig() {
         String packages;
         String groups;
         String methods;
-        InputStream in = FileUtils.getTestFileInputStream(testConfFilePath);
-        Properties properties = new Properties();
-        try {
-            properties.load(in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (properties.containsKey(Constants.RUN_TEST_PACKAGES)) {
-            packages = properties.getProperty(Constants.RUN_TEST_PACKAGES);
+        if (AtomicConfig.containsKey(ConfigConstants.RUN_TEST_PACKAGES)) {
+            packages = AtomicConfig.getStr(ConfigConstants.RUN_TEST_PACKAGES);
             if (packages != null && !"".equals(packages)) {
                 packageList.addAll(Arrays.asList(packages.split(",")));
             }
         }
-        if (properties.containsKey(Constants.RUN_TEST_GROUPS)) {
-            groups = properties.getProperty(Constants.RUN_TEST_GROUPS);
+        if (AtomicConfig.containsKey(ConfigConstants.RUN_TEST_GROUPS)) {
+            groups = AtomicConfig.getStr(ConfigConstants.RUN_TEST_GROUPS);
             if (groups != null && !"".equals(groups)) {
                 groupList.addAll(Arrays.asList(groups.split(",")));
             }
         }
-        if (properties.containsKey(Constants.RUN_TEST_CLASSES)) {
-            methods = properties.getProperty(Constants.RUN_TEST_CLASSES);
+        if (AtomicConfig.containsKey(ConfigConstants.RUN_TEST_CLASSES)) {
+            methods = AtomicConfig.getStr(ConfigConstants.RUN_TEST_CLASSES);
             if (methods != null && !"".equals(methods)) {
                 classList.addAll(Arrays.asList(methods.split(",")));
             }

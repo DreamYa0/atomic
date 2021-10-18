@@ -3,11 +3,7 @@ package com.atomic.schema;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author dreamyao
@@ -19,18 +15,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Configuration
-@Import(AtomicAutoTestRegistrar.class)
+@Import(AtomicAutoTestConfiguration.class)
 public @interface EnableAtomic {
 
-    /**
-     * 项目名称
-     * @return 项目名称
-     */
-    String projectName();
-
-    /**
-     * 测试运行人
-     * @return 测试运行人
-     */
-    String runner();
 }

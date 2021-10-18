@@ -1,7 +1,8 @@
 package com.atomic.annotations;
 
 import cn.hutool.core.util.StrUtil;
-import com.atomic.config.TesterConfig;
+import com.atomic.config.ConfigConstants;
+import com.atomic.config.AtomicConfig;
 import com.atomic.exception.AnnotationException;
 import com.atomic.param.Constants;
 import com.atomic.tools.autotest.AutoTest;
@@ -161,8 +162,9 @@ public abstract class AnnotationUtils {
 
     public static String getDubboVersion(ITestResult testResult) {
         String dubboServiceVersion = null;
-        if (TesterConfig.getServiceVersion() != null) {
-            dubboServiceVersion = TesterConfig.getServiceVersion();
+        final String dubboService = AtomicConfig.getStr(ConfigConstants.DUBBO_SERVICE_VERSION);
+        if (dubboService != null) {
+            dubboServiceVersion = dubboService;
         } else if (isServiceVersion(getTestMethod(testResult))) {
             dubboServiceVersion = getServiceVersion(getTestMethod(testResult));
         }
@@ -177,8 +179,9 @@ public abstract class AnnotationUtils {
 
     public static String getDubboGroup(ITestResult testResult) {
         String dubboGroup = null;
-        if (StrUtil.isNotBlank(TesterConfig.getServiceGroup())) {
-            dubboGroup = TesterConfig.getServiceGroup();
+        final String dubboServiceGroup = AtomicConfig.getStr(ConfigConstants.DUBBO_SERVICE_GROUP);
+        if (StrUtil.isNotBlank(dubboServiceGroup)) {
+            dubboGroup = dubboServiceGroup;
         } else if (isServiceGroup(getTestMethod(testResult))) {
             dubboGroup = getServiceGroup(getTestMethod(testResult));
         }

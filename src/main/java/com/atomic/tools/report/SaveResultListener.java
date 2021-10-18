@@ -2,10 +2,11 @@ package com.atomic.tools.report;
 
 import cn.hutool.db.Entity;
 import com.alibaba.fastjson.JSON;
-import com.atomic.config.TesterConfig;
+import com.atomic.config.ConfigConstants;
+import com.atomic.config.AtomicConfig;
 import com.atomic.param.Constants;
-import com.atomic.util.TestNGUtils;
 import com.atomic.util.GsonUtils;
+import com.atomic.util.TestNGUtils;
 import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,8 +144,8 @@ public class SaveResultListener extends TestListenerAdapter {
     private void init() {
         // 加载环境配置文件
         // 项目名称
-        String projectName = TesterConfig.getProjectName();
-        this.runAuthor = TesterConfig.getRunner();
+        String projectName = AtomicConfig.getStr(ConfigConstants.PROJECT_NAME);
+        this.runAuthor = AtomicConfig.getStr(ConfigConstants.RUNNER);
         if (StringUtils.isEmpty(projectName)) {
             projectName = "default";
         }

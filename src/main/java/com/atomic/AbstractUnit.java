@@ -1,7 +1,7 @@
 package com.atomic;
 
-import com.atomic.tools.mock.listener.SoaMockListener;
 import com.atomic.param.util.DataProviderUtils;
+import com.atomic.tools.mock.listener.SoaMockListener;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -15,20 +15,17 @@ import java.util.Iterator;
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, SoaMockListener.class})
 public abstract class AbstractUnit extends AbstractTestNGSpringContextTests {
 
-    // @DataProvider(name = "excel")
-    @DataProvider(name = "cases")
+    @DataProvider(name = "excel")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {
         return readDataForIntegration(method);
     }
 
-    // @DataProvider(name = "parallelExcel", parallel = true)
-    @DataProvider(name = "parallelCases", parallel = true)
+    @DataProvider(name = "parallelExcel", parallel = true)
     public Iterator<Object[]> parallelDataProvider(Method method) throws Exception {
         return readDataForIntegration(method);
     }
 
     private Iterator<Object[]> readDataForIntegration(Method method) throws Exception {
-        // return DataProviderUtils.readExcel(this, method);
         return DataProviderUtils.readDataSource(this, method);
     }
 }

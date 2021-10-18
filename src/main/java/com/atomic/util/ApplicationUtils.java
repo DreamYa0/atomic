@@ -54,7 +54,7 @@ public class ApplicationUtils implements ApplicationContextAware {
                         // 如果 interfaceType 实现了多个接口就没法了，BaseTestCase<T>必须填写接口
                         // 后期可以通过 method 来一起定位到底是哪个接口
                         Class<?>[] classes = interfaceType.getInterfaces();
-                        if (classes != null && classes.length > 0) {
+                        if (classes.length > 0) {
                             return applicationContext.getBean(classes[0]);
                         }
                     }

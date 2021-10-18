@@ -5,17 +5,15 @@ import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.rpc.service.GenericService;
+import com.atomic.config.ConfigConstants;
 import com.atomic.config.AtomicConfig;
-import com.atomic.config.TesterConfig;
 import com.atomic.exception.DubboServiceException;
-import com.atomic.param.Constants;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.testng.Reporter;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -31,26 +29,9 @@ public class DubboServiceFactory {
     private final Cache<String, GenericService> genericServiceCache = CacheBuilder.newBuilder().build();
     private final Cache<String, Object> serviceCache = CacheBuilder.newBuilder().build();
     private volatile String host = "172.16.2.124:2181";
-    private volatile String profile;
-
-    public DubboServiceFactory(String env) {
-        Map<String, String> maps = AtomicConfig.newInstance().readPropertyConfig(env);
-        host = maps.get(Constants.ZOOKEEPER);
-        application = new ApplicationConfig();
-        application.setName("atomic_config");
-        // 连接注册中心配置
-        registry = new RegistryConfig();
-        registry.setAddress("zookeeper://" + host);
-        registry.setUsername("atomic");
-        registry.setProtocol("dubbo");
-        registry.setRegister(false);
-    }
 
     public DubboServiceFactory() {
-        //加载环境配置文件
-        profile = TesterConfig.getProfile();
-        Map<String, String> maps = AtomicConfig.newInstance().readPropertyConfig(profile);
-        host = maps.get(Constants.ZOOKEEPER);
+        host = AtomicConfig.getStr(ConfigConstants.DUBBO_ZOOKEEPER);
         application = new ApplicationConfig();
         application.setName("atomic_config");
         // 连接注册中心配置
@@ -72,8 +53,9 @@ public class DubboServiceFactory {
     public <T> T getService(Class<? extends T> clazz, String version, String group) {
         //为获取覆盖率做全局配置,强制指定请求服务地址
         try {
-            if (TesterConfig.getHostDomain() != null) {
-                String url = "dubbo://" + TesterConfig.getHostDomain() + "/" + clazz.getName();
+            final String providerHost = AtomicConfig.getStr(ConfigConstants.DUBBO_PROVIDER_HOST);
+            if (StrUtil.isNotBlank(providerHost)) {
+                String url = "dubbo://" + providerHost + "/" + clazz.getName();
                 T t = getServiceByUrl(clazz, url, version, group);
                 checkService(t, clazz);
                 return t;
@@ -82,13 +64,13 @@ public class DubboServiceFactory {
         } catch (Exception e) {
             throw new DubboServiceException("获取dubbo服务异常！", e);
         }
-        return getService(clazz, profile, version, group);
+        return doGetService(clazz, version, group);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T getService(Class<? extends T> clazz, String profile, String version, String group) {
+    private <T> T doGetService(Class<? extends T> clazz, String version, String group) {
         // 先从缓存中获取服务，如果本地缓存没有此服务则从远程注册中心获取
-        String key = clazz.getName() + "_" + profile + "_" + version;
+        String key = clazz.getName() + "_" + "_" + version;
         Object object;
         try {
             object = serviceCache.get(key, () -> getRemoteService(clazz, version,

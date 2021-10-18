@@ -1,7 +1,9 @@
 package com.atomic.util;
 
-import cn.hutool.db.ds.DSFactory;
-import cn.hutool.setting.Setting;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.db.ds.simple.SimpleDataSource;
+import com.atomic.config.ConfigConstants;
+import com.atomic.config.AtomicConfig;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -80,11 +82,14 @@ public final class DataSourceUtils {
 
         } catch (Exception e) {
             // 如果从 spring 容器中获取DataSource 失败，则从加载数据库连接配置文件初始化
-            //自定义数据库Setting
-            Setting setting = new Setting("db.setting");
-            //获取指定配置，第二个参数为分组，用于多数据源，无分组情况下传null
-            DSFactory factory = DSFactory.create(setting);
-            DataSource dataSource = factory.getDataSource(dbName);
+            final String dbUrl = StrUtil.format(
+                    "jdbc:mysql://{}/{}" +
+                    "?useUnicode=true&characterEncoding=UTF8&zeroDateTimeBehavior=round&useSSL=false",
+                    AtomicConfig.getStr(ConfigConstants.DATABASE_URL),
+                    dbName);
+            DataSource dataSource = new SimpleDataSource(
+                    dbUrl, AtomicConfig.getStr(ConfigConstants.DATABASE_USER_NAME),
+                    AtomicConfig.getStr(ConfigConstants.DATABASE_PASSWORD));
             DATA_SOURCE_CONCURRENT_MAP.put(dbName, dataSource);
             return dataSource;
         }

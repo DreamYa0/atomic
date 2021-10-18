@@ -9,7 +9,10 @@ import org.testng.Reporter;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -20,57 +23,22 @@ import java.util.*;
  */
 public abstract class DataProviderUtils {
 
-//    public static Iterator<Object[]> readExcel(Object obj, Method method) throws Exception {
-//        String className = obj.getClass().getSimpleName();
-//        String resource = obj.getClass().getResource("").getPath();
-//        String xls = resource + className + ".xls";
-//
-//        // 获取接口已定义测试用例
-//        ExcelResolver excelUtil = new ExcelResolver(xls, method.getName());
-//        List<Map<String, Object>> list = excelUtil.readDataByRow();
-//
-//        Set<Object[]> set = Sets.newLinkedHashSet();
-//        // 如果有测试用例 testOnly 标志设置为1或者Y，则单独运行，其他没带此标志的测试用例跳过
-//        boolean hasTestOnly = false;
-//        for (Map<String, Object> map : list) {
-//            if (ParamUtils.isValueTrue(map.get(Constants.TEST_ONLY))) {
-//                hasTestOnly = true;
-//                break;
-//            }
-//        }
-//        for (Map<String, Object> map : list) {
-//            if (hasTestOnly) {
-//                if (!ParamUtils.isValueTrue(map.get(Constants.TEST_ONLY))) {
-//                    continue;
-//                }
-//            }
-//            // 注入默认值，否则执行时参数不匹配
-//            set.add(TestNGUtils.injectResultAndParametersByDefault(map, method));
-//        }
-//        return set.iterator();
-//    }
-
-    /** 读取测试用例数据并注入testNG上下文
+    /**
+     * 读取测试用例数据并注入testNG上下文
      * priority: yaml->xml->xls
      * xml文件读取暂不支持 2021-01-18
-     *
      */
     public static Iterator<Object[]> readDataSource(Object obj, Method method) throws Exception {
         String className = obj.getClass().getSimpleName();
         String resource = obj.getClass().getResource("").getPath();
         File caseFile = readCaseFile(resource + className);
 
-        if (caseFile.getAbsolutePath().substring(caseFile.getAbsolutePath().length() - 5).equals(".yaml")) {
+        if (caseFile.getAbsolutePath().endsWith(".yaml")) {
             return iterCaseFromYaml(caseFile, method);
-        } else if (caseFile.getAbsolutePath().substring(caseFile.getAbsolutePath().length() - 4).equals(".xml")) {
-            Set<Object[]> set = Sets.newLinkedHashSet();
-
-            return set.iterator();
-        } else if (caseFile.getAbsolutePath().substring(caseFile.getAbsolutePath().length() - 4).equals(".xls")) {
+        } else if (caseFile.getAbsolutePath().endsWith(".xls")) {
             return iterCaseFromExcel(caseFile.getAbsolutePath(), method);
         } else {
             Set<Object[]> set = Sets.newLinkedHashSet();
-
             return set.iterator();
         }
     }
@@ -78,6 +46,7 @@ public abstract class DataProviderUtils {
     /**
      * 按优先级返回文件对象
      * priority: yaml->xml->xls
+     *
      * @param filePath
      * @return
      */
@@ -105,6 +74,7 @@ public abstract class DataProviderUtils {
 
     /**
      * 提取yaml文件测试用例并注入testNG上下文
+     *
      * @param yamlFile
      * @param method
      * @return
@@ -133,6 +103,7 @@ public abstract class DataProviderUtils {
 
     /**
      * 提取excel文件测试用例并注入testNG上下文
+     *
      * @param excelFile
      * @param method
      * @return
