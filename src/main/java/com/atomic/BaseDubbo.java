@@ -279,7 +279,7 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
         //记录方法调用结束时间
         endTestTime(testResult);
 
-        if (result == null) {
+        if (!methodMeta.getReturnType().toString().equals("void") && result == null) {
             throw new InvokeException("调用测试方法返回结果为null！");
         }
 
