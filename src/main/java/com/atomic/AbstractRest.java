@@ -63,7 +63,7 @@ public abstract class AbstractRest {
     private Iterator<Object[]> readDataForTest(Method method) throws Exception {
         File caseFile = readCaseFile();
 
-        if (caseFile.getAbsolutePath().substring(caseFile.getAbsolutePath().length() - 5).equals(".yaml")) {
+        if (caseFile.getAbsolutePath().endsWith(".yaml")) {
             return iterCaseFromYaml(caseFile, method);
         } else if (caseFile.getAbsolutePath().substring(-4).equals(".xml")) {
             Set<Object[]> set = Sets.newLinkedHashSet();

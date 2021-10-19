@@ -1,37 +1,23 @@
 package com.atomic.tools.report;
 
-import cn.hutool.db.Entity;
-import com.atomic.config.ConfigConstants;
 import com.atomic.config.AtomicConfig;
+import com.atomic.config.ConfigConstants;
 import com.atomic.param.Constants;
-import com.atomic.util.TestNGUtils;
 import com.atomic.param.excel.parser.ExcelResolver;
 import com.atomic.util.GsonUtils;
+import com.atomic.util.TestNGUtils;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.model.TestAttribute;
-import com.google.common.collect.Maps;
 import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
-import org.testng.IReporter;
-import org.testng.IResultMap;
-import org.testng.ISuite;
-import org.testng.ISuiteResult;
-import org.testng.ITestContext;
-import org.testng.ITestResult;
-import org.testng.Reporter;
+import org.testng.*;
 import org.testng.xml.XmlSuite;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Comparator.comparing;
 
@@ -134,18 +120,6 @@ public class ReportListener implements IReporter {
             // 统计完成后清除suites集合，以免重复展示
             suites.clear();
         }
-        // 暂时做输出展示
-        /*Mongodb tools = new Mongodb.Builder().build().connectMongodb();
-        String Id = tools.getIdByExample("name", projectName + "#" + ExtentManager.newInstance().countBuild(projectName));
-        String reportURL = "http://10.200.173.92:1337/#/report-summary?id=" + Id;
-
-        System.out.println();
-        System.out.println("======================================================================================");
-        System.out.println();
-        System.out.println("报告地址：" + reportURL + "：报告地址");
-        System.out.println();
-        System.out.println("======================================================================================");
-        System.out.println();*/
     }
 
     private void buildTestNodes(ExtentTest extentTest, IResultMap resultMap, Status status) {
@@ -222,26 +196,6 @@ public class ReportListener implements IReporter {
                     }
                 }
 
-
-                /*Map<String, String> map = getParamAndReturn(result);
-                if (map != null) {
-                    test.info("入参：" + map.get("param"));
-                    test.info("出参：" + map.get("returnValue"));
-                    if ((AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(context) &&
-                            AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(result)) == CheckMode.NORMAL) || (!AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result))
-                            || !ParamUtils.isAutoAssert(context))) {
-                        if (map.get("expected_return") != null) {
-                            test.info("预期返回值：" + map.get("expected_return"));
-                        }
-                    }
-                    if (AnnotationUtils.isAutoAssert(TestNGUtils.getTestMethod(result)) && ParamUtils.isAutoAssert(context) &&
-                            AnnotationUtils.getCheckMode(TestNGUtils.getTestMethod(result)) == CheckMode.REPLAY) {
-                        String expectedReturn = AssertCheck.getExpectedReturn(HandleMethodName.getTestMethodName(result), map.get("param"));
-                        if (expectedReturn != null) {
-                            test.info("预期返回值：" + expectedReturn);
-                        }
-                    }
-                }*/
                 if (result.getThrowable() != null) {
                     test.log(status, result.getThrowable());
                 } else {
@@ -263,36 +217,6 @@ public class ReportListener implements IReporter {
             return str;
         }
         return str.replaceFirst(str.substring(0, 1), str.substring(0, 1).toUpperCase());
-    }
-
-    private Map<String, String> getParamAndReturn(ITestResult testResult) {
-
-        // 从库中获取对应测试的入参和返回值
-        Map<String, Object> param = TestNGUtils.getParamContext(testResult);
-        String className = HandleMethodName.getTestClassName(testResult);
-        String methodName = HandleMethodName.getTestMethodName(testResult);
-        String caseName;
-        if (param.get(Constants.CASE_NAME) == null) {
-            caseName = param.get(Constants.EXCEL_DESC).toString();
-        } else {
-            caseName = param.get(Constants.CASE_NAME).toString();
-        }
-        String sql = "SELECT * FROM autotest_result WHERE class_name=? AND methods_name=? AND case_name=? " +
-                "order by create_time desc";
-        Object[] params = {className, methodName, caseName};
-        Entity entity = ReportDb.query(sql, params);
-        Map<String, String> resultMap = Maps.newHashMap();
-        if (entity != null) {
-            resultMap.put("param", entity.getStr("methods_parameter"));
-            resultMap.put("returnValue", entity.getStr("methods_return"));
-            if (!"".equals(entity.getStr("expected_return")) && entity.getStr("expected_return") != null) {
-                resultMap.put("expected_return", entity.getStr("expected_return"));
-            } else {
-                resultMap.put("expected_return", null);
-            }
-            return resultMap;
-        }
-        return null;
     }
 
     private String createCaseName(ITestResult result) {
@@ -325,7 +249,7 @@ public class ReportListener implements IReporter {
         String name = sb.toString();
         if (sb.toString().length() > 0) {
             if (sb.toString().length() > 100) {
-                name = sb.toString().substring(0, 99) + "...";
+                name = sb.substring(0, 99) + "...";
             }
         } else {
             name = result.getMethod().getMethodName();

@@ -28,7 +28,7 @@ public class DubboServiceFactory {
     private final RegistryConfig registry;
     private final Cache<String, GenericService> genericServiceCache = CacheBuilder.newBuilder().build();
     private final Cache<String, Object> serviceCache = CacheBuilder.newBuilder().build();
-    private volatile String host = "172.16.2.124:2181";
+    private final String host;
 
     public DubboServiceFactory() {
         host = AtomicConfig.getStr(ConfigConstants.DUBBO_ZOOKEEPER);

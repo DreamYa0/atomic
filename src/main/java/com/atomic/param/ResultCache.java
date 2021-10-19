@@ -19,8 +19,8 @@ import static com.atomic.param.Constants.CASE_INDEX;
  */
 public final class ResultCache {
 
-    private static Cache<String, Object> testDataCache = CacheBuilder.newBuilder().build();
-    private static Cache<String, Object> testRequestCache = CacheBuilder.newBuilder().build();
+    private static final Cache<String, Object> TEST_DATA_CACHE = CacheBuilder.newBuilder().build();
+    private static final Cache<String, Object> TEST_REQUEST_CACHE = CacheBuilder.newBuilder().build();
 
     private ResultCache() {
     }
@@ -29,14 +29,14 @@ public final class ResultCache {
         // 把方法返回值保存到本地缓存中-Dubbo、Http
         if (Objects.nonNull(result)) {
             String name = TestNGUtils.getTestCaseClassName(testResult) + "_" + context.get(CASE_INDEX);
-            testDataCache.put(name, result);
+            TEST_DATA_CACHE.put(name, result);
         }
     }
 
     public static Object getTestResultInCache(String className, Object caseIndex) {
         // 从本地缓存中获取方法返回结果-Dubbo、Http
         String cacheKey = className + "_" + caseIndex;
-        return testDataCache.getIfPresent(cacheKey);
+        return TEST_DATA_CACHE.getIfPresent(cacheKey);
     }
 
     public static void saveTestRequestInCache(Object parameters,
@@ -45,13 +45,13 @@ public final class ResultCache {
 
         if (Objects.nonNull(parameters)) {
             String name = TestNGUtils.getTestCaseClassName(testResult) + "_" + context.get(CASE_INDEX);
-            testRequestCache.put(name, parameters);
+            TEST_REQUEST_CACHE.put(name, parameters);
         }
     }
 
     public static Object getTestRequestInCache(String className, Object caseIndex) {
         // 在场景测试时可以从本地缓存中获取接口入参对象
         String cacheKey = className + "_" + caseIndex;
-        return testRequestCache.getIfPresent(cacheKey);
+        return TEST_REQUEST_CACHE.getIfPresent(cacheKey);
     }
 }
