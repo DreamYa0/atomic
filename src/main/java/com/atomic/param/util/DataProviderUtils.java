@@ -47,8 +47,8 @@ public abstract class DataProviderUtils {
      * 按优先级返回文件对象
      * priority: yaml->xml->xls
      *
-     * @param filePath
-     * @return
+     * @param filePath 文件路径
+     * @return 文件流
      */
     private static File readCaseFile(String filePath) {
         // 优先级:1，读取yaml文件
@@ -75,9 +75,9 @@ public abstract class DataProviderUtils {
     /**
      * 提取yaml文件测试用例并注入testNG上下文
      *
-     * @param yamlFile
-     * @param method
-     * @return
+     * @param yamlFile yaml文件路径
+     * @param method   测试方法
+     * @return 迭代器
      * @throws Exception
      */
     public static Iterator<Object[]> iterCaseFromYaml(File yamlFile, Method method) throws Exception {
@@ -104,9 +104,9 @@ public abstract class DataProviderUtils {
     /**
      * 提取excel文件测试用例并注入testNG上下文
      *
-     * @param excelFile
-     * @param method
-     * @return
+     * @param excelFile excel文件路径
+     * @param method    测试方法
+     * @return 迭代器
      * @throws Exception
      */
     public static Iterator<Object[]> iterCaseFromExcel(String excelFile, Method method) throws Exception {

@@ -17,16 +17,12 @@ public abstract class AbstractDubbo {
     // @DataProvider(name = "excel")
     @DataProvider(name = "cases")
     public Iterator<Object[]> dataProvider(Method method) throws Exception {
-        return readDataForIntegration(method);
+        return DataProviderUtils.readDataSource(this, method);
     }
 
     // @DataProvider(name = "parallelExcel", parallel = true)
     @DataProvider(name = "parallelCases", parallel = true)
     public Iterator<Object[]> parallelDataProvider(Method method) throws Exception {
-        return readDataForIntegration(method);
-    }
-
-    private Iterator<Object[]> readDataForIntegration(Method method) throws Exception {
         return DataProviderUtils.readDataSource(this, method);
     }
 }
