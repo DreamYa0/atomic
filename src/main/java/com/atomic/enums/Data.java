@@ -11,12 +11,10 @@ public class Data {
     /**
      * 接口串行执行数据源名称
      */
-//    public static final String SINGLE = "excel";
     public static final String SINGLE = "cases";
 
     /**
      * 接口并行执行数据源名称
      */
-//    public static final String PARALLEL = "parallelExcel";
     public static final String PARALLEL = "parallelCases";
 }
