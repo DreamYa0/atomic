@@ -299,7 +299,6 @@ public abstract class BaseDubbo<T> extends AbstractDubbo implements IHookable, I
         assertResult(result, testResult, this, context, callback, parameters);
     }
 
-    @SuppressWarnings("unchecked")
     private void testCallBack(IHookCallBack callBack, ITestResult testResult) {
         // 测试方法回调
         try {

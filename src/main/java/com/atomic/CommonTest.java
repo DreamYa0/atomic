@@ -83,6 +83,8 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
     protected HttpServletRequest request;
     @Capturing
     protected HttpServletResponse response;
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors() * 4);
 
     @BeforeClass(alwaysRun = true)
     protected void beforeClass() throws Exception {
@@ -186,9 +188,8 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
                                  final ITestResult testResult) throws Exception {
 
         int threadCount = Integer.parseInt(context.get(THREAD_COUNT).toString());
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         // 构建完成服务
-        CompletionService completionService = new ExecutorCompletionService(executor);
+        CompletionService completionService = new ExecutorCompletionService(EXECUTOR);
         System.out.println("------------------- 多线程开始执行！-------------------");
         for (int i = 1; i <= threadCount; i++) {
             // 向线程池提交任务
@@ -204,7 +205,7 @@ public abstract class CommonTest<T> extends AbstractUnit implements ITestBase {
         }
         // 所有任务已经完成,关闭线程池
         System.out.println("------------------- 多线程执行完毕！-------------------");
-        executor.shutdown();
+        EXECUTOR.shutdown();
     }
 
     private void startRunTest(Map<String, Object> context,
