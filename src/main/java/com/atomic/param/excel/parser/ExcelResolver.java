@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author dreamyao
@@ -134,7 +131,7 @@ public class ExcelResolver {
         } catch (Exception ignored) {
         }
         if (sheetIndex < 0) {
-            sheetIndex = 0;
+            return new ArrayList<>();
         }
         return read(wb, sheetIndex);
     }

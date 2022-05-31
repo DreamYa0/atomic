@@ -161,22 +161,24 @@ public abstract class BaseRestful extends AbstractRest implements IHookable, ITe
 
     @SuppressWarnings("all")
     private RequestSpecification setHeader(RequestSpecification specification, String header) {
-        // 把Json字符串反序列化为Map<String,String>集合
-        Map<String, String> headerMap = GsonUtils.getGson().fromJson(header,
-                new TypeToken<Map<String, String>>() {
-                }.getType());
+        if (StrUtil.isNotBlank(header)) {
+            // 把Json字符串反序列化为Map<String,String>集合
+            Map<String, String> headerMap = GsonUtils.getGson().fromJson(header,
+                    new TypeToken<Map<String, String>>() {
+                    }.getType());
 
-        List<Header> headers = Lists.newArrayList();
+            List<Header> headers = Lists.newArrayList();
 
-        // 构造Header对象集合
-        Set<Map.Entry<String, String>> entries = headerMap.entrySet();
-        for (Map.Entry<String, String> entry : entries) {
-            Header head = new Header(entry.getKey(), entry.getValue());
-            headers.add(head);
+            // 构造Header对象集合
+            Set<Map.Entry<String, String>> entries = headerMap.entrySet();
+            for (Map.Entry<String, String> entry : entries) {
+                Header head = new Header(entry.getKey(), entry.getValue());
+                headers.add(head);
+            }
+
+            // 设置Header
+            specification = specification.headers(new Headers(headers));
         }
-
-        // 设置Header
-        specification = specification.headers(new Headers(headers));
         return specification;
     }
 

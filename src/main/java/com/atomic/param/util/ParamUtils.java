@@ -7,12 +7,7 @@ import com.atomic.exception.ParameterException;
 import com.atomic.exception.QueryDataException;
 import com.atomic.param.Constants;
 import com.atomic.param.entity.MethodMeta;
-import com.atomic.param.excel.handler.DateParamHandler;
-import com.atomic.param.excel.handler.EmailHandler;
-import com.atomic.param.excel.handler.IHandler;
-import com.atomic.param.excel.handler.IdCardHandler;
-import com.atomic.param.excel.handler.PhoneNoHandler;
-import com.atomic.param.excel.handler.RandomParamHandler;
+import com.atomic.param.excel.handler.*;
 import com.atomic.param.excel.parser.ExcelResolver;
 import com.atomic.tools.assertcheck.AssertCheckUtils;
 import com.atomic.tools.assertcheck.entity.AssertItem;
@@ -38,12 +33,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -249,7 +239,8 @@ public final class ParamUtils {
     }
 
     public static boolean isHttpHeaderNoNull(Map<String, Object> param) {
-        return StrUtil.isNotBlank(param.get(Constants.HTTP_HEADER).toString());
+        final Object header = param.get(Constants.HTTP_HEADER);
+        return Objects.nonNull(header) && StrUtil.isNotBlank(header.toString());
     }
 
     public static boolean isLoginUrlNoNull(Map<String, Object> param) {

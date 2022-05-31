@@ -12,7 +12,7 @@ import cn.hutool.setting.dialect.Props;
  */
 public class AtomicConfig {
 
-    private static final String TEST_CONFIG_FILE_PATH = "/test.properties";
+    private static final String TEST_CONFIG_FILE_PATH = "test.properties";
     private volatile static Props props;
 
     static {
