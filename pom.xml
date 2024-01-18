@@ -225,34 +225,6 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>artifactory</name>
-            <url>http://repo.chinawayltd.com/artifactory/g7-public</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <name>local-jfrog-releases</name>
-            <url>http://repo.chinawayltd.com/artifactory/libs-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>local-jfrog-snapshots</name>
-            <url>http://repo.chinawayltd.com/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>http://repo.chinawayltd.com/artifactory/g7-public</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <build>
         <plugins>
             <plugin>
